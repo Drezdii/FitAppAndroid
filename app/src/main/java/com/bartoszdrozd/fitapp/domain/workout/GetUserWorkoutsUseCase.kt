@@ -1,0 +1,23 @@
+package com.bartoszdrozd.fitapp.domain.workout
+
+import com.bartoszdrozd.fitapp.data.workout.IWorkoutRepository
+import com.bartoszdrozd.fitapp.di.IoDispatcher
+import com.bartoszdrozd.fitapp.domain.FlowUseCase
+import com.bartoszdrozd.fitapp.model.workout.Workout
+import com.bartoszdrozd.fitapp.utils.Result
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+
+class GetUserWorkoutsUseCase @Inject constructor(
+    private val workoutRepo: IWorkoutRepository,
+    @IoDispatcher private val dispatcher: CoroutineDispatcher
+) : FlowUseCase<GetUserWorkoutsParameters, List<Workout>>(dispatcher) {
+    override suspend fun execute(params: GetUserWorkoutsParameters): Flow<Result<List<Workout>>> {
+        return workoutRepo.getUserWorkoutsFlow(params.userId)
+    }
+}
+
+data class GetUserWorkoutsParameters(
+    val userId: String
+)

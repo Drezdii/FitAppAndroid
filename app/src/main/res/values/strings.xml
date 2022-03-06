@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">FitApp</string>
+    <string name="fitapp_name">Fit App</string>
+    <string name="sign_in">Sign in</string>
+    <string name="or_divider">or</string>
+    <string name="register">Register</string>
+    <string name="email">E-mail</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="signin_invalid_creds">Wrong e-mail or password.</string>
+    <string name="general_error">Something went wrong.</string>
+    <string name="username_hint">Username</string>
+    <string name="required_field">This field is required.</string>
+    <string name="invalid_email">Invalid e-mail address.</string>
+    <string name="email_in_use">This e-mail is already in use.</string>
+    <string name="username_too_short">Username must have at least 3 characters.</string>
+    <string name="nickname_in_use">This nickname is already in use.</string>
+    <string name="password_too_short">Password must have at least 6 characters.</string>
+    <string name="passwords_must_match">Passwords must match.</string>
+    <string name="password_confirm">Confirm password</string>
+    <string name="timeline">Timeline</string>
+    <string name="workout_type">Workout type</string>
+    <string name="weight_hint">Weight</string>
+    <string name="reps_divider">x</string>
+    <string name="reps_hint">Reps</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="add_set">Add set</string>
+    <string name="add_exercise">Add exercise</string>
+    <string name="delete_exercise">Delete exercise</string>
+    <string name="duration_placeholder">--:--:--</string>
+</resources>

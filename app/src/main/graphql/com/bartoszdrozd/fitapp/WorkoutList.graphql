@@ -1,0 +1,9 @@
+query WorkoutList($userid: ID!) {
+    userWorkouts(userid: $userid){
+        id
+        date
+        startDate
+        endDate
+        type
+    }
+}

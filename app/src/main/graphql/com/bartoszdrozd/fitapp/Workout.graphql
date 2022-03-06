@@ -1,0 +1,19 @@
+query Workout($id: ID!){
+    workout(id: $id) {
+        id
+        date
+        startDate
+        endDate
+        type
+        exercises {
+            id
+            exerciseInfoId
+            sets{
+                id
+                reps
+                weight
+                completed
+            }
+        }
+    }
+}

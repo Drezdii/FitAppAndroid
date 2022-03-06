@@ -1,0 +1,8 @@
+mutation SaveWorkout($workout: WorkoutInput!) {
+    saveWorkout(workout: $workout) {
+        id
+        exercises {
+            id
+        }
+    }
+}
