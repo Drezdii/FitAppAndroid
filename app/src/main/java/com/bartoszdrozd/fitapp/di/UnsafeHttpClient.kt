@@ -17,6 +17,7 @@ object UnsafeHttpClient {
     init {
         okHttpClient = getOkHttpBuilder()
             .connectTimeout(10, TimeUnit.SECONDS)
+            .addInterceptor(AuthInterceptor())
             .callTimeout(10, TimeUnit.SECONDS)
             .build()
     }

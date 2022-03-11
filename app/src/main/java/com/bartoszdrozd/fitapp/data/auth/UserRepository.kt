@@ -1,6 +1,7 @@
 package com.bartoszdrozd.fitapp.data.auth
 
 import com.bartoszdrozd.fitapp.domain.auth.RegisterUserParameters
+import com.bartoszdrozd.fitapp.model.user.User
 import com.bartoszdrozd.fitapp.utils.Result
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -14,7 +15,7 @@ class UserRepository @Inject constructor(
 ) : IUserRepository {
     override suspend fun signIn(email: String, password: String) {
         try {
-            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).await()
+            val res = FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).await()
         } catch (e: FirebaseAuthInvalidCredentialsException) {
             // Rethrow custom exception to not depend on Firebase classes other than in this repository
             throw InvalidCredentialsException()
@@ -40,5 +41,14 @@ class UserRepository @Inject constructor(
                 Result.Error(Exception("Something went wrong processing the request."))
             }
         }
+    }
+
+    override suspend fun getUser(): User? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getUserToken(): String {
+        val user = FirebaseAuth.getInstance().currentUser ?: return ""
+        return user.getIdToken(false).await().token ?: ""
     }
 }

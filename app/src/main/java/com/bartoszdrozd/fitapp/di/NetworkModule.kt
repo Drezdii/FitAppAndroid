@@ -9,13 +9,16 @@ import com.bartoszdrozd.fitapp.data.auth.IAuthService
 import com.bartoszdrozd.fitapp.data.auth.RegisterUserResponseErrorCode
 import com.bartoszdrozd.fitapp.type.Date
 import com.bartoszdrozd.fitapp.type.DateTime
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kotlinx.datetime.LocalDate
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDateTime
@@ -77,6 +80,7 @@ object NetworkModule {
     } else {
         OkHttpClient()
             .newBuilder()
+            .addInterceptor(AuthInterceptor())
             .connectTimeout(10, TimeUnit.SECONDS)
             .callTimeout(10, TimeUnit.SECONDS)
             .build()
@@ -102,4 +106,25 @@ object NetworkModule {
             .addCustomScalarAdapter(Date.type, KotlinxLocalDateAdapter)
             .addCustomScalarAdapter(DateTime.type, KotlinxInstantAdapter)
             .build()
+}
+
+class AuthInterceptor() : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        var token = ""
+        try {
+            token = FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.result?.token ?: ""
+        } catch (e: Exception) {
+            // Log exception
+        }
+
+        val request =
+            chain
+                .request()
+                .newBuilder()
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+        return chain.proceed(request)
+    }
+
 }

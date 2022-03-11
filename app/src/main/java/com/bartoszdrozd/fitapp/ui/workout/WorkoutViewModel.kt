@@ -85,7 +85,7 @@ class WorkoutViewModel @Inject constructor(
         val workout = getWorkoutCopy()
 
         val exercises = workout.exercises.toMutableList()
-        exercises.add(0, Exercise(lastTempIndex, exerciseInfoId))
+        exercises.add(Exercise(lastTempIndex, exerciseInfoId))
         workout.exercises = exercises
 
         updateState(workout)

@@ -37,7 +37,9 @@ fun WorkoutSetItem(
             })
         OutlinedTextField(
             value = set.reps.toString(),
-            onValueChange = { reps -> updateSet(set.copy(reps = reps.toInt())) },
+            onValueChange = { reps ->
+                updateSet(set.copy(reps = reps.toIntOrNull() ?: 0))
+            },
             Modifier.weight(1f),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             colors = TextFieldDefaults.outlinedTextFieldColors(
