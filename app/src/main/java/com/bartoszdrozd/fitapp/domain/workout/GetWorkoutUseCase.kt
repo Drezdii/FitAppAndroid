@@ -13,8 +13,8 @@ import javax.inject.Inject
 class GetWorkoutUseCase @Inject constructor(
     private val workoutRepo: IWorkoutRepository,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
-) : FlowUseCase<Int, Workout?>(dispatcher) {
-    override suspend fun execute(id: Int): Flow<Result<Workout?>> {
+) : FlowUseCase<Long, Workout?>(dispatcher) {
+    override suspend fun execute(id: Long): Flow<Result<Workout?>> {
         return workoutRepo.getWorkout(id)
     }
 }

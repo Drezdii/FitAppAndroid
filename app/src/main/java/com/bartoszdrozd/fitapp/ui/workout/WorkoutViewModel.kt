@@ -12,7 +12,6 @@ import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,12 +26,12 @@ class WorkoutViewModel @Inject constructor(
     val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState
 
     // Keep track of last temporary ID
-    private var lastTempIndex: Int = -1
+    private var lastTempIndex: Long = -1
         get() {
             return field--
         }
 
-    fun loadWorkout(id: Int) {
+    fun loadWorkout(id: Long) {
         viewModelScope.launch {
             getWorkoutUseCase(id).collect {
                 when (it) {
@@ -56,7 +55,7 @@ class WorkoutViewModel @Inject constructor(
         Workout::class.java
     )
 
-    fun deleteSet(set: WorkoutSet, exerciseId: Int) {
+    fun deleteSet(set: WorkoutSet, exerciseId: Long) {
         val workout = getWorkoutCopy()
 
         val exercise = workout.exercises.find { it.id == exerciseId }!!
@@ -67,7 +66,7 @@ class WorkoutViewModel @Inject constructor(
         updateState(workout)
     }
 
-    fun updateSet(set: WorkoutSet, exerciseId: Int) {
+    fun updateSet(set: WorkoutSet, exerciseId: Long) {
         val workout = getWorkoutCopy()
 
         val sets = workout.exercises.find { it.id == exerciseId }!!.sets.toMutableList()

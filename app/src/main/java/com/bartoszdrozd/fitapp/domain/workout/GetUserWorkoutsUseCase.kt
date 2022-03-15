@@ -12,12 +12,8 @@ import javax.inject.Inject
 class GetUserWorkoutsUseCase @Inject constructor(
     private val workoutRepo: IWorkoutRepository,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
-) : FlowUseCase<GetUserWorkoutsParameters, List<Workout>>(dispatcher) {
-    override suspend fun execute(params: GetUserWorkoutsParameters): Flow<Result<List<Workout>>> {
-        return workoutRepo.getUserWorkoutsFlow(params.userId)
+) : FlowUseCase<Unit, List<Workout>>(dispatcher) {
+    override suspend fun execute(params: Unit): Flow<Result<List<Workout>>> {
+        return workoutRepo.getUserWorkoutsFlow()
     }
 }
-
-data class GetUserWorkoutsParameters(
-    val userId: String
-)

@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "cc5be92c8ea2a02cc57647d704ba9851",
+    "version": 3,
+    "identityHash": "f7d1603c544441e386c1e22df7f1f78f",
     "entities": [
       {
         "tableName": "workouts",
@@ -51,7 +51,17 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_workouts_server_id",
+            "unique": true,
+            "columnNames": [
+              "server_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_workouts_server_id` ON `${TABLE_NAME}` (`server_id`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -134,7 +144,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cc5be92c8ea2a02cc57647d704ba9851')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f7d1603c544441e386c1e22df7f1f78f')"
     ]
   }
 }

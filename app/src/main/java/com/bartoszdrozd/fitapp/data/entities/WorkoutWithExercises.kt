@@ -1,4 +1,4 @@
-package com.bartoszdrozd.fitapp.data.workout.entity
+package com.bartoszdrozd.fitapp.data.entities
 
 import androidx.room.Embedded
 import androidx.room.Relation

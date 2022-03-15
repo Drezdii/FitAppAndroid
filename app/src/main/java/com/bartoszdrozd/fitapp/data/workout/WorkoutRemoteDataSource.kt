@@ -13,41 +13,44 @@ import com.bartoszdrozd.fitapp.type.ExerciseInput
 import com.bartoszdrozd.fitapp.type.SetInput
 import com.bartoszdrozd.fitapp.type.WorkoutInput
 import com.bartoszdrozd.fitapp.type.WorkoutTypeCode
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class WorkoutRemoteDataSource @Inject constructor(
     private val apolloClient: ApolloClient
 ) : IWorkoutDataSource {
-    override suspend fun getUserWorkouts(userId: String): List<Workout> {
-        val result = apolloClient.query(WorkoutListQuery(userId)).execute().dataAssertNoErrors
+    override suspend fun getUserWorkouts(): Flow<List<Workout>> = flow {
+        val result = apolloClient.query(WorkoutListQuery()).execute().dataAssertNoErrors
 
-        return result.userWorkouts.map { workout ->
+        emit(result.userWorkouts.map { workout ->
             Workout(
-                workout.id.toInt(),
+                workout.id.toLong(),
                 workout.date,
                 workout.startDate,
                 workout.endDate,
                 WorkoutType.valueOf(workout.type.name)
             )
-        }
+        })
     }
 
-    override suspend fun getWorkout(id: Int): Workout? {
+
+    override suspend fun getWorkout(id: Long): Workout? {
         val result = apolloClient.query(WorkoutQuery(id.toString())).execute().dataAssertNoErrors
         return result.workout?.let { wrk ->
             Workout(
-                wrk.id.toInt(),
+                wrk.id.toLong(),
                 wrk.date,
                 wrk.startDate,
                 wrk.endDate,
                 WorkoutType.valueOf(wrk.type.name),
                 exercises = wrk.exercises.map { exr ->
                     Exercise(
-                        exr.id.toInt(),
+                        exr.id.toLong(),
                         exr.exerciseInfoId,
                         sets = exr.sets.map { set ->
                             WorkoutSet(
-                                set.id.toInt(),
+                                set.id.toLong(),
                                 set.reps,
                                 set.weight,
                                 set.completed
@@ -59,7 +62,7 @@ class WorkoutRemoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun saveWorkout(workout: Workout): Workout {
+    override suspend fun saveFullWorkout(workout: Workout): Workout {
         val workoutInput = WorkoutInput(
             id = workout.id.toString(),
             date = workout.date,
@@ -81,5 +84,9 @@ class WorkoutRemoteDataSource @Inject constructor(
             apolloClient.mutation(SaveWorkoutMutation(workoutInput)).execute().dataAssertNoErrors
 
         return Workout()
+    }
+
+    override suspend fun saveWorkouts(workouts: List<Workout>) {
+        TODO("Not yet implemented")
     }
 }

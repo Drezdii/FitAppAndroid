@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "cc5be92c8ea2a02cc57647d704ba9851",
+    "version": 5,
+    "identityHash": "7c7a7a309ff098a27df37c9366b31e85",
     "entities": [
       {
         "tableName": "workouts",
@@ -51,16 +51,32 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_workouts_server_id",
+            "unique": true,
+            "columnNames": [
+              "server_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_workouts_server_id` ON `${TABLE_NAME}` (`server_id`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
         "tableName": "exercises",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `exercise_info_id` INTEGER NOT NULL, `workoutId` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `server_id` INTEGER NOT NULL, `exercise_info_id` INTEGER NOT NULL, `workoutId` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serverId",
+            "columnName": "server_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -88,11 +104,17 @@
       },
       {
         "tableName": "sets",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `reps` INTEGER NOT NULL, `weight` REAL NOT NULL, `completed` INTEGER NOT NULL, `exerciseId` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `server_id` INTEGER NOT NULL, `reps` INTEGER NOT NULL, `weight` REAL NOT NULL, `completed` INTEGER NOT NULL, `exerciseId` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serverId",
+            "columnName": "server_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -134,7 +156,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cc5be92c8ea2a02cc57647d704ba9851')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7c7a7a309ff098a27df37c9366b31e85')"
     ]
   }
 }

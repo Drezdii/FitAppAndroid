@@ -100,11 +100,11 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(
                             "workout/{workoutId}",
-                            arguments = listOf(navArgument("workoutId") { type = NavType.IntType })
+                            arguments = listOf(navArgument("workoutId") { type = NavType.LongType })
                         ) { backStackEntry ->
                             WorkoutScreen(
                                 workoutViewModel = hiltViewModel(),
-                                backStackEntry.arguments?.getInt("workoutId") ?: -1
+                                backStackEntry.arguments?.getLong("workoutId") ?: -1L
                             )
                         }
                     }

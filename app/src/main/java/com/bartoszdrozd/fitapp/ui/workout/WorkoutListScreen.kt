@@ -26,7 +26,7 @@ import com.bartoszdrozd.fitapp.utils.toWorkoutDate
 import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
 
 @Composable
-fun WorkoutListScreen(viewModel: WorkoutListViewModel, onWorkoutClick: (Int) -> Unit) {
+fun WorkoutListScreen(viewModel: WorkoutListViewModel, onWorkoutClick: (Long) -> Unit) {
     val workouts by viewModel.workouts.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -39,7 +39,7 @@ fun WorkoutListScreen(viewModel: WorkoutListViewModel, onWorkoutClick: (Int) -> 
 @Composable
 fun WorkoutList(
     workoutList: List<Workout>,
-    onWorkoutClick: (Int) -> Unit
+    onWorkoutClick: (Long) -> Unit
 ) {
     LazyColumn {
         items(workoutList) { workout ->
@@ -52,7 +52,7 @@ fun WorkoutList(
 @Composable
 fun WorkoutItem(
     workout: Workout,
-    onWorkoutClick: (Int) -> Unit
+    onWorkoutClick: (Long) -> Unit
 ) {
     OutlinedCard(
         Modifier

@@ -1,17 +1,18 @@
 package com.bartoszdrozd.fitapp.di
 
+import android.content.Context
+import androidx.room.Room
 import com.apollographql.apollo3.ApolloClient
+import com.bartoszdrozd.fitapp.AppDatabase
 import com.bartoszdrozd.fitapp.data.auth.IAuthService
 import com.bartoszdrozd.fitapp.data.auth.IUserRepository
 import com.bartoszdrozd.fitapp.data.auth.UserRepository
-import com.bartoszdrozd.fitapp.data.workout.IWorkoutDataSource
-import com.bartoszdrozd.fitapp.data.workout.IWorkoutRepository
-import com.bartoszdrozd.fitapp.data.workout.WorkoutRemoteDataSource
-import com.bartoszdrozd.fitapp.data.workout.WorkoutRepository
+import com.bartoszdrozd.fitapp.data.workout.*
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Named
 import javax.inject.Singleton
@@ -27,12 +28,32 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun providesWorkoutRepository(@Named("workoutRemoteDataSource") remoteDataSource: IWorkoutDataSource): IWorkoutRepository =
-        WorkoutRepository(remoteDataSource)
+    fun providesWorkoutRepository(
+        @Named("workoutRemoteDataSource") remoteDataSource: IWorkoutDataSource,
+        @Named("workoutLocalDataSource") localDataSource: IWorkoutDataSource,
+        workoutDao: WorkoutDao
+    ): IWorkoutRepository =
+        WorkoutRepository(remoteDataSource, localDataSource, workoutDao)
 
     @Provides
     @Singleton
     @Named("workoutRemoteDataSource")
     fun providesWorkoutRemoteDataSource(apolloClient: ApolloClient): IWorkoutDataSource =
         WorkoutRemoteDataSource(apolloClient)
+
+    @Provides
+    @Singleton
+    @Named("workoutLocalDataSource")
+    fun providesWorkoutLocalDataSource(workoutDao: WorkoutDao): IWorkoutDataSource =
+        WorkoutLocalDataSource(workoutDao)
+
+    @Provides
+    @Singleton
+    fun providesWorkoutDao(database: AppDatabase): WorkoutDao = database.workoutDao()
+
+    @Provides
+    @Singleton
+    fun providesAppDatabase(@ApplicationContext context: Context): AppDatabase =
+        Room.databaseBuilder(context, AppDatabase::class.java, "FitAppDb")
+            .fallbackToDestructiveMigration().build()
 }

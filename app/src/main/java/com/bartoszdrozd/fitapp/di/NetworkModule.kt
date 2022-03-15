@@ -108,7 +108,7 @@ object NetworkModule {
             .build()
 }
 
-class AuthInterceptor() : Interceptor {
+class AuthInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         var token = ""
         try {

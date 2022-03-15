@@ -3,7 +3,6 @@ package com.bartoszdrozd.fitapp.ui.workout
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bartoszdrozd.fitapp.domain.workout.GetUserWorkoutsParameters
 import com.bartoszdrozd.fitapp.domain.workout.GetUserWorkoutsUseCase
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutType
@@ -30,7 +29,7 @@ class WorkoutListViewModel @Inject constructor(
 
     fun getWorkouts() {
         viewModelScope.launch {
-            getUserWorkoutsUseCase(GetUserWorkoutsParameters("Zf42J6wSkUTJWcBRfdCJCViuVxu1")).collect {
+            getUserWorkoutsUseCase(Unit).collect {
                 if (it !is Result.Loading) {
                     _isLoading.value = false
                 }

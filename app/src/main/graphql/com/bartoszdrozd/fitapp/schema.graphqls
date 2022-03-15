@@ -5,7 +5,7 @@ schema {
 
 type Query {
     workout(id: ID!) : WorkoutType
-    userWorkouts(userid: ID!) : [WorkoutType!]!
+    userWorkouts : [WorkoutType!]!
 }
 
 type Mutation {
@@ -35,7 +35,7 @@ input SetInput {
     completed: Boolean!
 }
 
-type WorkoutType {
+type WorkoutType  {
     id: ID!
     date: Date!
     startDate: DateTime

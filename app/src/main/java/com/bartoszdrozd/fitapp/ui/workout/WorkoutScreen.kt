@@ -29,16 +29,16 @@ import com.bartoszdrozd.fitapp.utils.toWorkoutDate
 import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
 
 interface WorkoutActions {
-    fun updateSet(set: WorkoutSet, exerciseId: Int)
+    fun updateSet(set: WorkoutSet, exerciseId: Long)
     fun addSet(exercise: Exercise)
-    fun deleteSet(set: WorkoutSet, exerciseId: Int)
+    fun deleteSet(set: WorkoutSet, exerciseId: Long)
     fun addExercise(exerciseInfoId: Int)
     fun deleteExercise(exercise: Exercise)
     fun saveWorkout()
 }
 
 @Composable
-fun WorkoutScreen(workoutViewModel: WorkoutViewModel, workoutId: Int) {
+fun WorkoutScreen(workoutViewModel: WorkoutViewModel, workoutId: Long) {
     val state by workoutViewModel.workoutUiState.collectAsState()
 
     LaunchedEffect(Unit) {
@@ -46,7 +46,7 @@ fun WorkoutScreen(workoutViewModel: WorkoutViewModel, workoutId: Int) {
     }
 
     val actions = object : WorkoutActions {
-        override fun updateSet(set: WorkoutSet, exerciseId: Int) {
+        override fun updateSet(set: WorkoutSet, exerciseId: Long) {
             workoutViewModel.updateSet(set, exerciseId)
         }
 
@@ -54,7 +54,7 @@ fun WorkoutScreen(workoutViewModel: WorkoutViewModel, workoutId: Int) {
             workoutViewModel.addSet(exercise)
         }
 
-        override fun deleteSet(set: WorkoutSet, exerciseId: Int) {
+        override fun deleteSet(set: WorkoutSet, exerciseId: Long) {
             workoutViewModel.deleteSet(set, exerciseId)
         }
 
@@ -185,7 +185,7 @@ fun WorkoutPreview() {
     )
 
     val actions = object : WorkoutActions {
-        override fun updateSet(set: WorkoutSet, exerciseId: Int) {
+        override fun updateSet(set: WorkoutSet, exerciseId: Long) {
             TODO("Not yet implemented")
         }
 
@@ -193,7 +193,7 @@ fun WorkoutPreview() {
             TODO("Not yet implemented")
         }
 
-        override fun deleteSet(set: WorkoutSet, exerciseId: Int) {
+        override fun deleteSet(set: WorkoutSet, exerciseId: Long) {
             TODO("Not yet implemented")
         }
 

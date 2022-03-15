@@ -1,5 +1,5 @@
-query WorkoutList($userid: ID!) {
-    userWorkouts(userid: $userid){
+query WorkoutList {
+    userWorkouts {
         id
         date
         startDate
