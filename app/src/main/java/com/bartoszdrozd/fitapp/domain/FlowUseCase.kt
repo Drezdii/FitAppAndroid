@@ -11,7 +11,8 @@ abstract class FlowUseCase<in P, R>(private val coroutineDispatcher: CoroutineDi
     suspend operator fun invoke(params: P): Flow<Result<R>> = execute(params)
         .catch { e ->
             Log.d("TEST", e.message.toString())
-            emit(Result.Error(Exception(e)))
+            throw e
+//            emit(Result.Error(Exception(e)))
         }
         .flowOn(coroutineDispatcher)
 

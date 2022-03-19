@@ -1,11 +1,13 @@
 package com.bartoszdrozd.fitapp.data.workout
 
-import android.util.Log
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.Result
 import com.bartoszdrozd.fitapp.utils.toModel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -14,31 +16,28 @@ class WorkoutRepository @Inject constructor(
     @Named("workoutLocalDataSource") private val localDataSource: IWorkoutDataSource,
     private val workoutDao: WorkoutDao
 ) : IWorkoutRepository {
-    override suspend fun getUserWorkoutsFlow(): Flow<Result<List<Workout>>> = flow {
-//        val token = FirebaseAuth.getInstance().currentUser?.getIdToken(false)?.await()?.token
-//        Log.d("TEST", token.toString())
-        // TODO: Emit data from cache
-        emit(Result.Success(emptyList()))
-        emit(Result.Loading)
-        remoteDataSource.getUserWorkouts().collect {
-            localDataSource.saveWorkouts(it)
-        }
+    override suspend fun getUserWorkoutsFlow(): Flow<Result<List<Workout>>> = channelFlow {
+        coroutineScope {
+            launch {
+                localDataSource.getUserWorkouts().collect {
+                    send(Result.Success(it))
+                }
+            }
 
-        localDataSource.getUserWorkouts().collect {
-            emit(Result.Success(it))
+            launch {
+                remoteDataSource.getUserWorkouts().collect {
+                    localDataSource.saveWorkouts(it)
+                }
+            }
         }
     }
 
     override suspend fun getWorkout(id: Long): Flow<Result<Workout?>> = flow {
-        // TODO: Emit data from cache
-        emit(Result.Success(null))
-        emit(Result.Loading)
+        val workout = localDataSource.getWorkout(id)
 
-        val workout = workoutDao.get(id)
-
-        if (workout != null) {
+        if (workout != null && workout.exercises.isNotEmpty()) {
             // Emit from cache
-            emit(Result.Success(workout.toModel()))
+            emit(Result.Success(workout))
         } else {
             // Get the workout from the server
             // Map id to server-side ID
@@ -54,26 +53,34 @@ class WorkoutRepository @Inject constructor(
                 emit(Result.Error(IllegalArgumentException("Couldn't find a workout with provided server-side ID.")))
             }
         }
-//        if (workout != null) {
-////            val res = localDataSource.saveFullWorkout(workout)
-//            localDataSource.getWorkout(res.id)
-//            emit(Result.Success(workout))
-//        } else {
-//            emit(Result.Error(IllegalArgumentException("Couldn't find a workout with provided server-side ID.")))
-//        }
     }
 
     override suspend fun saveWorkout(workout: Workout): Result<Unit> {
-        // Find server-side Id of workout
-        val realId = workoutDao.getRealId(workout.id) ?: return Result.Error(
-            IllegalArgumentException("Couldn't find a workout with provided ID.")
-        )
+        val wrk = workoutDao.get(workout.id)
+            ?: throw Exception("Couldn't save the workout. Workout not found.")
 
-        // Change client-side ID to server-side ID
-        val workoutCopy = workout.copy(id = realId)
+        val model = wrk.workout.toModel()
 
+        val workoutCopy = model.copy(id = wrk.workout.serverId!!)
+
+        val exercises = workout.exercises.map {
+            val cacheExercise =
+                wrk.exercises.find { ex -> ex.exercise.id == it.id }
+
+            val serverId = cacheExercise?.exercise?.serverId ?: -1
+
+            val exercise = it.copy(id = serverId)
+            exercise.sets = it.sets.map { set ->
+                val setServerId = cacheExercise?.sets?.find { s -> s.id == set.id }?.serverId ?: -1
+                set.copy(id = setServerId)
+            }
+
+            exercise
+        }
+
+        workoutCopy.exercises = exercises
         remoteDataSource.saveFullWorkout(workoutCopy)
-        Log.d("TEST", "Saved")
+
         return Result.Success(Unit)
     }
 }

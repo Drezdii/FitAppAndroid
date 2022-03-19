@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 8,
-    "identityHash": "57040eb4f9e150485fbb1178af9f0ab5",
+    "version": 2,
+    "identityHash": "cc5be92c8ea2a02cc57647d704ba9851",
     "entities": [
       {
         "tableName": "workouts",
@@ -51,32 +51,16 @@
           ],
           "autoGenerate": true
         },
-        "indices": [
-          {
-            "name": "index_workouts_server_id",
-            "unique": true,
-            "columnNames": [
-              "server_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_workouts_server_id` ON `${TABLE_NAME}` (`server_id`)"
-          }
-        ],
+        "indices": [],
         "foreignKeys": []
       },
       {
         "tableName": "exercises",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `server_id` INTEGER NOT NULL, `exercise_info_id` INTEGER NOT NULL, `workout_id` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `exercise_info_id` INTEGER NOT NULL, `workoutId` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "serverId",
-            "columnName": "server_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -88,7 +72,7 @@
           },
           {
             "fieldPath": "workoutId",
-            "columnName": "workout_id",
+            "columnName": "workoutId",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -99,32 +83,16 @@
           ],
           "autoGenerate": false
         },
-        "indices": [
-          {
-            "name": "index_exercises_server_id",
-            "unique": true,
-            "columnNames": [
-              "server_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_exercises_server_id` ON `${TABLE_NAME}` (`server_id`)"
-          }
-        ],
+        "indices": [],
         "foreignKeys": []
       },
       {
         "tableName": "sets",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `server_id` INTEGER NOT NULL, `reps` INTEGER NOT NULL, `weight` REAL NOT NULL, `completed` INTEGER NOT NULL, `exerciseId` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `reps` INTEGER NOT NULL, `weight` REAL NOT NULL, `completed` INTEGER NOT NULL, `exerciseId` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "serverId",
-            "columnName": "server_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -159,24 +127,14 @@
           ],
           "autoGenerate": false
         },
-        "indices": [
-          {
-            "name": "index_sets_server_id",
-            "unique": true,
-            "columnNames": [
-              "server_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_sets_server_id` ON `${TABLE_NAME}` (`server_id`)"
-          }
-        ],
+        "indices": [],
         "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '57040eb4f9e150485fbb1178af9f0ab5')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cc5be92c8ea2a02cc57647d704ba9851')"
     ]
   }
 }

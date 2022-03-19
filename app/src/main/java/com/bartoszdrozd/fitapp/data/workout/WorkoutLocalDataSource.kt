@@ -3,6 +3,7 @@ package com.bartoszdrozd.fitapp.data.workout
 import com.bartoszdrozd.fitapp.data.entities.WorkoutEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutSetEntity
 import com.bartoszdrozd.fitapp.model.workout.Workout
+import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 import com.bartoszdrozd.fitapp.utils.toEntity
 import com.bartoszdrozd.fitapp.utils.toModel
 import kotlinx.coroutines.flow.Flow
@@ -32,16 +33,14 @@ class WorkoutLocalDataSource(private val workoutDao: WorkoutDao) : IWorkoutDataS
     }
 
     override suspend fun saveFullWorkout(workout: Workout): Workout {
-        val exercises = workout.exercises.map {
-            it.toEntity(workout.id)
+        val workoutEntity = workout.toEntity()
+        workoutEntity.exercises = workout.exercises.map {
+            val exerciseEntity = it.toEntity()
+            exerciseEntity.sets = it.sets.map(WorkoutSet::toEntity)
+            exerciseEntity
         }
 
-        val sets = workout.exercises.flatMap { exercise ->
-            exercise.sets.map { it.toEntity(exercise.id) }
-        }
-
-
-        val res = workoutDao.saveWorkout(workout.toEntity(), exercises, sets = sets)
+        val res = workoutDao.saveWorkout(workoutEntity)
         return workoutDao.get(res)!!.workout.toModel()
     }
 

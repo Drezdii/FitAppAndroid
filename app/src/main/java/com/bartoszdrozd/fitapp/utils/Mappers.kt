@@ -33,19 +33,19 @@ fun Workout.toEntity(): WorkoutEntity = WorkoutEntity(
     type = type
 )
 
-fun Exercise.toEntity(workoutId: Long): ExerciseEntity =
-    ExerciseEntity(id = 0, serverId = id, exerciseInfoId = exerciseInfoId, workoutId = workoutId)
+fun Exercise.toEntity(): ExerciseEntity =
+    ExerciseEntity(id = 0, serverId = id, exerciseInfoId = exerciseInfoId, workoutId = 0)
 
 fun ExerciseEntity.toModel(): Exercise = Exercise(id, exerciseInfoId)
 
-fun WorkoutSet.toEntity(exerciseId: Long): WorkoutSetEntity =
+fun WorkoutSet.toEntity(): WorkoutSetEntity =
     WorkoutSetEntity(
         id = 0,
         serverId = id,
         reps = reps,
         weight = weight,
-        completed = true,
-        exerciseId = exerciseId
+        completed = completed,
+        exerciseId = 0
     )
 
 fun WorkoutSetEntity.toModel(): WorkoutSet = WorkoutSet(id, reps, weight, completed)

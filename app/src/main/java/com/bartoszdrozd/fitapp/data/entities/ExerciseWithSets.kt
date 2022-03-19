@@ -9,7 +9,7 @@ data class ExerciseWithSets(
     @Embedded val exercise: ExerciseEntity,
     @Relation(
         parentColumn = "id",
-        entityColumn = "exerciseId",
+        entityColumn = "exercise_id",
         entity = WorkoutSetEntity::class
     )
     val sets: List<WorkoutSetEntity>
