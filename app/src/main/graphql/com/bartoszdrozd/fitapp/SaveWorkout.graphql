@@ -1,8 +1,19 @@
 mutation SaveWorkout($workout: WorkoutInput!) {
     saveWorkout(workout: $workout) {
         id
+        date
+        startDate
+        endDate
+        type
         exercises {
             id
+            exerciseInfoId
+            sets {
+                id
+                reps
+                weight
+                completed
+            }
         }
     }
 }

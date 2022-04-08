@@ -10,8 +10,8 @@ import javax.inject.Inject
 class SaveWorkoutUseCase @Inject constructor(
     private val workoutRepository: IWorkoutRepository,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
-) : UseCase<Workout, Unit>(dispatcher) {
-    override suspend fun execute(params: Workout) {
-        workoutRepository.saveWorkout(params)
+) : UseCase<Workout, Long>(dispatcher) {
+    override suspend fun execute(params: Workout): Long {
+        return workoutRepository.saveWorkout(params)
     }
 }

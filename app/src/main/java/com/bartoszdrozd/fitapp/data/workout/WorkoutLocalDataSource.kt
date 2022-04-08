@@ -16,20 +16,23 @@ class WorkoutLocalDataSource(private val workoutDao: WorkoutDao) : IWorkoutDataS
         }
     }
 
-    override suspend fun getWorkout(id: Long): Workout? {
-        val workout = workoutDao.get(id) ?: return null
+    override suspend fun getWorkout(id: Long): Flow<Workout?> {
+        return workoutDao.get(id).map { workout ->
+            if (workout == null) {
+                return@map null
+            }
 
-        val exercises = workout.exercises.map {
-            val exercise = it.exercise.toModel()
-            exercise.sets = it.sets.map(WorkoutSetEntity::toModel)
+            val exercises = workout.exercises.map {
+                val exercise = it.exercise.toModel()
+                exercise.sets = it.sets.map(WorkoutSetEntity::toModel)
 
-            exercise
+                exercise
+            }
+
+            val wrk = workout.toModel()
+            wrk.exercises = exercises
+            wrk
         }
-
-        val wrk = workout.toModel()
-        wrk.exercises = exercises
-
-        return wrk
     }
 
     override suspend fun saveFullWorkout(workout: Workout): Workout {
@@ -40,13 +43,14 @@ class WorkoutLocalDataSource(private val workoutDao: WorkoutDao) : IWorkoutDataS
             exerciseEntity
         }
 
-        val res = workoutDao.saveWorkout(workoutEntity)
-        return workoutDao.get(res)!!.workout.toModel()
+        val workoutId = workoutDao.saveWorkout(workoutEntity)
+
+        return workoutDao.getOnce(workoutId)!!.toModel()
     }
 
-    override suspend fun saveWorkouts(workouts: List<Workout>) {
+    override suspend fun saveRemoteWorkouts(workouts: List<Workout>) {
         val entities = workouts.map(Workout::toEntity)
 
-        workoutDao.insertWorkouts(entities)
+        workoutDao.insertRemoteWorkouts(entities)
     }
 }

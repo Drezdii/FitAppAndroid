@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,7 +24,11 @@ class WorkoutViewModel @Inject constructor(
 ) : ViewModel() {
     private val _workoutUiState: MutableStateFlow<WorkoutUiState> =
         MutableStateFlow(WorkoutUiState())
+    private val _openExercises: MutableStateFlow<List<Long>> = MutableStateFlow(emptyList())
+
     val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState
+    val openExercises: StateFlow<List<Long>> = _openExercises
+
 
     // Keep track of last temporary ID
     private var lastTempIndex: Long = -1
@@ -45,8 +50,20 @@ class WorkoutViewModel @Inject constructor(
     }
 
     fun saveWorkout() {
+        // Mark workout as finished when saving
+        val workout = if (_workoutUiState.value.workout!!.endDate == null) {
+            getWorkoutCopy().copy(endDate = Clock.System.now())
+        } else {
+            _workoutUiState.value.workout!!
+        }
+
         viewModelScope.launch {
-            saveWorkoutUseCase(_workoutUiState.value.workout!!)
+            val res = saveWorkoutUseCase(workout)
+
+            // Load workout only if a new one was being added
+            if (res is Result.Success && workoutUiState.value.workout?.id == 0L) {
+                loadWorkout(res.data)
+            }
         }
     }
 
@@ -63,7 +80,7 @@ class WorkoutViewModel @Inject constructor(
         sets.remove(set)
         exercise.sets = sets
 
-        updateState(workout)
+        updateWorkoutState(workout)
     }
 
     fun updateSet(set: WorkoutSet, exerciseId: Long) {
@@ -77,17 +94,19 @@ class WorkoutViewModel @Inject constructor(
         }
         workout.exercises.find { it.id == exerciseId }!!.sets = sets
 
-        updateState(workout)
+        updateWorkoutState(workout)
     }
 
     fun addExercise(exerciseInfoId: Int) {
         val workout = getWorkoutCopy()
 
         val exercises = workout.exercises.toMutableList()
-        exercises.add(Exercise(lastTempIndex, exerciseInfoId))
+        val exercise = Exercise(lastTempIndex, exerciseInfoId)
+        exercises.add(exercise)
         workout.exercises = exercises
 
-        updateState(workout)
+        updateWorkoutState(workout)
+        _openExercises.value = _openExercises.value.toMutableList().also { it.add(exercise.id) }
     }
 
     fun addSet(exercise: Exercise) {
@@ -97,7 +116,7 @@ class WorkoutViewModel @Inject constructor(
         sets.add(WorkoutSet(lastTempIndex, 0, 0.0, false))
         workout.exercises.find { it.id == exercise.id }!!.sets = sets
 
-        updateState(workout)
+        updateWorkoutState(workout)
     }
 
     fun deleteExercise(exercise: Exercise) {
@@ -107,10 +126,16 @@ class WorkoutViewModel @Inject constructor(
         exercises.remove(exercise)
         workout.exercises = exercises
 
-        updateState(workout)
+        updateWorkoutState(workout)
     }
 
-    private fun updateState(workout: Workout) {
+    fun onClickExpand(id: Long) {
+        _openExercises.value = _openExercises.value.toMutableList().also {
+            if (it.contains(id)) it.remove(id) else it.add(id)
+        }
+    }
+
+    private fun updateWorkoutState(workout: Workout) {
         _workoutUiState.value = _workoutUiState.value.copy(workout = workout, isDirty = true)
     }
 }
@@ -118,5 +143,5 @@ class WorkoutViewModel @Inject constructor(
 data class WorkoutUiState(
     val workout: Workout? = null,
     val isLoading: Boolean = false,
-    val isDirty: Boolean = false
+    val isDirty: Boolean = false,
 )

@@ -14,6 +14,6 @@ class GetUserWorkoutsUseCase @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : FlowUseCase<Unit, List<Workout>>(dispatcher) {
     override suspend fun execute(params: Unit): Flow<Result<List<Workout>>> {
-        return workoutRepo.getUserWorkoutsFlow()
+        return workoutRepo.getUserWorkouts()
     }
 }

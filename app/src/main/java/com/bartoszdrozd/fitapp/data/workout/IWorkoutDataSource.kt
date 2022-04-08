@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface IWorkoutDataSource {
     suspend fun getUserWorkouts(): Flow<List<Workout>>
-    suspend fun getWorkout(id: Long): Workout?
+    suspend fun getWorkout(id: Long): Flow<Workout?>
     suspend fun saveFullWorkout(workout: Workout): Workout
-    suspend fun saveWorkouts(workouts: List<Workout>)
+    suspend fun saveRemoteWorkouts(workouts: List<Workout>)
 }

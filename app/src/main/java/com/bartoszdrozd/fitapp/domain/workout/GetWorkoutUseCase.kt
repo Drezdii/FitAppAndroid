@@ -7,6 +7,7 @@ import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
@@ -15,6 +16,11 @@ class GetWorkoutUseCase @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : FlowUseCase<Long, Workout?>(dispatcher) {
     override suspend fun execute(id: Long): Flow<Result<Workout?>> {
+        if (id == 0L) {
+            return flow {
+                emit(Result.Success(Workout()))
+            }
+        }
         return workoutRepo.getWorkout(id)
     }
 }

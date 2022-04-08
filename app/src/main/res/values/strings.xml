@@ -28,4 +28,19 @@
     <string name="add_exercise">Add exercise</string>
     <string name="delete_exercise">Delete exercise</string>
     <string name="duration_placeholder">--:--:--</string>
+
+    <!-- Exercise names definitions -->
+    <string name="deadlift">Deadlift</string>
+    <string name="bench">Bench</string>
+    <string name="squat">Squat</string>
+    <string name="ohp">OHP</string>
+    <string name="no_exercise_name">Exercise</string>
+    <string name="add_workout">Add workout</string>
+
+    <string-array name="exercise_names">
+        <item>@string/deadlift</item>
+        <item>@string/bench</item>
+        <item>@string/squat</item>
+        <item>@string/ohp</item>
+    </string-array>
 </resources>

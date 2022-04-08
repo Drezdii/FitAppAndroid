@@ -10,10 +10,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -27,6 +24,8 @@ import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.utils.toWorkoutDate
 import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
+import kotlinx.coroutines.delay
+import kotlinx.datetime.Clock
 
 interface WorkoutActions {
     fun updateSet(set: WorkoutSet, exerciseId: Long)
@@ -35,11 +34,13 @@ interface WorkoutActions {
     fun addExercise(exerciseInfoId: Int)
     fun deleteExercise(exercise: Exercise)
     fun saveWorkout()
+    fun onClickExpand(exerciseId: Long)
 }
 
 @Composable
 fun WorkoutScreen(workoutViewModel: WorkoutViewModel, workoutId: Long) {
     val state by workoutViewModel.workoutUiState.collectAsState()
+    val openExercises by workoutViewModel.openExercises.collectAsState()
 
     LaunchedEffect(Unit) {
         workoutViewModel.loadWorkout(workoutId)
@@ -69,16 +70,21 @@ fun WorkoutScreen(workoutViewModel: WorkoutViewModel, workoutId: Long) {
         override fun saveWorkout() {
             workoutViewModel.saveWorkout()
         }
+
+        override fun onClickExpand(exerciseId: Long) {
+            workoutViewModel.onClickExpand(exerciseId)
+        }
     }
 
     state.workout?.let {
-        WorkoutView(it, actions)
+        WorkoutView(it, actions, openExercises)
     }
 }
 
 @Composable
-private fun WorkoutView(workout: Workout, actions: WorkoutActions) {
+private fun WorkoutView(workout: Workout, actions: WorkoutActions, openExercises: List<Long>) {
     val smallPadding = dimensionResource(R.dimen.small_padding)
+
     LazyColumn(Modifier.padding(horizontal = smallPadding)) {
         item {
             WorkoutHeader(workout, actions::saveWorkout)
@@ -95,7 +101,11 @@ private fun WorkoutView(workout: Workout, actions: WorkoutActions) {
             }
         )
         { exercise ->
-            ExerciseItem(exercise, actions = actions)
+            ExerciseItem(
+                exercise,
+                actions = actions,
+                isExpanded = openExercises.contains(exercise.id)
+            )
         }
     }
 }
@@ -106,6 +116,7 @@ fun NewExerciseBar(addExercise: (Int) -> Unit) {
     val scrollState = rememberScrollState()
     val smallPadding = dimensionResource(R.dimen.small_padding)
     val verticalPadding = dimensionResource(R.dimen.vertical_padding)
+
     Row(
         Modifier
             .fillMaxWidth()
@@ -119,19 +130,25 @@ fun NewExerciseBar(addExercise: (Int) -> Unit) {
         Spacer(modifier = Modifier.width(smallPadding))
 
         com.bartoszdrozd.fitapp.ui.components.Chip(onClick = { addExercise(1) }) {
-            Text("Bench")
+            Text(stringResource(R.string.deadlift))
         }
 
         Spacer(modifier = Modifier.width(smallPadding))
 
         com.bartoszdrozd.fitapp.ui.components.Chip(onClick = { addExercise(2) }) {
-            Text("Deadlift")
+            Text(stringResource(R.string.bench))
         }
 
         Spacer(modifier = Modifier.width(smallPadding))
 
         com.bartoszdrozd.fitapp.ui.components.Chip(onClick = { addExercise(3) }) {
-            Text("Squat")
+            Text(stringResource(R.string.squat))
+        }
+
+        Spacer(modifier = Modifier.width(smallPadding))
+
+        com.bartoszdrozd.fitapp.ui.components.Chip(onClick = { addExercise(4) }) {
+            Text(stringResource(R.string.ohp))
         }
     }
 }
@@ -140,6 +157,8 @@ fun NewExerciseBar(addExercise: (Int) -> Unit) {
 @Composable
 private fun WorkoutHeader(workout: Workout, saveWorkout: () -> Unit) {
     val smallPadding = dimensionResource(R.dimen.small_padding)
+    var durationText by remember { mutableStateOf("") }
+
     ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -151,10 +170,20 @@ private fun WorkoutHeader(workout: Workout, saveWorkout: () -> Unit) {
                 .height(IntrinsicSize.Min)
         ) {
 
-            val durationText = if (workout.endDate != null && workout.startDate != null) {
-                workout.endDate.minus(workout.startDate).toWorkoutDuration()
+            if (workout.startDate != null && workout.endDate == null) {
+                LaunchedEffect(Unit) {
+                    while (true) {
+                        durationText =
+                            Clock.System.now().minus(workout.startDate).toWorkoutDuration()
+                        delay(1000)
+                    }
+                }
             } else {
-                stringResource(R.string.duration_placeholder)
+                durationText = if (workout.endDate != null && workout.startDate != null) {
+                    workout.endDate.minus(workout.startDate).toWorkoutDuration()
+                } else {
+                    stringResource(R.string.duration_placeholder)
+                }
             }
 
             WorkoutDateRow(date = workout.date.toWorkoutDate(), duration = durationText)
@@ -209,9 +238,12 @@ fun WorkoutPreview() {
             TODO("Not yet implemented")
         }
 
+        override fun onClickExpand(exerciseId: Long) {
+            TODO("Not yet implemented")
+        }
     }
 
     FitAppTheme {
-        WorkoutView(workout = workout, actions = actions)
+        WorkoutView(workout = workout, actions = actions, emptyList())
     }
 }
