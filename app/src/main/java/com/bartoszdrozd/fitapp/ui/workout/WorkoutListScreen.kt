@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -20,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutType.*
+import com.bartoszdrozd.fitapp.utils.modifyIf
 import com.bartoszdrozd.fitapp.utils.toWorkoutDate
 import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
 
@@ -40,18 +44,11 @@ fun WorkoutList(
     onWorkoutClick: (Long) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
-
-    LazyColumn(state = scrollState) {
-        item {
-            Button(
-                modifier = Modifier.fillMaxWidth(0.5f),
-                onClick = { onWorkoutClick(0) }
-            ) {
-                Text(stringResource(R.string.add_workout))
+    Column {
+        LazyColumn(state = scrollState) {
+            items(workoutList) { workout ->
+                WorkoutItem(workout, onWorkoutClick)
             }
-        }
-        items(workoutList) { workout ->
-            WorkoutItem(workout, onWorkoutClick)
         }
     }
 }
@@ -92,15 +89,20 @@ fun WorkoutItem(
                     .fillMaxHeight()
             )
 
-            val durationText = if (workout.endDate != null && workout.startDate != null) {
-                workout.endDate.minus(workout.startDate).toWorkoutDuration()
-            } else {
-                stringResource(R.string.duration_placeholder)
+            val durationText = when {
+                workout.startDate != null && workout.endDate != null -> {
+                    workout.endDate.minus(workout.startDate).toWorkoutDuration()
+                }
+                workout.startDate != null && workout.endDate == null -> {
+                    stringResource(id = R.string.active)
+                }
+                else -> stringResource(id = R.string.duration_placeholder)
             }
 
             WorkoutDateRow(
                 date = workout.date.toWorkoutDate(),
                 duration = durationText,
+                onDateClick = {},
                 Modifier.align(Alignment.CenterVertically)
             )
         }
@@ -108,15 +110,25 @@ fun WorkoutItem(
 }
 
 @Composable
-fun WorkoutDateRow(date: String, duration: String, modifier: Modifier = Modifier) {
-    Row(modifier) {
+fun WorkoutDateRow(
+    date: String,
+    duration: String,
+    onDateClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isEditing: Boolean = false,
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier.fillMaxWidth()
+    ) {
         Text(
             date,
             Modifier
-                .weight(1f),
+                .modifyIf(isEditing) {
+                    clickable(onClick = onDateClick)
+                },
             fontSize = 24.sp
         )
-
         Text(duration, fontSize = 24.sp)
     }
 }

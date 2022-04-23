@@ -4,7 +4,7 @@ import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
 
 @Entity(
-    tableName = "exercises", indices = [Index(value = ["server_id"], unique = true)],
+    tableName = "exercises",
     foreignKeys =
     [
         ForeignKey(
@@ -17,7 +17,6 @@ import androidx.room.ForeignKey.CASCADE
 )
 data class ExerciseEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
-    @ColumnInfo(name = "server_id") val serverId: Long,
     @ColumnInfo(name = "exercise_info_id") val exerciseInfoId: Int,
     @ColumnInfo(name = "workout_id", index = true) val workoutId: Long,
 ) {

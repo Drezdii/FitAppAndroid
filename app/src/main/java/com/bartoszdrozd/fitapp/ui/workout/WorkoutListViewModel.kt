@@ -10,7 +10,6 @@ import com.bartoszdrozd.fitapp.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -36,7 +35,9 @@ class WorkoutListViewModel @Inject constructor(
 
                 when (it) {
                     is Result.Success -> {
-                        _workouts.value = it.data
+                        _workouts.value = it.data.sortedByDescending { wrk ->
+                            wrk.date
+                        }
                     }
                     is Result.Error -> {
                         // Handle error here

@@ -25,27 +25,25 @@ fun WorkoutEntity.toModel(): Workout =
     Workout(id, date, startDate, endDate, WorkoutType.valueOf(type.name))
 
 fun Workout.toEntity(): WorkoutEntity = WorkoutEntity(
-    id = 0,
-    serverId = id,
+    id = id,
     date = date,
     startDate = startDate,
     endDate = endDate,
     type = type
 )
 
-fun Exercise.toEntity(): ExerciseEntity =
-    ExerciseEntity(id = 0, serverId = id, exerciseInfoId = exerciseInfoId, workoutId = 0)
+fun Exercise.toEntity(workoutId: Long): ExerciseEntity =
+    ExerciseEntity(id = id, exerciseInfoId = exerciseInfoId, workoutId = workoutId)
 
 fun ExerciseEntity.toModel(): Exercise = Exercise(id, exerciseInfoId)
 
-fun WorkoutSet.toEntity(): WorkoutSetEntity =
+fun WorkoutSet.toEntity(exerciseId: Long): WorkoutSetEntity =
     WorkoutSetEntity(
-        id = 0,
-        serverId = id,
+        id = id,
         reps = reps,
         weight = weight,
         completed = completed,
-        exerciseId = 0
+        exerciseId = exerciseId
     )
 
 fun WorkoutSetEntity.toModel(): WorkoutSet = WorkoutSet(id, reps, weight, completed)

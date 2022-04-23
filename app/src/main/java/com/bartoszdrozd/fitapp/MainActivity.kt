@@ -6,13 +6,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Velocity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -49,14 +55,49 @@ class MainActivity : ComponentActivity() {
         setContent {
             FitAppTheme {
                 val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination
+                val shouldExpandFAB = remember { mutableStateOf(true) }
+
+                val nestedScrollConnection = remember {
+                    object : NestedScrollConnection {
+                        override suspend fun onPreFling(available: Velocity): Velocity {
+                            shouldExpandFAB.value = when {
+                                available.y == 0F -> true
+                                available.y > 3000 -> true
+                                available.y < 3000 -> false
+                                else -> true
+                            }
+
+                            return Velocity.Zero
+                        }
+                    }
+                }
+
                 Scaffold(
+                    Modifier.nestedScroll(nestedScrollConnection),
                     topBar = {
                         SmallTopAppBar(title = { Text(text = "Top App Bar") })
                     },
+                    floatingActionButton = {
+                        when (currentDestination?.route) {
+                            "timeline" -> {
+                                ExtendedFloatingActionButton(
+                                    text = { Text(text = stringResource(id = R.string.add_workout)) },
+                                    icon = {
+                                        Icon(
+                                            Icons.Filled.Add,
+                                            contentDescription = "Add workout"
+                                        )
+                                    },
+                                    onClick = { navController.navigate("workout/0") },
+                                    expanded = shouldExpandFAB.value
+                                )
+                            }
+                        }
+                    },
                     bottomBar = {
                         NavigationBar {
-                            val navBackStackEntry by navController.currentBackStackEntryAsState()
-                            val currentDestination = navBackStackEntry?.destination
                             screens.forEach { screen ->
                                 NavigationBarItem(
                                     icon = {

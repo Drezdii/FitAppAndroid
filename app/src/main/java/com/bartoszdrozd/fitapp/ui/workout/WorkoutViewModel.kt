@@ -10,10 +10,14 @@ import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 import com.bartoszdrozd.fitapp.utils.Result
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,13 +29,17 @@ class WorkoutViewModel @Inject constructor(
     private val _workoutUiState: MutableStateFlow<WorkoutUiState> =
         MutableStateFlow(WorkoutUiState())
     private val _openExercises: MutableStateFlow<List<Long>> = MutableStateFlow(emptyList())
+    private val _savingResultEvent = Channel<Result<*>>()
+
+    private lateinit var _lastCleanWorkoutState: Workout
+
 
     val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState
     val openExercises: StateFlow<List<Long>> = _openExercises
+    val savingResultEvent: Flow<Result<*>> = _savingResultEvent.receiveAsFlow()
 
-
-    // Keep track of last temporary ID
-    private var lastTempIndex: Long = -1
+    // Keep track of the last temporary ID
+    private var tempIndex: Long = -1
         get() {
             return field--
         }
@@ -40,7 +48,12 @@ class WorkoutViewModel @Inject constructor(
         viewModelScope.launch {
             getWorkoutUseCase(id).collect {
                 when (it) {
-                    is Result.Success -> _workoutUiState.value = WorkoutUiState(it.data, false)
+                    is Result.Success -> {
+                        // Instantly mark new workout as dirty to display 'Save' button
+                        _workoutUiState.value =
+                            WorkoutUiState(it.data, false, isDirty = it.data.id == 0L)
+                        _lastCleanWorkoutState = it.data
+                    }
                     is Result.Error -> TODO()
                     is Result.Loading -> _workoutUiState.value =
                         _workoutUiState.value.copy(isLoading = true)
@@ -50,25 +63,22 @@ class WorkoutViewModel @Inject constructor(
     }
 
     fun saveWorkout() {
-        // Mark workout as finished when saving
-        val workout = if (_workoutUiState.value.workout!!.endDate == null) {
-            getWorkoutCopy().copy(endDate = Clock.System.now())
-        } else {
-            _workoutUiState.value.workout!!
-        }
-
         viewModelScope.launch {
-            val res = saveWorkoutUseCase(workout)
+            val res = saveWorkoutUseCase(_workoutUiState.value.workout)
 
-            // Load workout only if a new one was being added
-            if (res is Result.Success && workoutUiState.value.workout?.id == 0L) {
+            if (res is Result.Success) {
+                _savingResultEvent.send(Result.Success(Unit))
+            }
+
+            // Reload workout only if a new one was being added
+            if (res is Result.Success && workoutUiState.value.workout.id == 0L) {
                 loadWorkout(res.data)
             }
         }
     }
 
     private fun getWorkoutCopy(): Workout = gson.fromJson(
-        gson.toJson(_workoutUiState.value.workout!!, Workout::class.java),
+        gson.toJson(_workoutUiState.value.workout, Workout::class.java),
         Workout::class.java
     )
 
@@ -101,7 +111,7 @@ class WorkoutViewModel @Inject constructor(
         val workout = getWorkoutCopy()
 
         val exercises = workout.exercises.toMutableList()
-        val exercise = Exercise(lastTempIndex, exerciseInfoId)
+        val exercise = Exercise(tempIndex, exerciseInfoId)
         exercises.add(exercise)
         workout.exercises = exercises
 
@@ -113,7 +123,11 @@ class WorkoutViewModel @Inject constructor(
         val workout = getWorkoutCopy()
 
         val sets = workout.exercises.find { it.id == exercise.id }!!.sets.toMutableList()
-        sets.add(WorkoutSet(lastTempIndex, 0, 0.0, false))
+
+        val lastSet = if (sets.isNotEmpty()) sets.last() else WorkoutSet(0, 0, 0.0, false)
+
+        sets.add(WorkoutSet(tempIndex, lastSet.reps, lastSet.weight, false))
+
         workout.exercises.find { it.id == exercise.id }!!.sets = sets
 
         updateWorkoutState(workout)
@@ -129,19 +143,43 @@ class WorkoutViewModel @Inject constructor(
         updateWorkoutState(workout)
     }
 
+    fun updateDate(newDate: LocalDate) {
+        updateWorkoutState(_workoutUiState.value.workout.copy(date = newDate))
+    }
+
     fun onClickExpand(id: Long) {
         _openExercises.value = _openExercises.value.toMutableList().also {
             if (it.contains(id)) it.remove(id) else it.add(id)
         }
     }
 
+    fun changeWorkoutState() {
+        if (_workoutUiState.value.workout.startDate == null) {
+            val workout = getWorkoutCopy().copy(startDate = Clock.System.now())
+            _workoutUiState.value = _workoutUiState.value.copy(workout = workout)
+        } else {
+            val workout = getWorkoutCopy().copy(endDate = Clock.System.now())
+            _workoutUiState.value = _workoutUiState.value.copy(workout = workout)
+        }
+
+        saveWorkout()
+    }
+
     private fun updateWorkoutState(workout: Workout) {
         _workoutUiState.value = _workoutUiState.value.copy(workout = workout, isDirty = true)
+    }
+
+    fun cancelChanges() {
+        _workoutUiState.value = WorkoutUiState(
+            _lastCleanWorkoutState,
+            isLoading = false,
+            isDirty = false
+        )
     }
 }
 
 data class WorkoutUiState(
-    val workout: Workout? = null,
+    val workout: Workout = Workout(-1L),
     val isLoading: Boolean = false,
     val isDirty: Boolean = false,
 )
