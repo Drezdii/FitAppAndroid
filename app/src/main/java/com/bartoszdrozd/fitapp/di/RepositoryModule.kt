@@ -31,9 +31,8 @@ object RepositoryModule {
     fun providesWorkoutRepository(
         @Named("workoutRemoteDataSource") remoteDataSource: IWorkoutDataSource,
         @Named("workoutLocalDataSource") localDataSource: IWorkoutDataSource,
-        workoutDao: WorkoutDao
     ): IWorkoutRepository =
-        WorkoutRepository(remoteDataSource, localDataSource, workoutDao)
+        WorkoutRepository(remoteDataSource, localDataSource)
 
     @Provides
     @Singleton

@@ -3,14 +3,13 @@ package com.bartoszdrozd.fitapp.data.workout
 import com.bartoszdrozd.fitapp.data.entities.WorkoutEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutSetEntity
 import com.bartoszdrozd.fitapp.model.workout.Workout
-import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 import com.bartoszdrozd.fitapp.utils.toEntity
 import com.bartoszdrozd.fitapp.utils.toModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class WorkoutLocalDataSource(private val workoutDao: WorkoutDao) : IWorkoutDataSource {
-    override suspend fun getUserWorkouts(): Flow<List<Workout>> {
+    override suspend fun getWorkouts(): Flow<List<Workout>> {
         return workoutDao.getAll().map {
             it.map(WorkoutEntity::toModel)
         }
@@ -35,11 +34,12 @@ class WorkoutLocalDataSource(private val workoutDao: WorkoutDao) : IWorkoutDataS
         }
     }
 
-    override suspend fun saveFullWorkout(workout: Workout): Workout {
+    override suspend fun saveWorkout(workout: Workout): Workout {
         val workoutEntity = workout.toEntity()
-        workoutEntity.exercises = workout.exercises.map {
-            val exerciseEntity = it.toEntity()
-            exerciseEntity.sets = it.sets.map(WorkoutSet::toEntity)
+
+        workoutEntity.exercises = workout.exercises.map { exercise ->
+            val exerciseEntity = exercise.toEntity(workoutId = workout.id)
+            exerciseEntity.sets = exercise.sets.map { it.toEntity(exerciseId = exercise.id) }
             exerciseEntity
         }
 
@@ -48,9 +48,9 @@ class WorkoutLocalDataSource(private val workoutDao: WorkoutDao) : IWorkoutDataS
         return workoutDao.getOnce(workoutId)!!.toModel()
     }
 
-    override suspend fun saveRemoteWorkouts(workouts: List<Workout>) {
+    override suspend fun saveWorkouts(workouts: List<Workout>) {
         val entities = workouts.map(Workout::toEntity)
 
-        workoutDao.insertRemoteWorkouts(entities)
+        workoutDao.insert(entities)
     }
 }

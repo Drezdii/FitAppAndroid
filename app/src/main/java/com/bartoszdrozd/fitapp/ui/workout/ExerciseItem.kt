@@ -8,16 +8,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.workout.Exercise
+import kotlin.math.roundToInt
 
 fun exerciseIdToNameResId(id: Int): Int {
     return when (id) {
@@ -31,7 +33,7 @@ fun exerciseIdToNameResId(id: Int): Int {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExerciseItem(exercise: Exercise, actions: WorkoutActions, isExpanded: Boolean) {
+fun ExerciseItem(exercise: Exercise, actions: IWorkoutActions, isExpanded: Boolean) {
     val exerciseNameResId = rememberSaveable { exerciseIdToNameResId(exercise.exerciseInfoId) }
     val smallPadding = dimensionResource(R.dimen.small_padding)
 
@@ -44,27 +46,30 @@ fun ExerciseItem(exercise: Exercise, actions: WorkoutActions, isExpanded: Boolea
             Modifier
                 .padding(smallPadding)
         ) {
-            Row(
+            Column(
                 Modifier
                     .fillMaxWidth()
-                    .clickable { actions.onClickExpand(exercise.id) }) {
+            ) {
                 Text(
                     text = stringResource(exerciseNameResId),
                     Modifier
                         .padding(smallPadding)
-                        .weight(1f)
+                        .fillMaxWidth()
+                        .clickable { actions.onClickExpand(exercise.id) }
                 )
 
-                if (!isExpanded) {
-                    Text(
-                        text = pluralStringResource(
-                            id = R.plurals.plural_sets,
-                            count = exercise.sets.size,
-                            exercise.sets.size,
-                        ),
-                        Modifier.padding(smallPadding)
-                    )
-                }
+                OneRepMaxRow(exercise = exercise)
+
+//                if (!isExpanded) {
+//                    Text(
+//                        text = pluralStringResource(
+//                            id = R.plurals.plural_sets,
+//                            count = exercise.sets.size,
+//                            exercise.sets.size,
+//                        ),
+//                        Modifier.padding(smallPadding)
+//                    )
+//                }
             }
             Column {
                 exercise.sets.forEach { set ->
@@ -115,5 +120,44 @@ fun ExerciseItem(exercise: Exercise, actions: WorkoutActions, isExpanded: Boolea
                 }
             }
         }
+    }
+}
+
+@Composable
+fun OneRepMaxRow(exercise: Exercise) {
+    // Test with 1RM = 100kg
+    val oneRepMax = 100.0
+    val biggestSet = exercise.sets.maxByOrNull { it.weight } ?: return
+
+    var repsNeeded =
+        (-(biggestSet.weight - (1.0278 * oneRepMax)) / (0.0278 * oneRepMax)).roundToInt()
+            .coerceAtLeast(1)
+
+    // Take care of the edge case where current 1RM is equal to the heaviest set in the exercise
+    if (biggestSet.weight == oneRepMax) {
+        repsNeeded++
+    }
+
+    Row(
+        Modifier
+            .padding(dimensionResource(id = R.dimen.small_padding))
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (repsNeeded in 1..15) {
+            Icon(Icons.Outlined.EmojiEvents, contentDescription = null)
+
+            Text(
+                text = "Reps to beat 1RM: $repsNeeded",
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        val estimatedMax =
+            (biggestSet.weight / (1.0278 - (0.0278 * biggestSet.reps))).roundToInt()
+
+        Text(text = "Est. Max: ${estimatedMax}kg", style = MaterialTheme.typography.labelMedium)
     }
 }

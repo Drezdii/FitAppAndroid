@@ -36,6 +36,12 @@
     <string name="ohp">OHP</string>
     <string name="no_exercise_name">Exercise</string>
     <string name="add_workout">Add workout</string>
+    <string name="saved">Saved!</string>
+    <string name="start">Start</string>
+    <string name="finish">Finish</string>
+    <string name="active">Active</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
 
     <string-array name="exercise_names">
         <item>@string/deadlift</item>

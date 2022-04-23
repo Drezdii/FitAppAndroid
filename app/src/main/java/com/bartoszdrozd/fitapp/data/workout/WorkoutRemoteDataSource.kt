@@ -20,7 +20,7 @@ import javax.inject.Inject
 class WorkoutRemoteDataSource @Inject constructor(
     private val apolloClient: ApolloClient
 ) : IWorkoutDataSource {
-    override suspend fun getUserWorkouts(): Flow<List<Workout>> = flow {
+    override suspend fun getWorkouts(): Flow<List<Workout>> = flow {
         val result = apolloClient.query(WorkoutListQuery()).execute().dataAssertNoErrors
 
         emit(result.userWorkouts.map { workout ->
@@ -66,7 +66,7 @@ class WorkoutRemoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun saveFullWorkout(workout: Workout): Workout {
+    override suspend fun saveWorkout(workout: Workout): Workout {
         val workoutInput = WorkoutInput(
             id = workout.id.toString(),
             date = workout.date,
@@ -104,7 +104,7 @@ class WorkoutRemoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun saveRemoteWorkouts(workouts: List<Workout>) {
+    override suspend fun saveWorkouts(workouts: List<Workout>) {
         TODO("Not yet implemented")
     }
 }

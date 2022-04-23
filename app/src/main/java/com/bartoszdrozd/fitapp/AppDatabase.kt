@@ -11,7 +11,7 @@ import com.bartoszdrozd.fitapp.utils.RoomTypeConverters
 
 @Database(
     entities = [WorkoutEntity::class, ExerciseEntity::class, WorkoutSetEntity::class],
-    version = 13
+    version = 14
 )
 @TypeConverters(RoomTypeConverters::class)
 abstract class AppDatabase : RoomDatabase() {
