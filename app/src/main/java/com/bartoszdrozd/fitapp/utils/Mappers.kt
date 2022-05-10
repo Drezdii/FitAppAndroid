@@ -1,5 +1,8 @@
 package com.bartoszdrozd.fitapp.utils
 
+import com.bartoszdrozd.fitapp.data.dtos.ExerciseDTO
+import com.bartoszdrozd.fitapp.data.dtos.WorkoutDTO
+import com.bartoszdrozd.fitapp.data.dtos.WorkoutSetDTO
 import com.bartoszdrozd.fitapp.data.entities.ExerciseEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutSetEntity
@@ -53,3 +56,21 @@ fun WorkoutWithExercises.toModel(): Workout =
         workout.id, workout.date, workout.startDate, workout.endDate, workout.type,
         exercises.map { it.exercise.toModel() }
     )
+
+fun WorkoutDTO.toModel(): Workout = Workout(
+    id, date, startDate, endDate, type, exercises = exercises.map(ExerciseDTO::toModel)
+)
+
+fun ExerciseDTO.toModel(): Exercise =
+    Exercise(id, exerciseInfoId, sets = sets.map(WorkoutSetDTO::toModel))
+
+fun WorkoutSetDTO.toModel(): WorkoutSet = WorkoutSet(id, reps, weight, completed)
+
+fun Workout.toDTO(): WorkoutDTO = WorkoutDTO(
+    id, date, startDate, endDate, type, exercises = exercises.map(Exercise::toDTO)
+)
+
+fun Exercise.toDTO(): ExerciseDTO =
+    ExerciseDTO(id, exerciseInfoId, sets = sets.map(WorkoutSet::toDTO))
+
+fun WorkoutSet.toDTO(): WorkoutSetDTO = WorkoutSetDTO(id, reps, weight, completed)

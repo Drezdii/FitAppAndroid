@@ -2,7 +2,6 @@ package com.bartoszdrozd.fitapp.di
 
 import android.content.Context
 import androidx.room.Room
-import com.apollographql.apollo3.ApolloClient
 import com.bartoszdrozd.fitapp.AppDatabase
 import com.bartoszdrozd.fitapp.data.auth.IAuthService
 import com.bartoszdrozd.fitapp.data.auth.IUserRepository
@@ -37,8 +36,11 @@ object RepositoryModule {
     @Provides
     @Singleton
     @Named("workoutRemoteDataSource")
-    fun providesWorkoutRemoteDataSource(apolloClient: ApolloClient): IWorkoutDataSource =
-        WorkoutRemoteDataSource(apolloClient)
+    fun providesWorkoutRemoteDataSource(
+        workoutService: IWorkoutService,
+        userRepository: IUserRepository
+    ): IWorkoutDataSource =
+        WorkoutRemoteDataSource(workoutService, userRepository)
 
     @Provides
     @Singleton

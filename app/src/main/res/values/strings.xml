@@ -29,7 +29,6 @@
     <string name="delete_exercise">Delete exercise</string>
     <string name="duration_placeholder">--:--:--</string>
 
-    <!-- Exercise names definitions -->
     <string name="deadlift">Deadlift</string>
     <string name="bench">Bench</string>
     <string name="squat">Squat</string>
@@ -42,6 +41,9 @@
     <string name="active">Active</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="creator">Creator</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
 
     <string-array name="exercise_names">
         <item>@string/deadlift</item>

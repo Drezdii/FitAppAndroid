@@ -6,6 +6,7 @@ schema {
 type Query {
     workout(id: ID!) : WorkoutType
     userWorkouts : [WorkoutType!]!
+    oneRepMaxes: [OneRepMax]!
 }
 
 type Mutation {
@@ -15,7 +16,7 @@ type Mutation {
 
 input WorkoutInput {
     id: ID!
-    date: Date!
+    date: Date
     startDate: DateTime
     endDate: DateTime
     type: WorkoutTypeCode!
@@ -35,9 +36,21 @@ input SetInput {
     completed: Boolean!
 }
 
+type OneRepMax {
+    id: ID!
+    value: Float!
+    bigLiftType: BigLiftType!
+}
+
+enum BigLiftType {
+    DEADLIFT,
+    BENCH,
+    SQUAT
+}
+
 type WorkoutType  {
     id: ID!
-    date: Date!
+    date: Date
     startDate: DateTime
     endDate: DateTime
     type: WorkoutTypeCode!

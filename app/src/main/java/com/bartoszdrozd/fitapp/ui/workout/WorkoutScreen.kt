@@ -30,6 +30,8 @@ import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 interface IWorkoutActions {
     fun updateSet(set: WorkoutSet, exerciseId: Long)
@@ -241,17 +243,24 @@ private fun WorkoutHeader(
                 }
             }
 
+            val date =
+                workout.date ?: Clock.System.now()
+                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
+
             val datePickerDialog = DatePickerDialog(
                 LocalContext.current,
                 { _: DatePicker, year: Int, month: Int, day: Int ->
                     // DatePicker uses 0-11 for months
                     val newDate = LocalDate(year, month + 1, day)
                     updateDate(newDate)
-                }, workout.date.year, workout.date.monthNumber - 1, workout.date.dayOfMonth
+                },
+                date.year,
+                date.monthNumber - 1,
+                date.dayOfMonth
             )
 
             WorkoutDateRow(
-                date = workout.date.toWorkoutDate(),
+                date = workout.date?.toWorkoutDate(),
                 duration = durationText,
                 onDateClick = { datePickerDialog.show() },
                 isEditing = true
