@@ -6,10 +6,16 @@ import kotlinx.datetime.LocalDate
 
 class RoomTypeConverters {
     @TypeConverter
-    fun fromLocalDate(date: LocalDate): String = date.toString()
+    fun fromLocalDate(date: LocalDate?): String? = date?.toString()
 
     @TypeConverter
-    fun toLocalDate(date: String): LocalDate = LocalDate.parse(date)
+    fun toLocalDate(date: String?): LocalDate? {
+        return if (date == null) {
+            null
+        } else {
+            LocalDate.parse(date)
+        }
+    }
 
     @TypeConverter
     fun toInstant(dateTime: String?): Instant? {

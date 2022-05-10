@@ -44,14 +44,13 @@ fun WorkoutList(
     onWorkoutClick: (Long) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
-    Column {
-        LazyColumn(state = scrollState) {
-            items(workoutList) { workout ->
-                WorkoutItem(workout, onWorkoutClick)
-            }
+    LazyColumn(state = scrollState) {
+        items(workoutList) { workout ->
+            WorkoutItem(workout, onWorkoutClick)
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,11 +72,11 @@ fun WorkoutItem(
                 .height(IntrinsicSize.Min)
         ) {
             val workoutTypeId = when (workout.type) {
-                NONE -> R.drawable.ic_deadlift
-                DEADLIFT -> R.drawable.ic_deadlift
-                BENCH -> R.drawable.ic_bench_press
-                SQUAT -> R.drawable.ic_squat
-                OHP -> R.drawable.ic_ohp
+                None -> R.drawable.ic_deadlift
+                Deadlift -> R.drawable.ic_deadlift
+                Bench -> R.drawable.ic_bench_press
+                Squat -> R.drawable.ic_squat
+                Ohp -> R.drawable.ic_ohp
             }
 
             Icon(
@@ -100,7 +99,7 @@ fun WorkoutItem(
             }
 
             WorkoutDateRow(
-                date = workout.date.toWorkoutDate(),
+                date = workout.date?.toWorkoutDate(),
                 duration = durationText,
                 onDateClick = {},
                 Modifier.align(Alignment.CenterVertically)
@@ -111,7 +110,7 @@ fun WorkoutItem(
 
 @Composable
 fun WorkoutDateRow(
-    date: String,
+    date: String?,
     duration: String,
     onDateClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -122,7 +121,7 @@ fun WorkoutDateRow(
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
-            date,
+            date ?: "Planned",
             Modifier
                 .modifyIf(isEditing) {
                     clickable(onClick = onDateClick)
@@ -137,13 +136,13 @@ fun WorkoutDateRow(
 @Composable
 fun WorkoutListPreview() {
     val workouts = listOf(
-        Workout(1, type = BENCH),
-        Workout(2, type = DEADLIFT),
-        Workout(3, type = SQUAT),
-        Workout(4, type = DEADLIFT),
-        Workout(5, type = DEADLIFT),
-        Workout(6, type = BENCH),
-        Workout(7, type = SQUAT),
+        Workout(1, type = Bench),
+        Workout(2, type = Deadlift),
+        Workout(3, type = Squat),
+        Workout(4, type = Deadlift),
+        Workout(5, type = Deadlift),
+        Workout(6, type = Bench),
+        Workout(7, type = Squat),
     )
     WorkoutList(workoutList = workouts, onWorkoutClick = {})
 }

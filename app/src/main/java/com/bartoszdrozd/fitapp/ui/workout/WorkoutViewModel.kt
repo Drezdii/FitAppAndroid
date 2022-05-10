@@ -33,7 +33,6 @@ class WorkoutViewModel @Inject constructor(
 
     private lateinit var _lastCleanWorkoutState: Workout
 
-
     val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState
     val openExercises: StateFlow<List<Long>> = _openExercises
     val savingResultEvent: Flow<Result<*>> = _savingResultEvent.receiveAsFlow()

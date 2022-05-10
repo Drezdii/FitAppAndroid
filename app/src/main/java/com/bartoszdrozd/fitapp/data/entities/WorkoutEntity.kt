@@ -11,7 +11,7 @@ import kotlinx.datetime.LocalDate
 @Entity(tableName = "workouts")
 data class WorkoutEntity constructor(
     @PrimaryKey(autoGenerate = true) val id: Long,
-    @ColumnInfo(name = "date") val date: LocalDate,
+    @ColumnInfo(name = "date") val date: LocalDate?,
     @ColumnInfo(name = "start_date") val startDate: Instant?,
     @ColumnInfo(name = "end_date") val endDate: Instant?,
     @ColumnInfo(name = "type") val type: WorkoutType,

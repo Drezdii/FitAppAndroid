@@ -7,6 +7,7 @@ import com.apollographql.apollo3.network.okHttpClient
 import com.bartoszdrozd.fitapp.BuildConfig
 import com.bartoszdrozd.fitapp.data.auth.IAuthService
 import com.bartoszdrozd.fitapp.data.auth.RegisterUserResponseErrorCode
+import com.bartoszdrozd.fitapp.data.workout.IWorkoutService
 import com.bartoszdrozd.fitapp.type.Date
 import com.bartoszdrozd.fitapp.type.DateTime
 import com.google.firebase.auth.FirebaseAuth
@@ -29,8 +30,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
     // Auth server address
-    private const val BASE_URL: String = "https://10.0.2.2:7170"
-    private const val BASE_URL_BACKEND = "https://10.0.2.2:5001"
+    private const val BASE_URL = "https://10.0.2.2:5001"
 
     @Provides
     @Singleton
@@ -80,7 +80,7 @@ object NetworkModule {
     } else {
         OkHttpClient()
             .newBuilder()
-            .addInterceptor(AuthInterceptor())
+            .addInterceptor(AuthTokenInterceptor())
             .connectTimeout(10, TimeUnit.SECONDS)
             .callTimeout(10, TimeUnit.SECONDS)
             .build()
@@ -99,16 +99,27 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun providesWorkoutService(): IWorkoutService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(providesGson()))
+            .client(httpClient)
+            .build()
+            .create(IWorkoutService::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun providesApolloClient(): ApolloClient =
         ApolloClient.Builder()
             .okHttpClient(httpClient)
-            .serverUrl("$BASE_URL_BACKEND/graphql")
+            .serverUrl("$BASE_URL/graphql")
             .addCustomScalarAdapter(Date.type, KotlinxLocalDateAdapter)
             .addCustomScalarAdapter(DateTime.type, KotlinxInstantAdapter)
             .build()
 }
 
-class AuthInterceptor : Interceptor {
+class AuthTokenInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         var token = ""
         try {
@@ -126,5 +137,4 @@ class AuthInterceptor : Interceptor {
 
         return chain.proceed(request)
     }
-
 }

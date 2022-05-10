@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.bartoszdrozd.fitapp.ui.Screen
 import com.bartoszdrozd.fitapp.ui.auth.LoginActivity
+import com.bartoszdrozd.fitapp.ui.creator.CreatorScreen
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutListScreen
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutScreen
@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val screens = listOf(Screen.Timeline)
+        val screens = listOf(Screen.Timeline, Screen.Creator)
 
         FirebaseAuth.getInstance().addAuthStateListener {
             if (it.currentUser == null) {
@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
                                 NavigationBarItem(
                                     icon = {
                                         Icon(
-                                            Icons.Filled.Dashboard,
+                                            screen.icon,
                                             contentDescription = null
                                         )
                                     },
@@ -147,6 +147,9 @@ class MainActivity : ComponentActivity() {
                                 workoutViewModel = hiltViewModel(),
                                 backStackEntry.arguments?.getLong("workoutId") ?: -1L
                             )
+                        }
+                        composable("creator") {
+                            CreatorScreen(creatorViewModel = hiltViewModel())
                         }
                     }
                 }
