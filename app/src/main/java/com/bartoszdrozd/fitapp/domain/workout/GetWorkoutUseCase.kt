@@ -8,6 +8,7 @@ import com.bartoszdrozd.fitapp.utils.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
@@ -21,6 +22,6 @@ class GetWorkoutUseCase @Inject constructor(
                 emit(Result.Success(Workout()))
             }
         }
-        return workoutRepo.getWorkout(id)
+        return workoutRepo.getWorkout(id).map { Result.Success(it) }
     }
 }
