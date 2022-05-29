@@ -7,6 +7,7 @@ import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.Result
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetUserWorkoutsUseCase @Inject constructor(
@@ -14,6 +15,6 @@ class GetUserWorkoutsUseCase @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : FlowUseCase<Unit, List<Workout>>(dispatcher) {
     override suspend fun execute(params: Unit): Flow<Result<List<Workout>>> {
-        return workoutRepo.getUserWorkouts()
+        return workoutRepo.getUserWorkouts().map { Result.Success(it) }
     }
 }

@@ -2,7 +2,6 @@ package com.bartoszdrozd.fitapp.data.workout
 
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.ResourceNotFoundException
-import com.bartoszdrozd.fitapp.utils.Result
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -14,11 +13,11 @@ class WorkoutRepository @Inject constructor(
     @Named("workoutRemoteDataSource") private val remoteDataSource: IWorkoutDataSource,
     @Named("workoutLocalDataSource") private val localDataSource: IWorkoutDataSource,
 ) : IWorkoutRepository {
-    override suspend fun getUserWorkouts(): Flow<Result<List<Workout>>> = channelFlow {
+    override suspend fun getUserWorkouts(): Flow<List<Workout>> = channelFlow {
         coroutineScope {
             launch {
                 localDataSource.getWorkouts().collect {
-                    send(Result.Success(it))
+                    send(it)
                 }
             }
 
@@ -30,12 +29,12 @@ class WorkoutRepository @Inject constructor(
         }
     }
 
-    override suspend fun getWorkout(id: Long): Flow<Result<Workout>> = channelFlow {
+    override suspend fun getWorkout(id: Long): Flow<Workout> = channelFlow {
         coroutineScope {
             launch {
                 localDataSource.getWorkout(id).collect {
                     if (it != null) {
-                        send(Result.Success(it))
+                        send(it)
                     }
                 }
             }
@@ -45,7 +44,7 @@ class WorkoutRepository @Inject constructor(
                     if (it != null) {
                         localDataSource.saveWorkout(it)
                     } else {
-                        send(Result.Error(ResourceNotFoundException("Error getting workout with ID: $id")))
+                        throw ResourceNotFoundException("Error getting workout with ID: $id")
                     }
                 }
             }
