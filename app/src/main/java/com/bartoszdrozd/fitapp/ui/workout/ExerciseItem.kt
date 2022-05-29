@@ -18,15 +18,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.workout.Exercise
+import com.bartoszdrozd.fitapp.model.workout.ExerciseType
+import com.bartoszdrozd.fitapp.model.workout.ExerciseType.*
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-fun exerciseIdToNameResId(id: Int): Int {
-    return when (id) {
-        1 -> R.string.deadlift
-        2 -> R.string.bench
-        3 -> R.string.squat
-        4 -> R.string.ohp
+fun exerciseIdToNameResId(exerciseType: ExerciseType): Int {
+    return when (exerciseType) {
+        Deadlift -> R.string.deadlift
+        Bench -> R.string.bench
+        Squat -> R.string.squat
+        Ohp -> R.string.ohp
         else -> R.string.no_exercise_name
     }
 }
@@ -34,7 +36,7 @@ fun exerciseIdToNameResId(id: Int): Int {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExerciseItem(exercise: Exercise, actions: IWorkoutActions, isExpanded: Boolean) {
-    val exerciseNameResId = rememberSaveable { exerciseIdToNameResId(exercise.exerciseInfoId) }
+    val exerciseNameResId = rememberSaveable { exerciseIdToNameResId(exercise.exerciseType) }
     val smallPadding = dimensionResource(R.dimen.small_padding)
 
     ElevatedCard(

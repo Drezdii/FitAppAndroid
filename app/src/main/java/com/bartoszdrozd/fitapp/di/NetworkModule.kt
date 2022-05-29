@@ -1,15 +1,9 @@
 package com.bartoszdrozd.fitapp.di
 
-import com.apollographql.apollo3.ApolloClient
-import com.apollographql.apollo3.adapter.KotlinxInstantAdapter
-import com.apollographql.apollo3.adapter.KotlinxLocalDateAdapter
-import com.apollographql.apollo3.network.okHttpClient
 import com.bartoszdrozd.fitapp.BuildConfig
 import com.bartoszdrozd.fitapp.data.auth.IAuthService
 import com.bartoszdrozd.fitapp.data.auth.RegisterUserResponseErrorCode
 import com.bartoszdrozd.fitapp.data.workout.IWorkoutService
-import com.bartoszdrozd.fitapp.type.Date
-import com.bartoszdrozd.fitapp.type.DateTime
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.*
 import dagger.Module
@@ -107,16 +101,6 @@ object NetworkModule {
             .build()
             .create(IWorkoutService::class.java)
     }
-
-    @Provides
-    @Singleton
-    fun providesApolloClient(): ApolloClient =
-        ApolloClient.Builder()
-            .okHttpClient(httpClient)
-            .serverUrl("$BASE_URL/graphql")
-            .addCustomScalarAdapter(Date.type, KotlinxLocalDateAdapter)
-            .addCustomScalarAdapter(DateTime.type, KotlinxInstantAdapter)
-            .build()
 }
 
 class AuthTokenInterceptor : Interceptor {

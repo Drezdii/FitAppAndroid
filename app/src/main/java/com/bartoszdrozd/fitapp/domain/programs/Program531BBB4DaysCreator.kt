@@ -2,7 +2,7 @@ package com.bartoszdrozd.fitapp.domain.programs
 
 import com.bartoszdrozd.fitapp.model.program.ProgramValues
 import com.bartoszdrozd.fitapp.model.workout.Workout
-import com.bartoszdrozd.fitapp.model.workout.WorkoutType
+import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 
 class Program531BBB4DaysCreator {
     private val percentagesPerWeek = mapOf(
@@ -12,7 +12,7 @@ class Program531BBB4DaysCreator {
     )
 
     private val exercises =
-        listOf(WorkoutType.Deadlift, WorkoutType.Bench, WorkoutType.Squat, WorkoutType.Ohp)
+        listOf(ExerciseType.Deadlift, ExerciseType.Bench, ExerciseType.Squat, ExerciseType.Ohp)
 
     fun execute(config: ProgramValues): List<Workout> {
         val workouts = listOf<Workout>()

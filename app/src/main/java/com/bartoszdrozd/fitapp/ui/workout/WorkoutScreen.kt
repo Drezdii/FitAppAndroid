@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.workout.Exercise
+import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
@@ -33,7 +34,7 @@ interface IWorkoutActions {
     fun updateSet(set: WorkoutSet, exerciseId: Long)
     fun addSet(exercise: Exercise)
     fun deleteSet(set: WorkoutSet, exerciseId: Long)
-    fun addExercise(exerciseInfoId: Int)
+    fun addExercise(exerciseType: ExerciseType)
     fun deleteExercise(exercise: Exercise)
     fun saveWorkout()
     fun onClickExpand(exerciseId: Long)
@@ -74,8 +75,8 @@ fun WorkoutScreen(workoutViewModel: WorkoutViewModel, workoutId: Long) {
             workoutViewModel.deleteSet(set, exerciseId)
         }
 
-        override fun addExercise(exerciseInfoId: Int) {
-            workoutViewModel.addExercise(exerciseInfoId)
+        override fun addExercise(exerciseType: ExerciseType) {
+            workoutViewModel.addExercise(exerciseType)
         }
 
         override fun deleteExercise(exercise: Exercise) {
@@ -166,7 +167,7 @@ private fun WorkoutView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewExerciseBar(addExercise: (Int) -> Unit) {
+fun NewExerciseBar(addExercise: (ExerciseType) -> Unit) {
     val scrollState = rememberScrollState()
     val smallPadding = dimensionResource(R.dimen.small_padding)
     val verticalPadding = dimensionResource(R.dimen.vertical_padding)
@@ -179,19 +180,19 @@ fun NewExerciseBar(addExercise: (Int) -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(smallPadding)
     ) {
         InputChip(
-            onClick = { addExercise(1) },
+            onClick = { addExercise(ExerciseType.Deadlift) },
             label = { Text(text = stringResource(id = R.string.deadlift)) })
 
         InputChip(
-            onClick = { addExercise(2) },
+            onClick = { addExercise(ExerciseType.Bench) },
             label = { Text(text = stringResource(id = R.string.bench)) })
 
         InputChip(
-            onClick = { addExercise(3) },
+            onClick = { addExercise(ExerciseType.Squat) },
             label = { Text(text = stringResource(id = R.string.squat)) })
 
         InputChip(
-            onClick = { addExercise(4) },
+            onClick = { addExercise(ExerciseType.Ohp) },
             label = { Text(text = stringResource(id = R.string.ohp)) })
     }
 }
@@ -223,7 +224,8 @@ private fun WorkoutHeader(
                 LaunchedEffect(Unit) {
                     while (true) {
                         durationText =
-                            Clock.System.now().minus(workout.startDate).toWorkoutDuration()
+                            Clock.System.now().minus(workout.startDate)
+                                .toWorkoutDuration()
                         delay(1000)
                     }
                 }
@@ -293,9 +295,9 @@ private fun WorkoutHeader(
 fun WorkoutPreview() {
     val workout = Workout(
         1, exercises = listOf(
-            Exercise(1, 2),
+            Exercise(1, ExerciseType.Bench),
             Exercise(
-                2, 2, sets = listOf(
+                2, ExerciseType.Deadlift, sets = listOf(
                     WorkoutSet(1, 5, 120.0, true),
                     WorkoutSet(1, 5, 120.0, true),
                     WorkoutSet(1, 5, 120.0, true),
@@ -319,7 +321,7 @@ fun WorkoutPreview() {
             TODO("Not yet implemented")
         }
 
-        override fun addExercise(exerciseInfoId: Int) {
+        override fun addExercise(exerciseType: ExerciseType) {
             TODO("Not yet implemented")
         }
 

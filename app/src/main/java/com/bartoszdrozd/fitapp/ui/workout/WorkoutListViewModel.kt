@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bartoszdrozd.fitapp.domain.workout.GetUserWorkoutsUseCase
 import com.bartoszdrozd.fitapp.model.workout.Workout
-import com.bartoszdrozd.fitapp.model.workout.WorkoutType
+import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,5 +56,5 @@ data class WorkoutItemUiState(
     val date: LocalDate,
     val startDate: Instant?,
     val endDate: Instant?,
-    val type: WorkoutType,
+    val type: ExerciseType,
 )

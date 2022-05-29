@@ -8,9 +8,9 @@ import com.bartoszdrozd.fitapp.data.entities.WorkoutEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutSetEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutWithExercises
 import com.bartoszdrozd.fitapp.model.workout.Exercise
+import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
-import com.bartoszdrozd.fitapp.model.workout.WorkoutType
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaLocalDate
 import java.time.format.DateTimeFormatter
@@ -25,7 +25,7 @@ fun Duration.toWorkoutDuration(): String =
     }
 
 fun WorkoutEntity.toModel(): Workout =
-    Workout(id, date, startDate, endDate, WorkoutType.valueOf(type.name))
+    Workout(id, date, startDate, endDate, ExerciseType.valueOf(type.name))
 
 fun Workout.toEntity(): WorkoutEntity = WorkoutEntity(
     id = id,
@@ -36,9 +36,9 @@ fun Workout.toEntity(): WorkoutEntity = WorkoutEntity(
 )
 
 fun Exercise.toEntity(workoutId: Long): ExerciseEntity =
-    ExerciseEntity(id = id, exerciseInfoId = exerciseInfoId, workoutId = workoutId)
+    ExerciseEntity(id = id, exerciseType = exerciseType, workoutId = workoutId)
 
-fun ExerciseEntity.toModel(): Exercise = Exercise(id, exerciseInfoId)
+fun ExerciseEntity.toModel(): Exercise = Exercise(id, exerciseType)
 
 fun WorkoutSet.toEntity(exerciseId: Long): WorkoutSetEntity =
     WorkoutSetEntity(
@@ -62,7 +62,7 @@ fun WorkoutDTO.toModel(): Workout = Workout(
 )
 
 fun ExerciseDTO.toModel(): Exercise =
-    Exercise(id, exerciseInfoId, sets = sets.map(WorkoutSetDTO::toModel))
+    Exercise(id, exerciseType, sets = sets.map(WorkoutSetDTO::toModel))
 
 fun WorkoutSetDTO.toModel(): WorkoutSet = WorkoutSet(id, reps, weight, completed)
 
@@ -71,6 +71,6 @@ fun Workout.toDTO(): WorkoutDTO = WorkoutDTO(
 )
 
 fun Exercise.toDTO(): ExerciseDTO =
-    ExerciseDTO(id, exerciseInfoId, sets = sets.map(WorkoutSet::toDTO))
+    ExerciseDTO(id, exerciseType, sets = sets.map(WorkoutSet::toDTO))
 
 fun WorkoutSet.toDTO(): WorkoutSetDTO = WorkoutSetDTO(id, reps, weight, completed)
