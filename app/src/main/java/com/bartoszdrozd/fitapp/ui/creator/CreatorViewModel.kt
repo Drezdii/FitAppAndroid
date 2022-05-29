@@ -1,12 +1,23 @@
 package com.bartoszdrozd.fitapp.ui.creator
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.bartoszdrozd.fitapp.domain.creator.CreateProgramUseCase
 import com.bartoszdrozd.fitapp.model.creator.Program
+import com.bartoszdrozd.fitapp.model.program.ProgramValues
 import com.bartoszdrozd.fitapp.model.workout.Workout
+import com.bartoszdrozd.fitapp.utils.data
+import com.bartoszdrozd.fitapp.utils.succeeded
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CreatorViewModel : ViewModel() {
+@HiltViewModel
+class CreatorViewModel @Inject constructor(
+    private val createProgramUseCase: CreateProgramUseCase
+) : ViewModel() {
     private val _currentPage = MutableStateFlow(0)
     private val _selectedProgram: MutableStateFlow<Program?> = MutableStateFlow(null)
     private val _workouts: MutableStateFlow<List<Workout>> = MutableStateFlow(listOf())
@@ -39,6 +50,15 @@ class CreatorViewModel : ViewModel() {
 
     fun setWorkouts(workouts: List<Workout>) {
         _workouts.value = workouts
+    }
+
+    fun createWorkouts(config: ProgramValues) {
+        viewModelScope.launch {
+            val res = createProgramUseCase(config)
+            if (res.succeeded) {
+                _workouts.value = res.data!!
+            }
+        }
     }
 //
 //    fun setCanProceed(value: Boolean) {

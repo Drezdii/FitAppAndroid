@@ -17,7 +17,6 @@ class WorkoutRemoteDataSource @Inject constructor(
         // TODO: Do something about userId possibly being null
         val res = workoutService.getWorkouts(userRepository.getUserId() ?: "")
 
-        // TODO: Create DTOs for each call
         if (res.isSuccessful) {
             emit(res.body()!!.map(WorkoutDTO::toModel))
         } else {
