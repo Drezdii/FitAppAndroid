@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.bartoszdrozd.fitapp.domain.workout.GetWorkoutUseCase
 import com.bartoszdrozd.fitapp.domain.workout.SaveWorkoutUseCase
 import com.bartoszdrozd.fitapp.model.workout.Exercise
+import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 import com.bartoszdrozd.fitapp.utils.Result
@@ -106,11 +107,11 @@ class WorkoutViewModel @Inject constructor(
         updateWorkoutState(workout)
     }
 
-    fun addExercise(exerciseInfoId: Int) {
+    fun addExercise(exerciseType: ExerciseType) {
         val workout = getWorkoutCopy()
 
         val exercises = workout.exercises.toMutableList()
-        val exercise = Exercise(tempIndex, exerciseInfoId)
+        val exercise = Exercise(tempIndex, exerciseType)
         exercises.add(exercise)
         workout.exercises = exercises
 

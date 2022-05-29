@@ -17,7 +17,7 @@ import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.program.ProgramType
 import com.bartoszdrozd.fitapp.model.program.ProgramValues
 import com.bartoszdrozd.fitapp.model.workout.OneRepMax
-import com.bartoszdrozd.fitapp.model.workout.WorkoutType
+import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.ui.creator.CreatorViewModel
 import kotlin.math.roundToInt
 
@@ -96,10 +96,10 @@ fun Program531BBB4DaysScreen(creatorViewModel: CreatorViewModel) {
             val config = ProgramValues(
                 ProgramType.BBB_531_4_Days,
                 listOf(
-                    OneRepMax(WorkoutType.Deadlift, deadlift1RM.toFloat()),
-                    OneRepMax(WorkoutType.Bench, bench1RM.toFloat()),
-                    OneRepMax(WorkoutType.Squat, squat1RM.toFloat()),
-                    OneRepMax(WorkoutType.Ohp, ohp1RM.toFloat())
+                    OneRepMax(ExerciseType.Deadlift, deadlift1RM.toFloat()),
+                    OneRepMax(ExerciseType.Bench, bench1RM.toFloat()),
+                    OneRepMax(ExerciseType.Squat, squat1RM.toFloat()),
+                    OneRepMax(ExerciseType.Ohp, ohp1RM.toFloat())
                 ),
                 trainingMax = trainingMaxPercentage.roundToInt()
             )

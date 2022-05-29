@@ -9,6 +9,6 @@ data class Workout(
     val date: LocalDate? = java.time.LocalDate.now().toKotlinLocalDate(),
     val startDate: Instant? = null,
     val endDate: Instant? = null,
-    val type: WorkoutType = WorkoutType.None,
+    val type: ExerciseType = ExerciseType.None,
     var exercises: List<Exercise> = emptyList()
 )

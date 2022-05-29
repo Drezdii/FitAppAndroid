@@ -2,6 +2,7 @@ package com.bartoszdrozd.fitapp.data.entities
 
 import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
+import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 
 @Entity(
     tableName = "exercises",
@@ -17,7 +18,7 @@ import androidx.room.ForeignKey.CASCADE
 )
 data class ExerciseEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
-    @ColumnInfo(name = "exercise_info_id") val exerciseInfoId: Int,
+    @ColumnInfo(name = "exercise_type") val exerciseType: ExerciseType,
     @ColumnInfo(name = "workout_id", index = true) val workoutId: Long,
 ) {
     @Ignore

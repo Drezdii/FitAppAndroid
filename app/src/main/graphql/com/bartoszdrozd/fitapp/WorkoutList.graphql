@@ -1,9 +1,0 @@
-query WorkoutList {
-    userWorkouts {
-        id
-        date
-        startDate
-        endDate
-        type
-    }
-}
