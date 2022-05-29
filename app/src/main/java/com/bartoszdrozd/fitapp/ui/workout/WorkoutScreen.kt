@@ -7,10 +7,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,7 +19,6 @@ import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.workout.Exercise
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
-import com.bartoszdrozd.fitapp.ui.components.Chip
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.utils.Result
 import com.bartoszdrozd.fitapp.utils.toWorkoutDate
@@ -168,6 +164,7 @@ private fun WorkoutView(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewExerciseBar(addExercise: (Int) -> Unit) {
     val scrollState = rememberScrollState()
@@ -177,30 +174,25 @@ fun NewExerciseBar(addExercise: (Int) -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
-            .padding(vertical = verticalPadding, horizontal = smallPadding)
+            .padding(bottom = verticalPadding, start = smallPadding, end = smallPadding)
             .horizontalScroll(scrollState),
+        horizontalArrangement = Arrangement.spacedBy(smallPadding)
     ) {
-        Chip(onClick = { addExercise(1) }) {
-            Text(stringResource(R.string.deadlift))
-        }
+        InputChip(
+            onClick = { addExercise(1) },
+            label = { Text(text = stringResource(id = R.string.deadlift)) })
 
-        Spacer(modifier = Modifier.width(smallPadding))
+        InputChip(
+            onClick = { addExercise(2) },
+            label = { Text(text = stringResource(id = R.string.bench)) })
 
-        Chip(onClick = { addExercise(2) }) {
-            Text(stringResource(R.string.bench))
-        }
+        InputChip(
+            onClick = { addExercise(3) },
+            label = { Text(text = stringResource(id = R.string.squat)) })
 
-        Spacer(modifier = Modifier.width(smallPadding))
-
-        Chip(onClick = { addExercise(3) }) {
-            Text(stringResource(R.string.squat))
-        }
-
-        Spacer(modifier = Modifier.width(smallPadding))
-
-        Chip(onClick = { addExercise(4) }) {
-            Text(stringResource(R.string.ohp))
-        }
+        InputChip(
+            onClick = { addExercise(4) },
+            label = { Text(text = stringResource(id = R.string.ohp)) })
     }
 }
 

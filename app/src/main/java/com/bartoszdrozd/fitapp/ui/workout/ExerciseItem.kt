@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.DeleteOutline
-import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -19,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.workout.Exercise
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 fun exerciseIdToNameResId(id: Int): Int {
@@ -129,14 +129,9 @@ fun OneRepMaxRow(exercise: Exercise) {
     val oneRepMax = 100.0
     val biggestSet = exercise.sets.maxByOrNull { it.weight } ?: return
 
-    var repsNeeded =
-        (-(biggestSet.weight - (1.0278 * oneRepMax)) / (0.0278 * oneRepMax)).roundToInt()
-            .coerceAtLeast(1)
-
-    // Take care of the edge case where current 1RM is equal to the heaviest set in the exercise
-    if (biggestSet.weight == oneRepMax) {
-        repsNeeded++
-    }
+    val repsNeeded = ceil(
+        (-(biggestSet.weight - (1.0278 * oneRepMax)) / (0.0278 * oneRepMax))
+    ).toInt()
 
     Row(
         Modifier
@@ -144,20 +139,23 @@ fun OneRepMaxRow(exercise: Exercise) {
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (repsNeeded in 1..15) {
-            Icon(Icons.Outlined.EmojiEvents, contentDescription = null)
-
-            Text(
-                text = "Reps to beat 1RM: $repsNeeded",
-                style = MaterialTheme.typography.labelMedium
-            )
-        }
+        // TODO: Use actual 1RM to calculate this
+//        if (repsNeeded in 1..15) {
+//            Icon(Icons.Outlined.EmojiEvents, contentDescription = null)
+//
+//            Text(
+//                text = "Reps to beat 1RM: $repsNeeded",
+//                style = MaterialTheme.typography.labelMedium
+//            )
+//        }
 
         Spacer(modifier = Modifier.weight(1f))
 
-        val estimatedMax =
-            (biggestSet.weight / (1.0278 - (0.0278 * biggestSet.reps))).roundToInt()
+        if (biggestSet.reps in 1..15) {
+            val estimatedMax =
+                (biggestSet.weight / (1.0278 - (0.0278 * biggestSet.reps))).roundToInt()
 
-        Text(text = "Est. Max: ${estimatedMax}kg", style = MaterialTheme.typography.labelMedium)
+            Text(text = "Est. Max: ${estimatedMax}kg", style = MaterialTheme.typography.labelMedium)
+        }
     }
 }

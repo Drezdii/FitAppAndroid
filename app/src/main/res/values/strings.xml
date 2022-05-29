@@ -44,6 +44,8 @@
     <string name="creator">Creator</string>
     <string name="previous">Previous</string>
     <string name="next">Next</string>
+    <string name="your_maxes">Your 1RM</string>
+    <string name="training_max_percentage">Training Max</string>
 
     <string-array name="exercise_names">
         <item>@string/deadlift</item>

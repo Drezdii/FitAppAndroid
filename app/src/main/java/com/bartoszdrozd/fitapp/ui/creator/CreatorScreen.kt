@@ -15,10 +15,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.creator.Program
 import com.bartoszdrozd.fitapp.model.workout.Workout
@@ -88,6 +91,7 @@ fun CreatorScreen(creatorViewModel: CreatorViewModel) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CreatorView(program: @Composable () -> Unit, workouts: List<Workout>) {
     Column(
@@ -98,6 +102,19 @@ fun CreatorView(program: @Composable () -> Unit, workouts: List<Workout>) {
         Box(modifier = Modifier.wrapContentHeight(Alignment.Top)) {
             program()
         }
+
+        if (workouts.isNotEmpty()) {
+            Text(
+                text = pluralStringResource(
+                    id = R.plurals.plural_workouts,
+                    count = workouts.size,
+                    workouts.size,
+                ),
+                fontSize = 24.sp,
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+
         LazyColumn(Modifier.align(Alignment.CenterHorizontally)) {
             if (workouts.isEmpty()) {
                 item {
