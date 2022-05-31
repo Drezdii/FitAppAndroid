@@ -20,12 +20,12 @@ class CreatorViewModel @Inject constructor(
 ) : ViewModel() {
     private val _currentPage = MutableStateFlow(0)
     private val _selectedProgram: MutableStateFlow<Program?> = MutableStateFlow(null)
-    private val _workouts: MutableStateFlow<List<Workout>> = MutableStateFlow(listOf())
+    private val _workouts: MutableStateFlow<List<List<Workout>>> = MutableStateFlow(listOf())
 //    private val _canProceed = MutableStateFlow(false)
 
     val currentPage: StateFlow<Int> = _currentPage
     val selectedProgram: StateFlow<Program?> = _selectedProgram
-    val workouts: StateFlow<List<Workout>> = _workouts
+    val workouts: StateFlow<List<List<Workout>>> = _workouts
 //    val canProceed: StateFlow<Boolean> = _canProceed
 
     fun nextPage() {
@@ -48,7 +48,7 @@ class CreatorViewModel @Inject constructor(
 //        _canProceed.value = true
     }
 
-    fun setWorkouts(workouts: List<Workout>) {
+    fun setWorkouts(workouts: List<List<Workout>>) {
         _workouts.value = workouts
     }
 

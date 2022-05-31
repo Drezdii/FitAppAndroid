@@ -46,6 +46,7 @@
     <string name="next">Next</string>
     <string name="your_maxes">Your 1RM</string>
     <string name="training_max_percentage">Training Max</string>
+    <string name="week_with_placeholder">Week %d</string>
 
     <string-array name="exercise_names">
         <item>@string/deadlift</item>

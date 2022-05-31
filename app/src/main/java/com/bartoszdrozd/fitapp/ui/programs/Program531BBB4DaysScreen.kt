@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.sp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.program.ProgramType
 import com.bartoszdrozd.fitapp.model.program.ProgramValues
-import com.bartoszdrozd.fitapp.model.workout.OneRepMax
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
+import com.bartoszdrozd.fitapp.model.workout.OneRepMax
 import com.bartoszdrozd.fitapp.ui.creator.CreatorViewModel
 import kotlin.math.roundToInt
 
@@ -101,7 +101,7 @@ fun Program531BBB4DaysScreen(creatorViewModel: CreatorViewModel) {
                     OneRepMax(ExerciseType.Squat, squat1RM.toFloat()),
                     OneRepMax(ExerciseType.Ohp, ohp1RM.toFloat())
                 ),
-                trainingMax = trainingMaxPercentage.roundToInt()
+                trainingMax = trainingMaxPercentage.roundToInt() / 100F
             )
 
             creatorViewModel.createWorkouts(config)

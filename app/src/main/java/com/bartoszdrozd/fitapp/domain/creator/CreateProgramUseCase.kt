@@ -12,8 +12,8 @@ import javax.inject.Inject
 class CreateProgramUseCase @Inject constructor(
     private val program531BBB4Days: Program531BBB4DaysCreator,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
-) : UseCase<ProgramValues, List<Workout>>(dispatcher) {
-    override suspend fun execute(params: ProgramValues): List<Workout> {
+) : UseCase<ProgramValues, List<List<Workout>>>(dispatcher) {
+    override suspend fun execute(params: ProgramValues): List<List<Workout>> {
         return when (params.programType) {
             BBB_531_4_Days -> program531BBB4Days.execute(params)
         }

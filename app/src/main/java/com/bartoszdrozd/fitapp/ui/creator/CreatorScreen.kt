@@ -10,18 +10,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.outlinedCardColors
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.creator.Program
 import com.bartoszdrozd.fitapp.model.workout.Workout
@@ -30,6 +25,7 @@ import com.bartoszdrozd.fitapp.ui.workout.WorkoutItem
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -91,9 +87,11 @@ fun CreatorScreen(creatorViewModel: CreatorViewModel) {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalPagerApi::class)
 @Composable
-fun CreatorView(program: @Composable () -> Unit, workouts: List<Workout>) {
+fun CreatorView(program: @Composable () -> Unit, workouts: List<List<Workout>>) {
+    val pagerState = rememberPagerState()
+
     Column(
         Modifier
             .fillMaxHeight()
@@ -103,27 +101,63 @@ fun CreatorView(program: @Composable () -> Unit, workouts: List<Workout>) {
             program()
         }
 
+//        if (workouts.isNotEmpty()) {
+//            Text(
+//                text = pluralStringResource(
+//                    id = R.plurals.plural_workouts,
+//                    count = workouts.size,
+//                    workouts.size,
+//                ),
+//                fontSize = 24.sp,
+//                modifier = Modifier.padding(8.dp)
+//            )
+//        }
+
+
+//        LazyColumn(Modifier.align(Alignment.CenterHorizontally)) {
+//            if (workouts.isEmpty()) {
+//                item {
+//                    Text(text = "No workouts created yet.")
+//                }
+//            }
+//
+//            items(workouts) { workout ->
+//                WorkoutItem(workout = workout, onWorkoutClick = {})
+//            }
+//        }
+        val coroutineScope = rememberCoroutineScope()
         if (workouts.isNotEmpty()) {
-            Text(
-                text = pluralStringResource(
-                    id = R.plurals.plural_workouts,
-                    count = workouts.size,
-                    workouts.size,
-                ),
-                fontSize = 24.sp,
-                modifier = Modifier.padding(8.dp)
-            )
-        }
-
-        LazyColumn(Modifier.align(Alignment.CenterHorizontally)) {
-            if (workouts.isEmpty()) {
-                item {
-                    Text(text = "No workouts created yet.")
+            Column(Modifier.fillMaxWidth()) {
+                TabRow(selectedTabIndex = pagerState.currentPage) {
+                    for (week in workouts.indices) {
+                        Tab(
+                            text = {
+                                Text(
+                                    stringResource(
+                                        id = R.string.week_with_placeholder,
+                                        week + 1
+                                    )
+                                )
+                            },
+                            selected = pagerState.currentPage == week,
+                            onClick = {
+                                coroutineScope.launch { pagerState.animateScrollToPage(week) }
+                            }
+                        )
+                    }
                 }
-            }
-
-            items(workouts) { workout ->
-                WorkoutItem(workout = workout, onWorkoutClick = {})
+                HorizontalPager(
+                    count = workouts.size,
+                    modifier = Modifier
+                        .weight(1f),
+                    state = pagerState,
+                ) { page ->
+                    LazyColumn(Modifier.align(Alignment.CenterHorizontally)) {
+                        items(workouts[page]) { workout ->
+                            WorkoutItem(workout = workout, onWorkoutClick = {})
+                        }
+                    }
+                }
             }
         }
     }
