@@ -1,5 +1,6 @@
 package com.bartoszdrozd.fitapp.data.workout
 
+import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import kotlinx.coroutines.flow.Flow
 
@@ -8,4 +9,5 @@ interface IWorkoutDataSource {
     suspend fun getWorkout(id: Long): Flow<Workout?>
     suspend fun saveWorkout(workout: Workout): Workout
     suspend fun saveWorkouts(workouts: List<Workout>)
+    suspend fun saveProgramCycle(programCycle: ProgramCycle): ProgramCycle
 }

@@ -1,8 +1,8 @@
 package com.bartoszdrozd.fitapp.data.workout
 
 import androidx.room.*
-import androidx.room.OnConflictStrategy.IGNORE
-import androidx.room.OnConflictStrategy.REPLACE
+import androidx.room.OnConflictStrategy.Companion.IGNORE
+import androidx.room.OnConflictStrategy.Companion.REPLACE
 import com.bartoszdrozd.fitapp.data.entities.ExerciseEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutSetEntity

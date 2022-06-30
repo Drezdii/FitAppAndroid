@@ -84,13 +84,16 @@ fun Program531BBB4DaysScreen(creatorViewModel: CreatorViewModel) {
         }
 
         Text(text = stringResource(id = R.string.training_max_percentage))
-        Slider(
-            value = trainingMaxPercentage,
-            onValueChange = { value -> trainingMaxPercentage = value },
-            valueRange = 50f..100f,
-        )
+        Row {
+            Slider(
+                value = trainingMaxPercentage,
+                onValueChange = { value -> trainingMaxPercentage = value },
+                valueRange = 50f..100f,
+                modifier = Modifier.weight(1f)
+            )
 
-        Text(text = "${trainingMaxPercentage.roundToInt()}%")
+            Text(text = "${trainingMaxPercentage.roundToInt()}%", modifier = Modifier.weight(0.2f))
+        }
 
         Button(onClick = {
             val config = ProgramValues(

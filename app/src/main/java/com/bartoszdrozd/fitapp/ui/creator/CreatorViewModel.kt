@@ -3,7 +3,9 @@ package com.bartoszdrozd.fitapp.ui.creator
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bartoszdrozd.fitapp.domain.creator.CreateProgramUseCase
+import com.bartoszdrozd.fitapp.domain.creator.SaveProgramCycleUseCase
 import com.bartoszdrozd.fitapp.model.creator.Program
+import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.program.ProgramValues
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.data
@@ -16,16 +18,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreatorViewModel @Inject constructor(
-    private val createProgramUseCase: CreateProgramUseCase
+    private val createProgramUseCase: CreateProgramUseCase,
+    private val saveProgramCycleUseCase: SaveProgramCycleUseCase
 ) : ViewModel() {
     private val _currentPage = MutableStateFlow(0)
     private val _selectedProgram: MutableStateFlow<Program?> = MutableStateFlow(null)
-    private val _workouts: MutableStateFlow<List<List<Workout>>> = MutableStateFlow(listOf())
+    private val _workouts: MutableStateFlow<Map<Int, List<Workout>>> = MutableStateFlow(mapOf())
 //    private val _canProceed = MutableStateFlow(false)
 
     val currentPage: StateFlow<Int> = _currentPage
     val selectedProgram: StateFlow<Program?> = _selectedProgram
-    val workouts: StateFlow<List<List<Workout>>> = _workouts
+    val workouts: StateFlow<Map<Int, List<Workout>>> = _workouts
 //    val canProceed: StateFlow<Boolean> = _canProceed
 
     fun nextPage() {
@@ -44,12 +47,9 @@ class CreatorViewModel @Inject constructor(
 
     fun selectProgram(program: Program) {
         _selectedProgram.value = program
-        _workouts.value = listOf()
+        // Clear any leftover workouts from previous attempts
+        _workouts.value = mapOf()
 //        _canProceed.value = true
-    }
-
-    fun setWorkouts(workouts: List<List<Workout>>) {
-        _workouts.value = workouts
     }
 
     fun createWorkouts(config: ProgramValues) {
@@ -58,6 +58,13 @@ class CreatorViewModel @Inject constructor(
             if (res.succeeded) {
                 _workouts.value = res.data!!
             }
+        }
+    }
+
+    fun saveWorkouts() {
+        val cycle = ProgramCycle(selectedProgram.value!!, workouts.value)
+        viewModelScope.launch {
+            saveProgramCycleUseCase(cycle)
         }
     }
 //

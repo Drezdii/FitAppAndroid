@@ -2,6 +2,7 @@ package com.bartoszdrozd.fitapp.data.workout
 
 import com.bartoszdrozd.fitapp.data.entities.WorkoutEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutSetEntity
+import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.toEntity
 import com.bartoszdrozd.fitapp.utils.toModel
@@ -52,5 +53,9 @@ class WorkoutLocalDataSource(private val workoutDao: WorkoutDao) : IWorkoutDataS
         val entities = workouts.map(Workout::toEntity)
 
         workoutDao.insert(entities)
+    }
+
+    override suspend fun saveProgramCycle(programCycle: ProgramCycle): ProgramCycle {
+        TODO("Not yet implemented")
     }
 }

@@ -1,5 +1,6 @@
 package com.bartoszdrozd.fitapp.data.workout
 
+import com.bartoszdrozd.fitapp.data.dtos.ProgramCycleDTO
 import com.bartoszdrozd.fitapp.data.dtos.WorkoutDTO
 import retrofit2.Response
 import retrofit2.http.Body
@@ -16,4 +17,7 @@ interface IWorkoutService {
 
     @POST("workouts")
     suspend fun saveWorkout(@Body workout: WorkoutDTO): Response<WorkoutDTO>
+
+    @POST("workouts/program")
+    suspend fun saveProgramCycle(@Body programCycle: ProgramCycleDTO): Response<ProgramCycleDTO>
 }

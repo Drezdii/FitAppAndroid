@@ -15,13 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.creator.Program
+import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.ui.programs.Program531BBB4DaysScreen
-import com.bartoszdrozd.fitapp.ui.workout.WorkoutItem
+import com.bartoszdrozd.fitapp.utils.toNameResId
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -79,9 +81,16 @@ fun CreatorScreen(creatorViewModel: CreatorViewModel) {
             Spacer(modifier = Modifier.weight(1f))
 
             if (selectedProgram != null) {
-                Button(onClick = { creatorViewModel.nextPage() }) {
-                    Text(text = stringResource(id = R.string.next))
+                if (workouts.isNotEmpty()) {
+                    Button(onClick = { creatorViewModel.saveWorkouts() }) {
+                        Text(text = stringResource(id = R.string.save))
+                    }
+                } else {
+                    Button(onClick = { creatorViewModel.nextPage() }) {
+                        Text(text = stringResource(id = R.string.next))
+                    }
                 }
+
             }
         }
     }
@@ -89,7 +98,7 @@ fun CreatorScreen(creatorViewModel: CreatorViewModel) {
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalPagerApi::class)
 @Composable
-fun CreatorView(program: @Composable () -> Unit, workouts: List<List<Workout>>) {
+fun CreatorView(program: @Composable () -> Unit, workouts: Map<Int, List<Workout>>) {
     val pagerState = rememberPagerState()
 
     Column(
@@ -129,19 +138,19 @@ fun CreatorView(program: @Composable () -> Unit, workouts: List<List<Workout>>) 
         if (workouts.isNotEmpty()) {
             Column(Modifier.fillMaxWidth()) {
                 TabRow(selectedTabIndex = pagerState.currentPage) {
-                    for (week in workouts.indices) {
+                    for (workoutWeek in workouts) {
                         Tab(
                             text = {
                                 Text(
                                     stringResource(
                                         id = R.string.week_with_placeholder,
-                                        week + 1
+                                        workoutWeek.key
                                     )
                                 )
                             },
-                            selected = pagerState.currentPage == week,
+                            selected = pagerState.currentPage == workoutWeek.key - 1,
                             onClick = {
-                                coroutineScope.launch { pagerState.animateScrollToPage(week) }
+                                coroutineScope.launch { pagerState.animateScrollToPage(workoutWeek.key - 1) }
                             }
                         )
                     }
@@ -153,8 +162,8 @@ fun CreatorView(program: @Composable () -> Unit, workouts: List<List<Workout>>) 
                     state = pagerState,
                 ) { page ->
                     LazyColumn(Modifier.align(Alignment.CenterHorizontally)) {
-                        items(workouts[page]) { workout ->
-                            WorkoutItem(workout = workout, onWorkoutClick = {})
+                        items(workouts[page + 1]!!) { workout ->
+                            DetailedWorkoutItem(workout = workout)
                         }
                     }
                 }
@@ -216,4 +225,47 @@ fun ProgramsList(programs: List<Program>, selectedProgramId: Int, onClick: (Prog
 //            }
 //        }
 //    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DetailedWorkoutItem(workout: Workout) {
+    OutlinedCard(
+        Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Row(
+            Modifier
+                .padding(24.dp)
+                .height(IntrinsicSize.Min)
+        ) {
+            val workoutTypeId = when (workout.type) {
+                ExerciseType.None -> R.drawable.ic_deadlift
+                ExerciseType.Deadlift -> R.drawable.ic_deadlift
+                ExerciseType.Bench -> R.drawable.ic_bench_press
+                ExerciseType.Squat -> R.drawable.ic_squat
+                ExerciseType.Ohp -> R.drawable.ic_ohp
+            }
+
+            Icon(
+                painter = painterResource(id = workoutTypeId),
+                contentDescription = null,
+                Modifier
+                    .padding(end = 24.dp)
+                    .aspectRatio(1f)
+            )
+
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                for (exercise in workout.exercises) {
+                    Column {
+                        Text(stringResource(id = exercise.exerciseType.toNameResId()))
+                        for (set in exercise.sets) {
+                            Text("${set.reps} x ${set.weight} kg")
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

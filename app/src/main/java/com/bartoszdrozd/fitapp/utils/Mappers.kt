@@ -1,16 +1,13 @@
 package com.bartoszdrozd.fitapp.utils
 
-import com.bartoszdrozd.fitapp.data.dtos.ExerciseDTO
-import com.bartoszdrozd.fitapp.data.dtos.WorkoutDTO
-import com.bartoszdrozd.fitapp.data.dtos.WorkoutSetDTO
+import com.bartoszdrozd.fitapp.data.dtos.*
 import com.bartoszdrozd.fitapp.data.entities.ExerciseEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutSetEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutWithExercises
-import com.bartoszdrozd.fitapp.model.workout.Exercise
-import com.bartoszdrozd.fitapp.model.workout.ExerciseType
-import com.bartoszdrozd.fitapp.model.workout.Workout
-import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
+import com.bartoszdrozd.fitapp.model.creator.Program
+import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
+import com.bartoszdrozd.fitapp.model.workout.*
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaLocalDate
 import java.time.format.DateTimeFormatter
@@ -25,14 +22,23 @@ fun Duration.toWorkoutDuration(): String =
     }
 
 fun WorkoutEntity.toModel(): Workout =
-    Workout(id, date, startDate, endDate, ExerciseType.valueOf(type.name))
+    Workout(
+        id,
+        date,
+        startDate,
+        endDate,
+        ExerciseType.valueOf(type.name),
+        program = ProgramDetails(programId, null, programWeek)
+    )
 
 fun Workout.toEntity(): WorkoutEntity = WorkoutEntity(
     id = id,
     date = date,
     startDate = startDate,
     endDate = endDate,
-    type = type
+    type = type,
+    programId = program?.id,
+    programWeek = program?.week
 )
 
 fun Exercise.toEntity(workoutId: Long): ExerciseEntity =
@@ -58,19 +64,35 @@ fun WorkoutWithExercises.toModel(): Workout =
     )
 
 fun WorkoutDTO.toModel(): Workout = Workout(
-    id, date, startDate, endDate, type, exercises = exercises.map(ExerciseDTO::toModel)
+    id,
+    date,
+    startDate,
+    endDate,
+    type,
+    exercises.map(ExerciseDTO::toModel),
+    program?.toModel()
 )
 
 fun ExerciseDTO.toModel(): Exercise =
-    Exercise(id, exerciseType, sets = sets.map(WorkoutSetDTO::toModel))
+    Exercise(id, exerciseType, sets.map(WorkoutSetDTO::toModel))
 
 fun WorkoutSetDTO.toModel(): WorkoutSet = WorkoutSet(id, reps, weight, completed)
 
 fun Workout.toDTO(): WorkoutDTO = WorkoutDTO(
-    id, date, startDate, endDate, type, exercises = exercises.map(Exercise::toDTO)
+    id, date, startDate, endDate, type, exercises.map(Exercise::toDTO)
 )
 
 fun Exercise.toDTO(): ExerciseDTO =
-    ExerciseDTO(id, exerciseType, sets = sets.map(WorkoutSet::toDTO))
+    ExerciseDTO(id, exerciseType, sets.map(WorkoutSet::toDTO))
 
 fun WorkoutSet.toDTO(): WorkoutSetDTO = WorkoutSetDTO(id, reps, weight, completed)
+
+fun ProgramCycle.toDTO(): ProgramCycleDTO = ProgramCycleDTO(
+    program.toDTO(),
+    // Perform mapping of Workout objects to WorkoutDTO objects in the workout map
+    workoutsByWeek.map { it.key to it.value.map { workout -> workout.toDTO() } }.toMap()
+)
+
+fun Program.toDTO(): ProgramDTO = ProgramDTO(id, name)
+
+fun ProgramDetailsDTO.toModel(): ProgramDetails = ProgramDetails(id, name, week)

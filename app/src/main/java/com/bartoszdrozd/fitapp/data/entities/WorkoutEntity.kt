@@ -15,6 +15,8 @@ data class WorkoutEntity constructor(
     @ColumnInfo(name = "start_date") val startDate: Instant?,
     @ColumnInfo(name = "end_date") val endDate: Instant?,
     @ColumnInfo(name = "type") val type: ExerciseType,
+    @ColumnInfo(name = "programId") val programId: Int?,
+    @ColumnInfo(name = "program_week") val programWeek: Int?
 ) {
     @Ignore
     var exercises: List<ExerciseEntity> = emptyList()

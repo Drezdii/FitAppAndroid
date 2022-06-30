@@ -1,5 +1,6 @@
 package com.bartoszdrozd.fitapp.data.workout
 
+import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.ResourceNotFoundException
 import kotlinx.coroutines.coroutineScope
@@ -56,5 +57,9 @@ class WorkoutRepository @Inject constructor(
         val localWorkout = localDataSource.saveWorkout(res)
 
         return localWorkout.id
+    }
+
+    override suspend fun saveProgramCycle(programCycle: ProgramCycle): ProgramCycle {
+        return remoteDataSource.saveProgramCycle(programCycle)
     }
 }
