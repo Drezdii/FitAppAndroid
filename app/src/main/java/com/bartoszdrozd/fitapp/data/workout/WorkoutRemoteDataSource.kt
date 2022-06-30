@@ -1,7 +1,10 @@
 package com.bartoszdrozd.fitapp.data.workout
 
+import android.util.Log
 import com.bartoszdrozd.fitapp.data.auth.IUserRepository
 import com.bartoszdrozd.fitapp.data.dtos.WorkoutDTO
+import com.bartoszdrozd.fitapp.model.creator.Program
+import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.toDTO
 import com.bartoszdrozd.fitapp.utils.toModel
@@ -49,5 +52,17 @@ class WorkoutRemoteDataSource @Inject constructor(
 
     override suspend fun saveWorkouts(workouts: List<Workout>) {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun saveProgramCycle(programCycle: ProgramCycle): ProgramCycle {
+        // Cast to DTO
+        val res = workoutService.saveProgramCycle(programCycle.toDTO())
+        if (res.isSuccessful) {
+            return ProgramCycle(Program(1, "Test"), mapOf())
+//            return res.body()!!.toModel()
+        } else {
+            Log.d("TEST", res.code().toString())
+            throw Exception()
+        }
     }
 }

@@ -21,8 +21,8 @@ class Program531BBB4DaysCreator {
         ExerciseLink(ExerciseType.Ohp, ExerciseType.Bench)
     )
 
-    fun execute(config: ProgramValues): List<List<Workout>> {
-        val workoutsByWeek = mutableListOf<List<Workout>>()
+    fun execute(config: ProgramValues): Map<Int, List<Workout>> {
+        val workoutsByWeek = mutableMapOf<Int, List<Workout>>()
 
         // Create 3 weeks of trainings
         for (week in 1..3) {
@@ -46,11 +46,13 @@ class Program531BBB4DaysCreator {
                 }
 
                 exercise.sets = sets
-                // TODO: Add BBB exercise
+                val bbbExerciseOneRepMax =
+                    config.maxes.find { it.type == exercises[day].secondaryExercise }!!.value
                 val bbbExercise = Exercise(0, exercises[day].secondaryExercise)
                 val bbbSets = mutableListOf<WorkoutSet>()
-                // TODO: Add ability to change percentage for BBB exercises
-                val bbbWeight = 2.5 * ceil((0.50 * (oneRepMax * config.trainingMax)) / 2.5)
+                // TODO: Add ability to change percentages for BBB exercises
+                val bbbWeight =
+                    2.5 * ceil((0.50 * (bbbExerciseOneRepMax * config.trainingMax)) / 2.5)
 
                 for (i in 1..5) {
                     bbbSets.add(
@@ -63,7 +65,8 @@ class Program531BBB4DaysCreator {
                 workout.exercises = listOf(exercise, bbbExercise)
                 workouts.add(workout)
             }
-            workoutsByWeek.add(workouts)
+
+            workoutsByWeek[week] = workouts
         }
 
         return workoutsByWeek

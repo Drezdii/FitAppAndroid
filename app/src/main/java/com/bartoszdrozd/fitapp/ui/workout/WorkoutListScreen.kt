@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,8 +18,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bartoszdrozd.fitapp.R
-import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType.*
+import com.bartoszdrozd.fitapp.model.workout.ProgramDetails
+import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.modifyIf
 import com.bartoszdrozd.fitapp.utils.toWorkoutDate
 import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
@@ -98,12 +96,32 @@ fun WorkoutItem(
                 else -> stringResource(id = R.string.duration_placeholder)
             }
 
-            WorkoutDateRow(
-                date = workout.date?.toWorkoutDate(),
-                duration = durationText,
-                onDateClick = {},
-                Modifier.align(Alignment.CenterVertically)
-            )
+            Column {
+//                val programLabel = workout.program?.let {
+//                    "${stringResource(id = R.string.bbb5314BBB4Days)} ${workout.program.week}"
+//                }
+                WorkoutDateRow(
+                    date = workout.date?.toWorkoutDate(),
+                    duration = durationText,
+                    onDateClick = {},
+                )
+                val programLabel = workout.program?.let {
+                    "5/3/1 BBB Week ${it.week}"
+                }
+                if (programLabel != null) {
+                    InputChip(
+                        onClick = { },
+                        label = {
+                            Text(
+                                text = programLabel
+                            )
+                        },
+                        modifier = Modifier
+                            .align(Alignment.End),
+                        selected = false
+                    )
+                }
+            }
         }
     }
 }
@@ -136,7 +154,7 @@ fun WorkoutDateRow(
 @Composable
 fun WorkoutListPreview() {
     val workouts = listOf(
-        Workout(1, type = Bench),
+        Workout(1, type = Bench, program = ProgramDetails(1, "", 2)),
         Workout(2, type = Deadlift),
         Workout(3, type = Squat),
         Workout(4, type = Deadlift),

@@ -1,7 +1,7 @@
 package com.bartoszdrozd.fitapp.data.entities
 
 import androidx.room.*
-import androidx.room.ForeignKey.CASCADE
+import androidx.room.ForeignKey.Companion.CASCADE
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 
 @Entity(

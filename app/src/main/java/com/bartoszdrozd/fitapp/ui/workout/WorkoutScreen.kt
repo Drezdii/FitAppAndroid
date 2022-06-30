@@ -181,19 +181,19 @@ fun NewExerciseBar(addExercise: (ExerciseType) -> Unit) {
     ) {
         InputChip(
             onClick = { addExercise(ExerciseType.Deadlift) },
-            label = { Text(text = stringResource(id = R.string.deadlift)) })
+            label = { Text(text = stringResource(id = R.string.deadlift)) }, selected = false)
 
         InputChip(
             onClick = { addExercise(ExerciseType.Bench) },
-            label = { Text(text = stringResource(id = R.string.bench)) })
+            label = { Text(text = stringResource(id = R.string.bench)) }, selected = false)
 
         InputChip(
             onClick = { addExercise(ExerciseType.Squat) },
-            label = { Text(text = stringResource(id = R.string.squat)) })
+            label = { Text(text = stringResource(id = R.string.squat)) }, selected = false)
 
         InputChip(
             onClick = { addExercise(ExerciseType.Ohp) },
-            label = { Text(text = stringResource(id = R.string.ohp)) })
+            label = { Text(text = stringResource(id = R.string.ohp)) }, selected = false)
     }
 }
 
