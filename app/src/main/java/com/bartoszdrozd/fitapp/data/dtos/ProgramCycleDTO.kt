@@ -1,6 +1,6 @@
 package com.bartoszdrozd.fitapp.data.dtos
 
 data class ProgramCycleDTO(
-    val program: ProgramDTO,
+    val workoutProgramDetails: ProgramDTO,
     val workoutsByWeek: Map<Int, List<WorkoutDTO>>
 )

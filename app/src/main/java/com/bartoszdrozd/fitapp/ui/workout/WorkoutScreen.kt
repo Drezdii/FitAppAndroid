@@ -2,7 +2,6 @@ package com.bartoszdrozd.fitapp.ui.workout
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
-import android.widget.Toast
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.bartoszdrozd.fitapp.R
+import com.bartoszdrozd.fitapp.model.SnackbarMessage
 import com.bartoszdrozd.fitapp.model.workout.Exercise
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
@@ -37,6 +37,7 @@ interface IWorkoutActions {
     fun addExercise(exerciseType: ExerciseType)
     fun deleteExercise(exercise: Exercise)
     fun saveWorkout()
+    fun deleteWorkout()
     fun onClickExpand(exerciseId: Long)
     fun onChangeWorkoutState()
     fun updateDate(newDate: LocalDate)
@@ -44,7 +45,12 @@ interface IWorkoutActions {
 }
 
 @Composable
-fun WorkoutScreen(workoutViewModel: WorkoutViewModel, workoutId: Long) {
+fun WorkoutScreen(
+    workoutViewModel: WorkoutViewModel,
+    workoutId: Long,
+    showSnackbar: (SnackbarMessage) -> Unit,
+    onWorkoutDeleted: () -> Unit
+) {
     val state by workoutViewModel.workoutUiState.collectAsState()
     val openExercises by workoutViewModel.openExercises.collectAsState()
 
@@ -55,12 +61,21 @@ fun WorkoutScreen(workoutViewModel: WorkoutViewModel, workoutId: Long) {
 
         workoutViewModel.savingResultEvent.collect {
             if (it is Result.Success) {
-                Toast.makeText(context, context.getText(R.string.saved), Toast.LENGTH_SHORT)
-                    .show()
+                showSnackbar(SnackbarMessage(context.getString(R.string.saved)))
             }
         }
     }
 
+    LaunchedEffect(Unit) {
+        workoutViewModel.deleteResultEvent.collect {
+            if (it is Result.Success) {
+                showSnackbar(SnackbarMessage(context.getString(R.string.workout_deleted)))
+                onWorkoutDeleted()
+            } else {
+                showSnackbar(SnackbarMessage(context.getString(R.string.general_error)))
+            }
+        }
+    }
 
     val actions = object : IWorkoutActions {
         override fun updateSet(set: WorkoutSet, exerciseId: Long) {
@@ -85,6 +100,10 @@ fun WorkoutScreen(workoutViewModel: WorkoutViewModel, workoutId: Long) {
 
         override fun saveWorkout() {
             workoutViewModel.saveWorkout()
+        }
+
+        override fun deleteWorkout() {
+            workoutViewModel.deleteWorkout()
         }
 
         override fun onClickExpand(exerciseId: Long) {
@@ -129,10 +148,7 @@ private fun WorkoutView(
 //        item {
         WorkoutHeader(
             workout,
-            actions::saveWorkout,
-            actions::onChangeWorkoutState,
-            actions::updateDate,
-            actions::cancelChanges,
+            actions,
             isDirty
         )
 //        }
@@ -181,19 +197,23 @@ fun NewExerciseBar(addExercise: (ExerciseType) -> Unit) {
     ) {
         InputChip(
             onClick = { addExercise(ExerciseType.Deadlift) },
-            label = { Text(text = stringResource(id = R.string.deadlift)) }, selected = false)
+            label = { Text(text = stringResource(id = R.string.deadlift)) }, selected = false
+        )
 
         InputChip(
             onClick = { addExercise(ExerciseType.Bench) },
-            label = { Text(text = stringResource(id = R.string.bench)) }, selected = false)
+            label = { Text(text = stringResource(id = R.string.bench)) }, selected = false
+        )
 
         InputChip(
             onClick = { addExercise(ExerciseType.Squat) },
-            label = { Text(text = stringResource(id = R.string.squat)) }, selected = false)
+            label = { Text(text = stringResource(id = R.string.squat)) }, selected = false
+        )
 
         InputChip(
             onClick = { addExercise(ExerciseType.Ohp) },
-            label = { Text(text = stringResource(id = R.string.ohp)) }, selected = false)
+            label = { Text(text = stringResource(id = R.string.ohp)) }, selected = false
+        )
     }
 }
 
@@ -201,10 +221,7 @@ fun NewExerciseBar(addExercise: (ExerciseType) -> Unit) {
 @Composable
 private fun WorkoutHeader(
     workout: Workout,
-    saveWorkout: () -> Unit,
-    changeWorkoutState: () -> Unit,
-    updateDate: (LocalDate) -> Unit,
-    cancelChanges: () -> Unit,
+    actions: IWorkoutActions,
     isDirty: Boolean
 ) {
     var durationText by remember { mutableStateOf("") }
@@ -214,6 +231,9 @@ private fun WorkoutHeader(
             .fillMaxWidth()
             .padding(vertical = dimensionResource(R.dimen.small_padding))
     ) {
+        Button(onClick = actions::deleteWorkout) {
+            Text(text = "Delete workout")
+        }
         Row(
             modifier = Modifier
                 .padding(24.dp)
@@ -246,7 +266,7 @@ private fun WorkoutHeader(
                 { _: DatePicker, year: Int, month: Int, day: Int ->
                     // DatePicker uses 0-11 for months
                     val newDate = LocalDate(year, month + 1, day)
-                    updateDate(newDate)
+                    actions.updateDate(newDate)
                 },
                 date.year,
                 date.monthNumber - 1,
@@ -264,7 +284,10 @@ private fun WorkoutHeader(
         // Show Start/Finish button
         if (workout.startDate == null || workout.endDate == null) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                WorkoutStateButton(changeWorkoutState, isStarted = workout.startDate != null)
+                WorkoutStateButton(
+                    actions::onChangeWorkoutState,
+                    isStarted = workout.startDate != null
+                )
             }
         }
 
@@ -275,14 +298,14 @@ private fun WorkoutHeader(
                     .fillMaxWidth()
             ) {
                 if (workout.id != 0L) {
-                    Button(onClick = { cancelChanges() }) {
+                    Button(onClick = { actions.cancelChanges() }) {
                         Text(text = stringResource(id = R.string.cancel))
                     }
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                Button(onClick = { saveWorkout() }) {
+                Button(onClick = { actions.saveWorkout() }) {
                     Text(text = stringResource(id = R.string.save))
                 }
             }
@@ -330,6 +353,10 @@ fun WorkoutPreview() {
         }
 
         override fun saveWorkout() {
+            TODO("Not yet implemented")
+        }
+
+        override fun deleteWorkout() {
             TODO("Not yet implemented")
         }
 

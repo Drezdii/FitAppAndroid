@@ -8,5 +8,6 @@ interface IWorkoutRepository {
     suspend fun getUserWorkouts(): Flow<List<Workout>>
     suspend fun getWorkout(id: Long): Flow<Workout>
     suspend fun saveWorkout(workout: Workout): Long
+    suspend fun deleteWorkout(workout: Workout)
     suspend fun saveProgramCycle(programCycle: ProgramCycle): ProgramCycle
 }

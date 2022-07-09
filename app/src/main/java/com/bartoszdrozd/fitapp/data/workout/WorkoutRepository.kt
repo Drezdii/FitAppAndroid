@@ -59,6 +59,11 @@ class WorkoutRepository @Inject constructor(
         return localWorkout.id
     }
 
+    override suspend fun deleteWorkout(workout: Workout) {
+        remoteDataSource.deleteWorkout(workout)
+        localDataSource.deleteWorkout(workout)
+    }
+
     override suspend fun saveProgramCycle(programCycle: ProgramCycle): ProgramCycle {
         return remoteDataSource.saveProgramCycle(programCycle)
     }

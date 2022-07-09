@@ -25,6 +25,7 @@ import javax.inject.Singleton
 object NetworkModule {
     // Auth server address
     private const val BASE_URL = "https://10.0.2.2:5001"
+//    private const val BASE_URL = "https://fit-app.me"
 
     @Provides
     @Singleton

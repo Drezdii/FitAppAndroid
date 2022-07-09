@@ -8,6 +8,6 @@ import retrofit2.http.POST
 
 interface IAuthService {
     @Headers("Content-Type: application/json")
-    @POST("users")
+    @POST("auth/users")
     suspend fun registerUser(@Body user: RegisterUserParameters): Response<RegisterUserResult>
 }

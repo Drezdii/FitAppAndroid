@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -19,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -36,6 +34,7 @@ import com.bartoszdrozd.fitapp.ui.workout.WorkoutListScreen
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutScreen
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -58,6 +57,13 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 val shouldExpandFAB = remember { mutableStateOf(true) }
+                val snackbarHostState = remember { SnackbarHostState() }
+                val scope = rememberCoroutineScope()
+
+                val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
+                    "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+                }
+
 
                 val nestedScrollConnection = remember {
                     object : NestedScrollConnection {
@@ -79,6 +85,7 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         SmallTopAppBar(title = { Text(text = "Top App Bar") })
                     },
+                    snackbarHost = { SnackbarHost(snackbarHostState) },
                     floatingActionButton = {
                         when (currentDestination?.route) {
                             "timeline" -> {
@@ -145,7 +152,15 @@ class MainActivity : ComponentActivity() {
                         ) { backStackEntry ->
                             WorkoutScreen(
                                 workoutViewModel = hiltViewModel(),
-                                backStackEntry.arguments?.getLong("workoutId") ?: -1L
+                                backStackEntry.arguments?.getLong("workoutId") ?: -1L,
+                                showSnackbar = { message ->
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(message.message)
+                                    }
+                                },
+                                onWorkoutDeleted = {
+                                    navController.navigate("timeline")
+                                }
                             )
                         }
                         composable("creator") {
