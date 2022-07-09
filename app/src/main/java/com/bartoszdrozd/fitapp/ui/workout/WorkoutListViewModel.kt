@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bartoszdrozd.fitapp.domain.workout.GetUserWorkoutsUseCase
-import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
+import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +38,7 @@ class WorkoutListViewModel @Inject constructor(
                         _workouts.value = it.data.sortedByDescending { wrk ->
                             wrk.date
                         }
+                        Log.d("TEST", it.data.toString())
                     }
                     is Result.Error -> {
                         // Handle error here

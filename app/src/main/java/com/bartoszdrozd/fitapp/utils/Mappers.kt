@@ -28,8 +28,16 @@ fun WorkoutEntity.toModel(): Workout =
         startDate,
         endDate,
         ExerciseType.valueOf(type.name),
-        program = ProgramDetails(programId, null, programWeek)
+        program = programDetailsToModel(programId, programWeek)
     )
+
+private fun programDetailsToModel(programId: Int?, programWeek: Int?): ProgramDetails? {
+    return if (programId != null && programWeek != null) {
+        ProgramDetails(programId, null, programWeek)
+    } else {
+        null
+    }
+}
 
 fun Workout.toEntity(): WorkoutEntity = WorkoutEntity(
     id = id,
