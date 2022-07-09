@@ -6,6 +6,7 @@ import com.bartoszdrozd.fitapp.data.dtos.WorkoutDTO
 import com.bartoszdrozd.fitapp.model.creator.Program
 import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.workout.Workout
+import com.bartoszdrozd.fitapp.utils.ResourceNotFoundException
 import com.bartoszdrozd.fitapp.utils.toDTO
 import com.bartoszdrozd.fitapp.utils.toModel
 import kotlinx.coroutines.flow.Flow
@@ -47,6 +48,16 @@ class WorkoutRemoteDataSource @Inject constructor(
         } else {
             throw Exception()
             // Throw an error
+        }
+    }
+
+    override suspend fun deleteWorkout(workout: Workout) {
+        val res = workoutService.deleteWorkout(workout.id)
+        if (!res.isSuccessful) {
+            when (res.code()) {
+                404 -> throw ResourceNotFoundException("Workout does not exist.")
+                else -> throw Exception("Failed when deleting the workout.")
+            }
         }
     }
 

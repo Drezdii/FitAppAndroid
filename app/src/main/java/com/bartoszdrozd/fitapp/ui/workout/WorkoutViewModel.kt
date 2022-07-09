@@ -1,7 +1,9 @@
 package com.bartoszdrozd.fitapp.ui.workout
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bartoszdrozd.fitapp.domain.workout.DeleteWorkoutUseCase
 import com.bartoszdrozd.fitapp.domain.workout.GetWorkoutUseCase
 import com.bartoszdrozd.fitapp.domain.workout.SaveWorkoutUseCase
 import com.bartoszdrozd.fitapp.model.workout.Exercise
@@ -25,18 +27,20 @@ import javax.inject.Inject
 class WorkoutViewModel @Inject constructor(
     private val getWorkoutUseCase: GetWorkoutUseCase,
     private val saveWorkoutUseCase: SaveWorkoutUseCase,
+    private val deleteWorkoutUseCase: DeleteWorkoutUseCase,
     private val gson: Gson
 ) : ViewModel() {
-    private val _workoutUiState: MutableStateFlow<WorkoutUiState> =
-        MutableStateFlow(WorkoutUiState())
+    private val _workoutUiState = MutableStateFlow(WorkoutUiState())
     private val _openExercises: MutableStateFlow<List<Long>> = MutableStateFlow(emptyList())
     private val _savingResultEvent = Channel<Result<*>>()
+    private val _deleteResultEvent = Channel<Result<*>>()
 
     private lateinit var _lastCleanWorkoutState: Workout
 
     val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState
     val openExercises: StateFlow<List<Long>> = _openExercises
     val savingResultEvent: Flow<Result<*>> = _savingResultEvent.receiveAsFlow()
+    val deleteResultEvent: Flow<Result<*>> = _deleteResultEvent.receiveAsFlow()
 
     // Keep track of the last temporary ID
     private var tempIndex: Long = -1
@@ -68,6 +72,8 @@ class WorkoutViewModel @Inject constructor(
 
             if (res is Result.Success) {
                 _savingResultEvent.send(Result.Success(Unit))
+            } else {
+                Log.d("TEST", (res as Result.Error).exception.toString())
             }
 
             // Reload workout only if a new one was being added
@@ -141,6 +147,15 @@ class WorkoutViewModel @Inject constructor(
         workout.exercises = exercises
 
         updateWorkoutState(workout)
+    }
+
+    fun deleteWorkout() {
+        viewModelScope.launch {
+            val res = deleteWorkoutUseCase(_workoutUiState.value.workout)
+            if (res is Result.Success) {
+                _deleteResultEvent.send(Result.Success(Unit))
+            }
+        }
     }
 
     fun updateDate(newDate: LocalDate) {

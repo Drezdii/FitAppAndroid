@@ -31,6 +31,9 @@ abstract class WorkoutDao {
     @Query("DELETE FROM exercises WHERE workout_id=:workoutId")
     abstract suspend fun clearWorkout(workoutId: Long)
 
+    @Query("DELETE FROM workouts WHERE id = :id")
+    abstract suspend fun delete(id: Long)
+
     @Update
     abstract suspend fun update(workout: WorkoutEntity)
 
@@ -72,7 +75,7 @@ abstract class WorkoutDao {
         val sets = workout.exercises.flatMapIndexed { index: Int, exerciseEntity: ExerciseEntity ->
             exerciseEntity.sets.map { it.copy(exerciseId = exerciseIds[index]) }
         }
-        
+
         insertSets(sets)
 
         return workoutId

@@ -49,6 +49,10 @@ class WorkoutLocalDataSource(private val workoutDao: WorkoutDao) : IWorkoutDataS
         return workoutDao.getOnce(workoutId)!!.toModel()
     }
 
+    override suspend fun deleteWorkout(workout: Workout) {
+        workoutDao.delete(workout.id)
+    }
+
     override suspend fun saveWorkouts(workouts: List<Workout>) {
         val entities = workouts.map(Workout::toEntity)
 
