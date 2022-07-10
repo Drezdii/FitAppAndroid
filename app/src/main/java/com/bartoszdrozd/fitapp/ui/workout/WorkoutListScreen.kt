@@ -118,7 +118,7 @@ fun WorkoutItem(
                     duration = durationText,
                     onDateClick = {},
                 )
-                val programLabel = workout.program?.let {
+                val programLabel = workout.workoutProgramDetails?.let {
                     "5/3/1 BBB Week ${it.week}"
                 }
                 if (programLabel != null) {
@@ -167,7 +167,7 @@ fun WorkoutDateRow(
 @Composable
 fun WorkoutListPreview() {
     val workouts = listOf(
-        Workout(1, type = Bench, program = ProgramDetails(1, "", 2)),
+        Workout(1, type = Bench, workoutProgramDetails = ProgramDetails(1, "", 2)),
         Workout(2, type = Deadlift),
         Workout(3, type = Squat),
         Workout(4, type = Deadlift),

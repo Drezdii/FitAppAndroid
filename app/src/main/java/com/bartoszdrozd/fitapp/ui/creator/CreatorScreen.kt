@@ -14,14 +14,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bartoszdrozd.fitapp.R
+import com.bartoszdrozd.fitapp.model.SnackbarMessage
 import com.bartoszdrozd.fitapp.model.creator.Program
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.ui.programs.Program531BBB4DaysScreen
+import com.bartoszdrozd.fitapp.utils.EventType
 import com.bartoszdrozd.fitapp.utils.toNameResId
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -30,7 +33,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun CreatorScreen(creatorViewModel: CreatorViewModel) {
+fun CreatorScreen(
+    creatorViewModel: CreatorViewModel,
+    onProgramSaved: () -> Unit,
+    showSnackbar: (SnackbarMessage) -> Unit
+) {
     val currentPage by creatorViewModel.currentPage.collectAsState()
     val selectedProgram by creatorViewModel.selectedProgram.collectAsState()
     val workouts by creatorViewModel.workouts.collectAsState()
@@ -42,8 +49,24 @@ fun CreatorScreen(creatorViewModel: CreatorViewModel) {
         )
     )
 
+    val context = LocalContext.current
+
     LaunchedEffect(currentPage) {
         pagerState.animateScrollToPage(currentPage)
+    }
+
+    LaunchedEffect(Unit) {
+        creatorViewModel.events.collect {
+            when (it) {
+                EventType.Saved -> {
+                    showSnackbar(SnackbarMessage(context.getString(R.string.saved)))
+                    onProgramSaved()
+                }
+                // Add more error messages
+                is EventType.Error -> showSnackbar(SnackbarMessage(context.getString(R.string.general_error)))
+                else -> TODO()
+            }
+        }
     }
 
     Column {

@@ -8,11 +8,16 @@ import com.bartoszdrozd.fitapp.model.creator.Program
 import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.program.ProgramValues
 import com.bartoszdrozd.fitapp.model.workout.Workout
+import com.bartoszdrozd.fitapp.utils.EventType
+import com.bartoszdrozd.fitapp.utils.Result
 import com.bartoszdrozd.fitapp.utils.data
 import com.bartoszdrozd.fitapp.utils.succeeded
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,11 +29,13 @@ class CreatorViewModel @Inject constructor(
     private val _currentPage = MutableStateFlow(0)
     private val _selectedProgram: MutableStateFlow<Program?> = MutableStateFlow(null)
     private val _workouts: MutableStateFlow<Map<Int, List<Workout>>> = MutableStateFlow(mapOf())
+    private val _eventsChannel = Channel<EventType<*>>()
 //    private val _canProceed = MutableStateFlow(false)
 
     val currentPage: StateFlow<Int> = _currentPage
     val selectedProgram: StateFlow<Program?> = _selectedProgram
     val workouts: StateFlow<Map<Int, List<Workout>>> = _workouts
+    val events: Flow<EventType<*>> = _eventsChannel.receiveAsFlow()
 //    val canProceed: StateFlow<Boolean> = _canProceed
 
     fun nextPage() {
@@ -64,7 +71,12 @@ class CreatorViewModel @Inject constructor(
     fun saveWorkouts() {
         val cycle = ProgramCycle(selectedProgram.value!!, workouts.value)
         viewModelScope.launch {
-            saveProgramCycleUseCase(cycle)
+            val res = saveProgramCycleUseCase(cycle)
+            if (res is Result.Success) {
+                _eventsChannel.send(EventType.Saved)
+            } else {
+                _eventsChannel.send(EventType.Error((res as Result.Error).exception))
+            }
         }
     }
 //

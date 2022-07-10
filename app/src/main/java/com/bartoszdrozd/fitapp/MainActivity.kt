@@ -109,7 +109,7 @@ class MainActivity : ComponentActivity() {
                             visible = isKeyboardOpen == Keyboard.Closed, enter = slideInVertically(
                                 tween(250)
                             ) { fullHeight -> fullHeight },
-                            exit = slideOutVertically(tween(250)) { fullHeight ->  fullHeight}
+                            exit = slideOutVertically(tween(250)) { fullHeight -> fullHeight }
                         ) {
                             NavigationBar {
                                 screens.forEach { screen ->
@@ -172,7 +172,17 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("creator") {
-                            CreatorScreen(creatorViewModel = hiltViewModel())
+                            CreatorScreen(
+                                creatorViewModel = hiltViewModel(),
+                                onProgramSaved = {
+                                    navController.navigate("timeline")
+                                },
+                                showSnackbar = { message ->
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(message.message)
+                                    }
+                                }
+                            )
                         }
                     }
                 }

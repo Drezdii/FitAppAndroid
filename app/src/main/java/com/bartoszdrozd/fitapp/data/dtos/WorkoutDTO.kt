@@ -12,5 +12,5 @@ data class WorkoutDTO(
     val endDate: Instant? = null,
     val type: ExerciseType = ExerciseType.None,
     var exercises: List<ExerciseDTO> = emptyList(),
-    val program: ProgramDetailsDTO? = null
+    val workoutProgramDetails: ProgramDetailsDTO? = null
 )
