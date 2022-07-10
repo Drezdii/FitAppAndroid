@@ -11,5 +11,5 @@ data class Workout(
     val endDate: Instant? = null,
     val type: ExerciseType = ExerciseType.None,
     var exercises: List<Exercise> = emptyList(),
-    val program: ProgramDetails? = null
+    val workoutProgramDetails: ProgramDetails? = null
 )

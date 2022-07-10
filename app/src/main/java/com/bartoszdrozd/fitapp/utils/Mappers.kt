@@ -28,7 +28,7 @@ fun WorkoutEntity.toModel(): Workout =
         startDate,
         endDate,
         ExerciseType.valueOf(type.name),
-        program = programDetailsToModel(programId, programWeek)
+        workoutProgramDetails = programDetailsToModel(programId, programWeek)
     )
 
 private fun programDetailsToModel(programId: Int?, programWeek: Int?): ProgramDetails? {
@@ -45,8 +45,8 @@ fun Workout.toEntity(): WorkoutEntity = WorkoutEntity(
     startDate = startDate,
     endDate = endDate,
     type = type,
-    programId = program?.id,
-    programWeek = program?.week
+    programId = workoutProgramDetails?.id,
+    programWeek = workoutProgramDetails?.week
 )
 
 fun Exercise.toEntity(workoutId: Long): ExerciseEntity =
@@ -78,7 +78,7 @@ fun WorkoutDTO.toModel(): Workout = Workout(
     endDate,
     type,
     exercises.map(ExerciseDTO::toModel),
-    program?.toModel()
+    workoutProgramDetails?.toModel()
 )
 
 fun ExerciseDTO.toModel(): Exercise =
