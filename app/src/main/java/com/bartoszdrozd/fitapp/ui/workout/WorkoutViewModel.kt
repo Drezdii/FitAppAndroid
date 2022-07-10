@@ -1,6 +1,5 @@
 package com.bartoszdrozd.fitapp.ui.workout
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bartoszdrozd.fitapp.domain.workout.DeleteWorkoutUseCase
@@ -10,6 +9,7 @@ import com.bartoszdrozd.fitapp.model.workout.Exercise
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
+import com.bartoszdrozd.fitapp.utils.EventType
 import com.bartoszdrozd.fitapp.utils.Result
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,12 +35,13 @@ class WorkoutViewModel @Inject constructor(
     private val _savingResultEvent = Channel<Result<*>>()
     private val _deleteResultEvent = Channel<Result<*>>()
 
+    private val _eventChannel = Channel<EventType<*>>();
+
     private lateinit var _lastCleanWorkoutState: Workout
 
     val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState
     val openExercises: StateFlow<List<Long>> = _openExercises
-    val savingResultEvent: Flow<Result<*>> = _savingResultEvent.receiveAsFlow()
-    val deleteResultEvent: Flow<Result<*>> = _deleteResultEvent.receiveAsFlow()
+    val events: Flow<EventType<*>> = _eventChannel.receiveAsFlow()
 
     // Keep track of the last temporary ID
     private var tempIndex: Long = -1
@@ -58,7 +59,7 @@ class WorkoutViewModel @Inject constructor(
                             WorkoutUiState(it.data, false, isDirty = it.data.id == 0L)
                         _lastCleanWorkoutState = it.data
                     }
-                    is Result.Error -> TODO()
+                    is Result.Error -> _eventChannel.send(EventType.Error(it.exception))
                     is Result.Loading -> _workoutUiState.value =
                         _workoutUiState.value.copy(isLoading = true)
                 }
@@ -71,14 +72,23 @@ class WorkoutViewModel @Inject constructor(
             val res = saveWorkoutUseCase(_workoutUiState.value.workout)
 
             if (res is Result.Success) {
-                _savingResultEvent.send(Result.Success(Unit))
+                _eventChannel.send(EventType.Saved)
             } else {
-                Log.d("TEST", (res as Result.Error).exception.toString())
+                _eventChannel.send(EventType.Error((res as Result.Error).exception))
             }
 
             // Reload workout only if a new one was being added
             if (res is Result.Success && workoutUiState.value.workout.id == 0L) {
                 loadWorkout(res.data)
+            }
+        }
+    }
+
+    fun deleteWorkout() {
+        viewModelScope.launch {
+            val res = deleteWorkoutUseCase(_workoutUiState.value.workout)
+            if (res is Result.Success) {
+                _eventChannel.send(EventType.Deleted)
             }
         }
     }
@@ -147,15 +157,6 @@ class WorkoutViewModel @Inject constructor(
         workout.exercises = exercises
 
         updateWorkoutState(workout)
-    }
-
-    fun deleteWorkout() {
-        viewModelScope.launch {
-            val res = deleteWorkoutUseCase(_workoutUiState.value.workout)
-            if (res is Result.Success) {
-                _deleteResultEvent.send(Result.Success(Unit))
-            }
-        }
     }
 
     fun updateDate(newDate: LocalDate) {

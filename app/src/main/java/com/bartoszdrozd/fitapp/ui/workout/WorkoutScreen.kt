@@ -21,7 +21,7 @@ import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
-import com.bartoszdrozd.fitapp.utils.Result
+import com.bartoszdrozd.fitapp.utils.EventType
 import com.bartoszdrozd.fitapp.utils.toWorkoutDate
 import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
 import kotlinx.coroutines.delay
@@ -59,20 +59,16 @@ fun WorkoutScreen(
     LaunchedEffect(Unit) {
         workoutViewModel.loadWorkout(workoutId)
 
-        workoutViewModel.savingResultEvent.collect {
-            if (it is Result.Success) {
-                showSnackbar(SnackbarMessage(context.getString(R.string.saved)))
-            }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        workoutViewModel.deleteResultEvent.collect {
-            if (it is Result.Success) {
-                showSnackbar(SnackbarMessage(context.getString(R.string.workout_deleted)))
-                onWorkoutDeleted()
-            } else {
-                showSnackbar(SnackbarMessage(context.getString(R.string.general_error)))
+        workoutViewModel.events.collect {
+            when (it) {
+                EventType.Deleted -> {
+                    showSnackbar(SnackbarMessage(context.getString(R.string.workout_deleted)))
+                    onWorkoutDeleted()
+                }
+                is EventType.Error -> showSnackbar(SnackbarMessage(context.getString(R.string.general_error)))
+                EventType.Loading -> TODO()
+                EventType.Saved -> showSnackbar(SnackbarMessage(context.getString(R.string.saved)))
+                else -> {}
             }
         }
     }

@@ -49,6 +49,7 @@
     <string name="week_with_placeholder">Week %d</string>
     <string name="bbb5314BBB4Days">5/3/1 BBB</string>
     <string name="workout_deleted">Workout has been deleted successfully.</string>
+    <string name="no_workouts">You haven\'t added any workouts yet.</string>
 
     <string-array name="exercise_names">
         <item>@string/deadlift</item>

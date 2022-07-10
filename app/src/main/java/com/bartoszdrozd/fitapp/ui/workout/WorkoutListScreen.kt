@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,7 +43,19 @@ fun WorkoutList(
     onWorkoutClick: (Long) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
+    val smallPadding = dimensionResource(R.dimen.small_padding)
+
     LazyColumn(state = scrollState) {
+        if (workoutList.isEmpty()) {
+            item {
+                Column(
+                    Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(stringResource(R.string.no_workouts), Modifier.padding(smallPadding))
+                }
+            }
+        }
         items(workoutList) { workout ->
             WorkoutItem(workout, onWorkoutClick)
         }
