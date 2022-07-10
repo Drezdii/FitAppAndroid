@@ -4,6 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -16,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -32,6 +35,8 @@ import com.bartoszdrozd.fitapp.ui.creator.CreatorScreen
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutListScreen
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutScreen
+import com.bartoszdrozd.fitapp.utils.Keyboard
+import com.bartoszdrozd.fitapp.utils.keyboardAsState
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -58,12 +63,8 @@ class MainActivity : ComponentActivity() {
                 val currentDestination = navBackStackEntry?.destination
                 val shouldExpandFAB = remember { mutableStateOf(true) }
                 val snackbarHostState = remember { SnackbarHostState() }
+                val isKeyboardOpen by keyboardAsState()
                 val scope = rememberCoroutineScope()
-
-                val viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
-                    "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
-                }
-
 
                 val nestedScrollConnection = remember {
                     object : NestedScrollConnection {
@@ -104,33 +105,40 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     bottomBar = {
-                        NavigationBar {
-                            screens.forEach { screen ->
-                                NavigationBarItem(
-                                    icon = {
-                                        Icon(
-                                            screen.icon,
-                                            contentDescription = null
-                                        )
-                                    },
-                                    label = { Text(stringResource(screen.resourceId)) },
-                                    selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                                    onClick = {
-                                        navController.navigate(screen.route) {
-                                            // Pop up to the start destination of the graph to
-                                            // avoid building up a large stack of destinations
-                                            // on the back stack as users select items
-                                            popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true
+                        AnimatedVisibility(
+                            visible = isKeyboardOpen == Keyboard.Closed, enter = slideInVertically(
+                                tween(250)
+                            ) { fullHeight -> fullHeight },
+                            exit = slideOutVertically(tween(250)) { fullHeight ->  fullHeight}
+                        ) {
+                            NavigationBar {
+                                screens.forEach { screen ->
+                                    NavigationBarItem(
+                                        icon = {
+                                            Icon(
+                                                screen.icon,
+                                                contentDescription = null
+                                            )
+                                        },
+                                        label = { Text(stringResource(screen.resourceId)) },
+                                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                                        onClick = {
+                                            navController.navigate(screen.route) {
+                                                // Pop up to the start destination of the graph to
+                                                // avoid building up a large stack of destinations
+                                                // on the back stack as users select items
+                                                popUpTo(navController.graph.findStartDestination().id) {
+                                                    saveState = true
+                                                }
+                                                // Avoid multiple copies of the same destination when
+                                                // reselecting the same item
+                                                launchSingleTop = true
+                                                // Restore state when reselecting a previously selected item
+                                                restoreState = true
                                             }
-                                            // Avoid multiple copies of the same destination when
-                                            // reselecting the same item
-                                            launchSingleTop = true
-                                            // Restore state when reselecting a previously selected item
-                                            restoreState = true
                                         }
-                                    }
-                                )
+                                    )
+                                }
                             }
                         }
                     }
