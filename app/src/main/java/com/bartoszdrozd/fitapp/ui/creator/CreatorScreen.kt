@@ -12,7 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.material3.CardDefaults.outlinedCardColors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -96,7 +95,7 @@ fun CreatorScreen(creatorViewModel: CreatorViewModel) {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun CreatorView(program: @Composable () -> Unit, workouts: Map<Int, List<Workout>>) {
     val pagerState = rememberPagerState()
@@ -249,17 +248,16 @@ private fun DetailedWorkoutItem(workout: Workout) {
             }
 
             Icon(
-                painter = painterResource(id = workoutTypeId),
+                painter = painterResource(workoutTypeId),
                 contentDescription = null,
                 Modifier
                     .padding(end = 24.dp)
-                    .aspectRatio(1f)
             )
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 for (exercise in workout.exercises) {
                     Column {
-                        Text(stringResource(id = exercise.exerciseType.toNameResId()))
+                        Text(stringResource(exercise.exerciseType.toNameResId()))
                         for (set in exercise.sets) {
                             Text("${set.reps} x ${set.weight} kg")
                         }
