@@ -5,7 +5,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -21,6 +21,9 @@ fun WorkoutSetItem(
     deleteSet: (WorkoutSet) -> Unit
 ) {
     val smallPadding = dimensionResource(R.dimen.small_padding)
+    var reps by remember { mutableStateOf(set.reps.toString()) }
+    var weight by remember { mutableStateOf<String?>(set.weight.toString()) }
+
     Row(
         Modifier
             .fillMaxWidth()
@@ -33,10 +36,12 @@ fun WorkoutSetItem(
                     set.copy(completed = !set.completed)
                 )
             })
+
         OutlinedTextField(
-            value = set.reps.toString(),
-            onValueChange = { reps ->
-                updateSet(set.copy(reps = reps.toIntOrNull() ?: 0))
+            value = reps,
+            onValueChange = { repsValue ->
+                reps = repsValue
+                updateSet(set.copy(reps = repsValue.toIntOrNull() ?: 0))
             },
             Modifier.weight(1f),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -60,7 +65,10 @@ fun WorkoutSetItem(
 
         OutlinedTextField(
             value = set.weight.toString(),
-            onValueChange = { weight -> updateSet(set.copy(weight = weight.toDouble())) },
+            onValueChange = { weightValue ->
+                weight = weightValue
+                updateSet(set.copy(weight = weightValue.toDoubleOrNull() ?: 0.0))
+            },
             Modifier.weight(1f),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             colors = TextFieldDefaults.outlinedTextFieldColors(
