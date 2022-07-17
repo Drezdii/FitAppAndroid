@@ -4,21 +4,21 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Velocity
+import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -35,8 +35,8 @@ import com.bartoszdrozd.fitapp.ui.creator.CreatorScreen
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutListScreen
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutScreen
-import com.bartoszdrozd.fitapp.utils.Keyboard
 import com.bartoszdrozd.fitapp.utils.keyboardAsState
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -56,7 +56,16 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+
         setContent {
+            val systemUiController = rememberSystemUiController()
+
+            SideEffect {
+                systemUiController.setSystemBarsColor(Color.Transparent, true)
+            }
+
             FitAppTheme {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -81,8 +90,23 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                // Padding used to hide navigation bar when keyboard is open
+                val navBarTopPadding = (WindowInsets.ime.asPaddingValues()
+                    .calculateBottomPadding().value.minus(60)).coerceAtLeast(0f)
+
+                val systemBarsPadding = WindowInsets.systemBars.asPaddingValues()
+
+                val scaffoldPadding = PaddingValues(
+                    systemBarsPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    systemBarsPadding.calculateTopPadding(),
+                    systemBarsPadding.calculateEndPadding(LayoutDirection.Ltr),
+                    (systemBarsPadding.calculateBottomPadding()).coerceAtLeast(0.dp)
+                )
+
                 Scaffold(
-                    Modifier.nestedScroll(nestedScrollConnection),
+                    Modifier
+                        .nestedScroll(nestedScrollConnection)
+                        .padding(scaffoldPadding),
                     topBar = {
                         SmallTopAppBar(title = { Text(text = "Top App Bar") })
                     },
@@ -99,54 +123,57 @@ class MainActivity : ComponentActivity() {
                                         )
                                     },
                                     onClick = { navController.navigate("workout/0") },
-                                    expanded = shouldExpandFAB.value
+                                    expanded = shouldExpandFAB.value,
                                 )
                             }
                         }
                     },
                     bottomBar = {
-                        AnimatedVisibility(
-                            visible = isKeyboardOpen == Keyboard.Closed, enter = slideInVertically(
-                                tween(250)
-                            ) { fullHeight -> fullHeight },
-                            exit = slideOutVertically(tween(250)) { fullHeight -> fullHeight }
+                        NavigationBar(
+                            Modifier.padding(top = navBarTopPadding.dp)
                         ) {
-                            NavigationBar {
-                                screens.forEach { screen ->
-                                    NavigationBarItem(
-                                        icon = {
-                                            Icon(
-                                                screen.icon,
-                                                contentDescription = null
-                                            )
-                                        },
-                                        label = { Text(stringResource(screen.resourceId)) },
-                                        selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                                        onClick = {
-                                            navController.navigate(screen.route) {
-                                                // Pop up to the start destination of the graph to
-                                                // avoid building up a large stack of destinations
-                                                // on the back stack as users select items
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
-                                                }
-                                                // Avoid multiple copies of the same destination when
-                                                // reselecting the same item
-                                                launchSingleTop = true
-                                                // Restore state when reselecting a previously selected item
-                                                restoreState = true
+                            screens.forEach { screen ->
+                                NavigationBarItem(
+                                    icon = {
+                                        Icon(
+                                            screen.icon,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    label = { Text(stringResource(screen.resourceId)) },
+                                    selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                                    onClick = {
+                                        navController.navigate(screen.route) {
+                                            // Pop up to the start destination of the graph to
+                                            // avoid building up a large stack of destinations
+                                            // on the back stack as users select items
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
                                             }
+                                            // Avoid multiple copies of the same destination when
+                                            // reselecting the same item
+                                            launchSingleTop = true
+                                            // Restore state when reselecting a previously selected item
+                                            restoreState = true
                                         }
-                                    )
-                                }
+                                    }
+                                )
                             }
                         }
+//                        }
                     }
                 ) { innerPadding ->
+                    val navHostPadding = PaddingValues(
+                        innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                        innerPadding.calculateTopPadding(),
+                        innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                        (innerPadding.calculateBottomPadding().minus(70.dp)).coerceAtLeast(80.dp)
+                    )
+
                     NavHost(
                         navController = navController,
                         startDestination = "timeline",
-                        Modifier.padding(innerPadding)
+                        Modifier.padding(navHostPadding)
                     ) {
                         composable("timeline") {
                             WorkoutListScreen(
