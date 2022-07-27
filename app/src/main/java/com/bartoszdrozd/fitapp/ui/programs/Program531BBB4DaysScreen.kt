@@ -4,10 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -21,6 +18,7 @@ import com.bartoszdrozd.fitapp.model.workout.OneRepMax
 import com.bartoszdrozd.fitapp.ui.creator.CreatorViewModel
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Program531BBB4DaysScreen(creatorViewModel: CreatorViewModel) {
     var deadlift1RM by remember { mutableStateOf("0") }

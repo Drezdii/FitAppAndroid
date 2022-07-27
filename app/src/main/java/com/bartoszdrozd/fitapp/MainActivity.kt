@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
@@ -35,8 +34,6 @@ import com.bartoszdrozd.fitapp.ui.creator.CreatorScreen
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutListScreen
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutScreen
-import com.bartoszdrozd.fitapp.utils.keyboardAsState
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -60,19 +57,12 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-            val systemUiController = rememberSystemUiController()
-
-            SideEffect {
-                systemUiController.setSystemBarsColor(Color.Transparent, true)
-            }
-
             FitAppTheme {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 val shouldExpandFAB = remember { mutableStateOf(true) }
                 val snackbarHostState = remember { SnackbarHostState() }
-                val isKeyboardOpen by keyboardAsState()
                 val scope = rememberCoroutineScope()
 
                 val nestedScrollConnection = remember {

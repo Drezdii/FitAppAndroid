@@ -7,10 +7,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircleOutline
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -22,11 +26,12 @@ import com.bartoszdrozd.fitapp.utils.toNameResId
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExerciseItem(exercise: Exercise, actions: IWorkoutActions, isExpanded: Boolean) {
+fun ExerciseItem(exercise: Exercise, actions: IWorkoutActions) {
     val exerciseNameResId = rememberSaveable { exercise.exerciseType.toNameResId() }
     val smallPadding = dimensionResource(R.dimen.small_padding)
+    // Only expand by default for non-empty exercises
+    var isExpanded by rememberSaveable { mutableStateOf(exercise.sets.isEmpty()) }
 
     ElevatedCard(
         Modifier
@@ -41,71 +46,79 @@ fun ExerciseItem(exercise: Exercise, actions: IWorkoutActions, isExpanded: Boole
                 Modifier
                     .fillMaxWidth()
             ) {
-                Text(
-                    text = stringResource(exerciseNameResId),
-                    Modifier
-                        .padding(smallPadding)
-                        .fillMaxWidth()
-                        .clickable { actions.onClickExpand(exercise.id) }
-                )
+                Row(Modifier.padding(smallPadding)) {
+                    Text(
+                        text = stringResource(exerciseNameResId),
+                        Modifier
+                            .weight(1f)
+                            .clickable {
+                                // Don't allow closing empty exercises
+                                if(exercise.sets.isNotEmpty()) {
+                                    isExpanded = !isExpanded
+                                }
+                            }
+                    )
+
+                    // Show number of completed sets or a completion icon
+                    if (!isExpanded && exercise.sets.isNotEmpty()) {
+                        val numOfCompleted = exercise.sets.count { it.completed }
+
+                        if (numOfCompleted == exercise.sets.size) {
+                            Icon(Icons.Outlined.Check, contentDescription = null)
+                        } else {
+                            Text(text = "${numOfCompleted}/${exercise.sets.size}")
+                        }
+                    }
+                }
 
                 OneRepMaxRow(exercise = exercise)
-
-//                if (!isExpanded) {
-//                    Text(
-//                        text = pluralStringResource(
-//                            id = R.plurals.plural_sets,
-//                            count = exercise.sets.size,
-//                            exercise.sets.size,
-//                        ),
-//                        Modifier.padding(smallPadding)
-//                    )
-//                }
             }
             Column {
-                exercise.sets.forEach { set ->
-                    WorkoutSetItem(
-                        set,
-                        updateSet = { updatedSet ->
-                            actions.updateSet(
-                                updatedSet,
-                                exercise.id
-                            )
-                        },
-                        deleteSet = {
-                            actions.deleteSet(it, exercise.id)
-                        }
-                    )
-                }
-                Surface(
-                    Modifier.fillMaxWidth()
-                ) {
-                    Row(
-                        Modifier
-                            .wrapContentWidth()
-                            .border(
-                                BorderStroke(1.dp, LocalContentColor.current),
-                                RoundedCornerShape(20.dp)
-                            )
-                            .padding(horizontal = smallPadding),
-                        horizontalArrangement = Arrangement.Center
+                if (isExpanded) {
+                    exercise.sets.forEach { set ->
+                        WorkoutSetItem(
+                            set,
+                            updateSet = { updatedSet ->
+                                actions.updateSet(
+                                    updatedSet,
+                                    exercise.id
+                                )
+                            },
+                            deleteSet = {
+                                actions.deleteSet(it, exercise.id)
+                            }
+                        )
+                    }
+                    Surface(
+                        Modifier.fillMaxWidth()
                     ) {
-                        IconButton(
-                            onClick = { actions.addSet(exercise) }
+                        Row(
+                            Modifier
+                                .wrapContentWidth()
+                                .border(
+                                    BorderStroke(1.dp, LocalContentColor.current),
+                                    RoundedCornerShape(20.dp)
+                                )
+                                .padding(horizontal = smallPadding),
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                            Icon(
-                                Icons.Outlined.AddCircleOutline,
-                                contentDescription = stringResource(R.string.add_set)
-                            )
-                        }
+                            IconButton(
+                                onClick = { actions.addSet(exercise) }
+                            ) {
+                                Icon(
+                                    Icons.Outlined.AddCircleOutline,
+                                    contentDescription = stringResource(R.string.add_set)
+                                )
+                            }
 
-                        IconButton(
-                            onClick = { actions.deleteExercise(exercise) }
-                        ) {
-                            Icon(
-                                Icons.Outlined.DeleteOutline,
-                                contentDescription = stringResource(R.string.delete_exercise)
-                            )
+                            IconButton(
+                                onClick = { actions.deleteExercise(exercise) }
+                            ) {
+                                Icon(
+                                    Icons.Outlined.DeleteOutline,
+                                    contentDescription = stringResource(R.string.delete_exercise)
+                                )
+                            }
                         }
                     }
                 }
