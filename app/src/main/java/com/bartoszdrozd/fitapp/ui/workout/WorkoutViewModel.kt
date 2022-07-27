@@ -40,7 +40,6 @@ class WorkoutViewModel @Inject constructor(
     private lateinit var _lastCleanWorkoutState: Workout
 
     val workoutUiState: StateFlow<WorkoutUiState> = _workoutUiState
-    val openExercises: StateFlow<List<Long>> = _openExercises
     val events: Flow<EventType<*>> = _eventsChannel.receiveAsFlow()
 
     // Keep track of the last temporary ID
@@ -161,12 +160,6 @@ class WorkoutViewModel @Inject constructor(
 
     fun updateDate(newDate: LocalDate) {
         updateWorkoutState(_workoutUiState.value.workout.copy(date = newDate))
-    }
-
-    fun onClickExpand(id: Long) {
-        _openExercises.value = _openExercises.value.toMutableList().also {
-            if (it.contains(id)) it.remove(id) else it.add(id)
-        }
     }
 
     fun changeWorkoutState() {

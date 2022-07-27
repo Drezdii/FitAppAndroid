@@ -39,7 +39,6 @@ interface IWorkoutActions {
     fun deleteExercise(exercise: Exercise)
     fun saveWorkout()
     fun deleteWorkout()
-    fun onClickExpand(exerciseId: Long)
     fun onChangeWorkoutState()
     fun updateDate(newDate: LocalDate)
     fun cancelChanges()
@@ -53,7 +52,6 @@ fun WorkoutScreen(
     onWorkoutDeleted: () -> Unit
 ) {
     val state by workoutViewModel.workoutUiState.collectAsState()
-    val openExercises by workoutViewModel.openExercises.collectAsState()
 
     val context = LocalContext.current
 
@@ -103,10 +101,6 @@ fun WorkoutScreen(
             workoutViewModel.deleteWorkout()
         }
 
-        override fun onClickExpand(exerciseId: Long) {
-            workoutViewModel.onClickExpand(exerciseId)
-        }
-
         override fun onChangeWorkoutState() {
             workoutViewModel.changeWorkoutState()
         }
@@ -122,7 +116,7 @@ fun WorkoutScreen(
 
     // Don't display the default workout state that is set before the real workout loads in
     if (state.workout.id != -1L) {
-        WorkoutView(state.workout, actions, openExercises, state.isDirty)
+        WorkoutView(state.workout, actions, state.isDirty)
     }
 }
 
@@ -130,7 +124,6 @@ fun WorkoutScreen(
 private fun WorkoutView(
     workout: Workout,
     actions: IWorkoutActions,
-    openExercises: List<Long>,
     isDirty: Boolean
 ) {
     val smallPadding = dimensionResource(R.dimen.small_padding)
@@ -196,7 +189,6 @@ private fun WorkoutView(
             ExerciseItem(
                 exercise,
                 actions = actions,
-                isExpanded = openExercises.contains(exercise.id)
             )
         }
     }
@@ -238,7 +230,6 @@ fun NewExerciseBar(addExercise: (ExerciseType) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun WorkoutHeader(
     workout: Workout,
@@ -252,82 +243,87 @@ private fun WorkoutHeader(
             .fillMaxWidth()
             .padding(vertical = dimensionResource(R.dimen.small_padding))
     ) {
-        Button(onClick = actions::deleteWorkout) {
-            Text(text = "Delete workout")
-        }
-        Row(
-            modifier = Modifier
-                .padding(24.dp)
-                .height(IntrinsicSize.Min)
-        ) {
-            // Start the timer if workout is in progress
-            if (workout.startDate != null && workout.endDate == null) {
-                LaunchedEffect(Unit) {
-                    while (true) {
-                        durationText =
-                            Clock.System.now().minus(workout.startDate)
-                                .toWorkoutDuration()
-                        delay(1000)
-                    }
-                }
-            } else {
-                durationText = if (workout.endDate != null && workout.startDate != null) {
-                    workout.endDate.minus(workout.startDate).toWorkoutDuration()
-                } else {
-                    stringResource(R.string.duration_placeholder)
-                }
+        Column(modifier = Modifier.padding(dimensionResource(R.dimen.small_padding))) {
+            Button(onClick = actions::deleteWorkout) {
+                Text(text = "Delete workout")
             }
-
-            val date =
-                workout.date ?: Clock.System.now()
-                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
-
-            val datePickerDialog = DatePickerDialog(
-                LocalContext.current,
-                { _: DatePicker, year: Int, month: Int, day: Int ->
-                    // DatePicker uses 0-11 for months
-                    val newDate = LocalDate(year, month + 1, day)
-                    actions.updateDate(newDate)
-                },
-                date.year,
-                date.monthNumber - 1,
-                date.dayOfMonth
-            )
-
-            WorkoutDateRow(
-                date = workout.date?.toWorkoutDate(),
-                duration = durationText,
-                onDateClick = { datePickerDialog.show() },
-                isEditing = true
-            )
-        }
-
-        // Show Start/Finish button
-        if (workout.startDate == null || workout.endDate == null) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                WorkoutStateButton(
-                    actions::onChangeWorkoutState,
-                    isStarted = workout.startDate != null
-                )
-            }
-        }
-
-        // Show Save/Cancel buttons
-        if (isDirty) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .padding(24.dp)
+                    .height(IntrinsicSize.Min)
             ) {
-                if (workout.id != 0L) {
-                    Button(onClick = { actions.cancelChanges() }) {
-                        Text(text = stringResource(id = R.string.cancel))
+                // Start the timer if workout is in progress
+                if (workout.startDate != null && workout.endDate == null) {
+                    LaunchedEffect(Unit) {
+                        while (true) {
+                            durationText =
+                                Clock.System.now().minus(workout.startDate)
+                                    .toWorkoutDuration()
+                            delay(1000)
+                        }
+                    }
+                } else {
+                    durationText = if (workout.endDate != null && workout.startDate != null) {
+                        workout.endDate.minus(workout.startDate).toWorkoutDuration()
+                    } else {
+                        stringResource(R.string.duration_placeholder)
                     }
                 }
 
-                Spacer(modifier = Modifier.weight(1f))
+                val date =
+                    workout.date ?: Clock.System.now()
+                        .toLocalDateTime(TimeZone.currentSystemDefault()).date
 
-                Button(onClick = { actions.saveWorkout() }) {
-                    Text(text = stringResource(id = R.string.save))
+                val datePickerDialog = DatePickerDialog(
+                    LocalContext.current,
+                    { _: DatePicker, year: Int, month: Int, day: Int ->
+                        // DatePicker uses 0-11 for months
+                        val newDate = LocalDate(year, month + 1, day)
+                        actions.updateDate(newDate)
+                    },
+                    date.year,
+                    date.monthNumber - 1,
+                    date.dayOfMonth
+                )
+
+                WorkoutDateRow(
+                    date = workout.date?.toWorkoutDate(),
+                    duration = durationText,
+                    onDateClick = { datePickerDialog.show() },
+                    isEditing = true
+                )
+            }
+
+            // Show Start/Finish button
+            if (workout.startDate == null || workout.endDate == null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    WorkoutStateButton(
+                        actions::onChangeWorkoutState,
+                        isStarted = workout.startDate != null
+                    )
+                }
+            }
+
+            // Show Save/Cancel buttons
+            if (isDirty) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    if (workout.id != 0L) {
+                        Button(onClick = { actions.cancelChanges() }) {
+                            Text(text = stringResource(id = R.string.cancel))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Button(onClick = { actions.saveWorkout() }) {
+                        Text(text = stringResource(id = R.string.save))
+                    }
                 }
             }
         }
@@ -381,10 +377,6 @@ fun WorkoutPreview() {
             TODO("Not yet implemented")
         }
 
-        override fun onClickExpand(exerciseId: Long) {
-            TODO("Not yet implemented")
-        }
-
         override fun onChangeWorkoutState() {
             TODO("Not yet implemented")
         }
@@ -399,6 +391,6 @@ fun WorkoutPreview() {
     }
 
     FitAppTheme {
-        WorkoutView(workout = workout, actions = actions, emptyList(), true)
+        WorkoutView(workout = workout, actions = actions, true)
     }
 }

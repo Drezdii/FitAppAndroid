@@ -2,10 +2,7 @@ package com.bartoszdrozd.fitapp.ui.auth
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -22,6 +19,7 @@ import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.ui.components.OutlinedTextFieldError
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignInScreen(
     navigateToRegister: () -> Unit,
