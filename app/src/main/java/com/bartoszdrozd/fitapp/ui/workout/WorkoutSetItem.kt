@@ -21,8 +21,9 @@ fun WorkoutSetItem(
     deleteSet: (WorkoutSet) -> Unit
 ) {
     val smallPadding = dimensionResource(R.dimen.small_padding)
-    var reps by remember { mutableStateOf(set.reps.toString()) }
-    var weight by remember { mutableStateOf<String?>(set.weight.toString()) }
+
+    var reps by remember(set.id) { mutableStateOf(set.reps.toString()) }
+    var weight by remember(set.id) { mutableStateOf(set.weight.toString()) }
 
     Row(
         Modifier
@@ -64,7 +65,7 @@ fun WorkoutSetItem(
         }
 
         OutlinedTextField(
-            value = set.weight.toString(),
+            value = weight,
             onValueChange = { weightValue ->
                 weight = weightValue
                 updateSet(set.copy(weight = weightValue.toDoubleOrNull() ?: 0.0))

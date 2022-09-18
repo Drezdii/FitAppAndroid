@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
@@ -82,23 +83,13 @@ class MainActivity : ComponentActivity() {
 
                 // Padding used to hide navigation bar when keyboard is open
                 val navBarTopPadding = (WindowInsets.ime.asPaddingValues()
-                    .calculateBottomPadding().value.minus(60)).coerceAtLeast(0f)
-
-                val systemBarsPadding = WindowInsets.systemBars.asPaddingValues()
-
-                val scaffoldPadding = PaddingValues(
-                    systemBarsPadding.calculateStartPadding(LayoutDirection.Ltr),
-                    systemBarsPadding.calculateTopPadding(),
-                    systemBarsPadding.calculateEndPadding(LayoutDirection.Ltr),
-                    (systemBarsPadding.calculateBottomPadding()).coerceAtLeast(0.dp)
-                )
+                    .calculateBottomPadding().value.minus(130)).coerceAtLeast(0f)
 
                 Scaffold(
                     Modifier
-                        .nestedScroll(nestedScrollConnection)
-                        .padding(scaffoldPadding),
+                        .nestedScroll(nestedScrollConnection),
                     topBar = {
-                        SmallTopAppBar(title = { Text(text = "Top App Bar") })
+                        TopAppBar(title = { Text(text = "Top App Bar") })
                     },
                     snackbarHost = { SnackbarHost(snackbarHostState) },
                     floatingActionButton = {
@@ -154,10 +145,13 @@ class MainActivity : ComponentActivity() {
                     }
                 ) { innerPadding ->
                     val navHostPadding = PaddingValues(
-                        innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                        innerPadding.calculateStartPadding(LayoutDirection.Ltr)
+                            .plus(dimensionResource(R.dimen.small_padding)),
                         innerPadding.calculateTopPadding(),
-                        innerPadding.calculateEndPadding(LayoutDirection.Ltr),
-                        (innerPadding.calculateBottomPadding().minus(70.dp)).coerceAtLeast(80.dp)
+                        innerPadding.calculateEndPadding(LayoutDirection.Ltr).plus(
+                            dimensionResource(R.dimen.small_padding)
+                        ),
+                        innerPadding.calculateBottomPadding()
                     )
 
                     NavHost(

@@ -120,6 +120,7 @@ class AuthTokenInterceptor : Interceptor {
                 .addHeader("Authorization", "Bearer $token")
                 .build()
 
+
         return chain.proceed(request)
     }
 }
