@@ -30,7 +30,7 @@ import kotlin.math.roundToInt
 fun ExerciseItem(exercise: Exercise, actions: IWorkoutActions) {
     val exerciseNameResId = rememberSaveable { exercise.exerciseType.toNameResId() }
     val smallPadding = dimensionResource(R.dimen.small_padding)
-    // Only expand by default for non-empty exercises
+    // Only expand by default for empty exercises
     var isExpanded by rememberSaveable { mutableStateOf(exercise.sets.isEmpty()) }
 
     ElevatedCard(

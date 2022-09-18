@@ -21,6 +21,29 @@ fun Duration.toWorkoutDuration(): String =
         return@toComponents String.format("%1\$02d:%2\$02d:%3\$02d", hours, minutes, seconds)
     }
 
+fun Duration.toWorkoutDurationFormatted(
+    hoursAbbr: String,
+    minutesAbbr: String,
+    secondsAbbr: String
+): String =
+    this.toComponents { hours, minutes, seconds, _ ->
+        val builder = StringBuilder()
+
+        // Handle an edge case where workout duration is shorter than 1 minute
+        if (hours == 0L && minutes == 0) {
+            return@toComponents "1$minutesAbbr"
+        }
+
+        if (hours != 0L) {
+            builder.append("$hours$hoursAbbr")
+        }
+
+        builder.append(" $minutes$minutesAbbr")
+        builder.append(" $seconds$secondsAbbr")
+
+        return@toComponents builder.toString()
+    }
+
 fun WorkoutEntity.toModel(): Workout =
     Workout(
         id,

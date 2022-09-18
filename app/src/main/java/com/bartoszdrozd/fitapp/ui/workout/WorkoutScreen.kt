@@ -4,9 +4,8 @@ import android.app.DatePickerDialog
 import android.widget.DatePicker
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -126,72 +125,44 @@ private fun WorkoutView(
     actions: IWorkoutActions,
     isDirty: Boolean
 ) {
-    val smallPadding = dimensionResource(R.dimen.small_padding)
     val scrollState = rememberScrollState()
 
-    // Temporary fix for crashes caused by LazyColumn/focused TextFields
-//    Column(
-//        Modifier
-//            .padding(horizontal = smallPadding)
-//            .verticalScroll(scrollState)
-//    ) {
-////        item {
-//        WorkoutHeader(
-//            workout,
-//            actions,
-//            isDirty
-//        )
-////        }
-//
-////        item {
-//        NewExerciseBar(addExercise = actions::addExercise)
-////        }
-//
-//        for (ex in workout.exercises) {
-//            ExerciseItem(
-//                exercise = ex,
-//                actions = actions,
-//                isExpanded = openExercises.contains(ex.id)
-//            )
-//        }
-//
-////        items(
-////            items = workout.exercises,
-////            key = { exercise ->
-////                exercise.id
-////            }
-////        )
-////        { exercise ->
-////            ExerciseItem(
-////                exercise,
-////                actionsI = actions,
-////                isExpanded = openExercises.contains(exercise.id)
-////            )
-////        }
-//    }
+    // Temporary fix for lost focus in TextFields when using LazyColumn
+    Column(Modifier.verticalScroll(scrollState)) {
+        WorkoutHeader(workout, actions, isDirty)
 
-    LazyColumn {
-        item {
-            WorkoutHeader(workout, actions, isDirty)
-        }
+        NewExerciseBar(actions::addExercise)
 
-        item {
-            NewExerciseBar(actions::addExercise)
-        }
-
-        items(
-            items = workout.exercises,
-            key = { exercise ->
-                exercise.id
-            }
-        )
-        { exercise ->
+        for (exercise in workout.exercises) {
             ExerciseItem(
                 exercise,
                 actions = actions,
             )
         }
     }
+
+//    LazyColumn {
+//        item {
+//            WorkoutHeader(workout, actions, isDirty)
+//        }
+//
+//        item {
+//            NewExerciseBar(actions::addExercise)
+//        }
+//
+//        items(
+//            items = workout.exercises,
+//            key = { exercise ->
+//                exercise.id
+//            }
+//        )
+//        { exercise ->
+//            ExerciseItem(
+//                exercise,
+//                actions = actions,
+//            )
+//        }
+//    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -24,7 +24,7 @@ import com.bartoszdrozd.fitapp.model.workout.ProgramDetails
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.modifyIf
 import com.bartoszdrozd.fitapp.utils.toWorkoutDate
-import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
+import com.bartoszdrozd.fitapp.utils.toWorkoutDurationFormatted
 
 @Composable
 fun WorkoutListScreen(viewModel: WorkoutListViewModel, onWorkoutClick: (Long) -> Unit) {
@@ -43,7 +43,6 @@ fun WorkoutList(
     onWorkoutClick: (Long) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
-    val smallPadding = dimensionResource(R.dimen.small_padding)
 
     LazyColumn(state = scrollState) {
         if (workoutList.isEmpty()) {
@@ -52,7 +51,7 @@ fun WorkoutList(
                     Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(stringResource(R.string.no_workouts), Modifier.padding(smallPadding))
+                    Text(stringResource(R.string.no_workouts))
                 }
             }
         }
@@ -72,7 +71,7 @@ fun WorkoutItem(
     OutlinedCard(
         Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(bottom = dimensionResource(R.dimen.workout_item_gap))
             .clickable {
                 onWorkoutClick(workout.id)
             }
@@ -95,13 +94,15 @@ fun WorkoutItem(
                 contentDescription = null,
                 Modifier
                     .padding(end = 24.dp)
+                    .fillMaxHeight(0.75f)
                     .aspectRatio(1f)
-                    .fillMaxHeight()
+                    .align(Alignment.CenterVertically)
             )
 
             val durationText = when {
                 workout.startDate != null && workout.endDate != null -> {
-                    workout.endDate.minus(workout.startDate).toWorkoutDuration()
+                    workout.endDate.minus(workout.startDate).toWorkoutDurationFormatted(
+                        stringResource(R.string.hours_abbr), stringResource(R.string.minutes_abbr), stringResource(R.string.seconds_abbr))
                 }
                 workout.startDate != null && workout.endDate == null -> {
                     stringResource(id = R.string.active)
@@ -110,9 +111,6 @@ fun WorkoutItem(
             }
 
             Column {
-//                val programLabel = workout.program?.let {
-//                    "${stringResource(id = R.string.bbb5314BBB4Days)} ${workout.program.week}"
-//                }
                 WorkoutDateRow(
                     date = workout.date?.toWorkoutDate(),
                     duration = durationText,
@@ -129,9 +127,8 @@ fun WorkoutItem(
                                 text = programLabel
                             )
                         },
-                        modifier = Modifier
-                            .align(Alignment.End),
-                        selected = false
+                        selected = false,
+                        modifier = Modifier.padding(0.dp)
                     )
                 }
             }
