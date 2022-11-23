@@ -32,8 +32,6 @@ class WorkoutViewModel @Inject constructor(
 ) : ViewModel() {
     private val _workoutUiState = MutableStateFlow(WorkoutUiState())
     private val _openExercises: MutableStateFlow<List<Long>> = MutableStateFlow(emptyList())
-    private val _savingResultEvent = Channel<Result<*>>()
-    private val _deleteResultEvent = Channel<Result<*>>()
 
     private val _eventsChannel = Channel<EventType<*>>();
 

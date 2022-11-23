@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val screens = listOf(Screen.Timeline, Screen.Creator)
+        val screens = listOf(Screen.Timeline, Screen.History, Screen.Creator)
 
         FirebaseAuth.getInstance().addAuthStateListener {
             if (it.currentUser == null) {

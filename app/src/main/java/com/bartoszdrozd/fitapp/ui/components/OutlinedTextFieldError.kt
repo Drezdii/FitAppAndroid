@@ -41,8 +41,7 @@ fun OutlinedTextFieldError(
 ) {
     Column {
         OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
+            value = value, onValueChange = onValueChange,
             modifier,
             enabled,
             readOnly,
@@ -52,15 +51,15 @@ fun OutlinedTextFieldError(
             leadingIcon,
             trailingIcon,
             isError = isError || (error != null && error.isNotEmpty()),
-            visualTransformation,
-            keyboardOptions,
-            keyboardActions,
-            singleLine,
-            maxLines,
-            interactionSource,
-            shape,
-            colors
-        )
+            visualTransformation = visualTransformation,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            singleLine = singleLine,
+            maxLines = maxLines,
+            interactionSource = interactionSource,
+            shape = shape,
+            colors = colors
+            )
         Text(
             text = error ?: "",
             color = Color.Red,

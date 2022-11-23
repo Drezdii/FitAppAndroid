@@ -1,6 +1,9 @@
 package com.bartoszdrozd.fitapp.ui.workout
 
 import android.app.DatePickerDialog
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.widget.DatePicker
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -14,6 +17,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.getSystemService
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.SnackbarMessage
 import com.bartoszdrozd.fitapp.model.workout.Exercise
@@ -22,6 +27,7 @@ import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.utils.EventType
+import com.bartoszdrozd.fitapp.utils.programDetailsToNameId
 import com.bartoszdrozd.fitapp.utils.toWorkoutDate
 import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
 import kotlinx.coroutines.delay
@@ -51,6 +57,7 @@ fun WorkoutScreen(
     onWorkoutDeleted: () -> Unit
 ) {
     val state by workoutViewModel.workoutUiState.collectAsState()
+    val isActive = state.workout.startDate != null && state.workout.endDate == null
 
     val context = LocalContext.current
 
@@ -61,6 +68,7 @@ fun WorkoutScreen(
             when (it) {
                 EventType.Deleted -> {
                     showSnackbar(SnackbarMessage(context.getString(R.string.workout_deleted)))
+                    NotificationManagerCompat.from(context).cancel(state.workout.id.toInt())
                     onWorkoutDeleted()
                 }
                 is EventType.Error -> showSnackbar(SnackbarMessage(context.getString(R.string.general_error)))
@@ -68,6 +76,49 @@ fun WorkoutScreen(
                 EventType.Saved -> showSnackbar(SnackbarMessage(context.getString(R.string.saved)))
                 else -> {}
             }
+        }
+    }
+
+    val programName =
+        state.workout.workoutProgramDetails?.let { stringResource(programDetailsToNameId(it)) }
+
+    val builder = Notification.Builder(context, "WORKOUT_ACTIVE")
+        .setSmallIcon(R.drawable.ic_deadlift)
+        .setContentTitle("Workout ${programName ?: ""}")
+        .setOnlyAlertOnce(true)
+        .setOngoing(true)
+
+    // Create the NotificationChannel, but only on API 26+ because
+    // the NotificationChannel class is new and not in the support library
+    val name = "Active workout channel"
+    val descriptionText = "Workout active channel"
+    val importance = NotificationManager.IMPORTANCE_DEFAULT
+    val channel = NotificationChannel("WORKOUT_ACTIVE", name, importance).apply {
+        description = descriptionText
+    }
+
+    // Register the channel with the system
+    val notificationManager: NotificationManager = context.getSystemService()!!
+    notificationManager.createNotificationChannel(channel)
+
+    // Workout can be both active and have ID equal to 0 or less if it's being added
+    // We want to prevent displaying notification for that kind of workout
+    if (isActive && state.workout.id > 0) {
+        with(NotificationManagerCompat.from(context)) {
+            LaunchedEffect(Unit) {
+                while (true) {
+                    val durationText =
+                        Clock.System.now().minus(state.workout.startDate!!)
+                            .toWorkoutDuration()
+                    builder.setContentText("Workout is currently active, Duration: $durationText")
+                    notify(state.workout.id.toInt(), builder.build())
+                    delay(1000)
+                }
+            }
+        }
+    } else {
+        with(NotificationManagerCompat.from(context)) {
+            cancel(state.workout.id.toInt())
         }
     }
 
@@ -113,10 +164,7 @@ fun WorkoutScreen(
         }
     }
 
-    // Don't display the default workout state that is set before the real workout loads in
-    if (state.workout.id != -1L) {
-        WorkoutView(state.workout, actions, state.isDirty)
-    }
+    WorkoutView(state.workout, actions, state.isDirty)
 }
 
 @Composable
@@ -320,45 +368,25 @@ fun WorkoutPreview() {
     )
 
     val actions = object : IWorkoutActions {
-        override fun updateSet(set: WorkoutSet, exerciseId: Long) {
-            TODO("Not yet implemented")
-        }
+        override fun updateSet(set: WorkoutSet, exerciseId: Long) {}
 
-        override fun addSet(exercise: Exercise) {
-            TODO("Not yet implemented")
-        }
+        override fun addSet(exercise: Exercise) {}
 
-        override fun deleteSet(set: WorkoutSet, exerciseId: Long) {
-            TODO("Not yet implemented")
-        }
+        override fun deleteSet(set: WorkoutSet, exerciseId: Long) {}
 
-        override fun addExercise(exerciseType: ExerciseType) {
-            TODO("Not yet implemented")
-        }
+        override fun addExercise(exerciseType: ExerciseType) {}
 
-        override fun deleteExercise(exercise: Exercise) {
-            TODO("Not yet implemented")
-        }
+        override fun deleteExercise(exercise: Exercise) {}
 
-        override fun saveWorkout() {
-            TODO("Not yet implemented")
-        }
+        override fun saveWorkout() {}
 
-        override fun deleteWorkout() {
-            TODO("Not yet implemented")
-        }
+        override fun deleteWorkout() {}
 
-        override fun onChangeWorkoutState() {
-            TODO("Not yet implemented")
-        }
+        override fun onChangeWorkoutState() {}
 
-        override fun updateDate(newDate: LocalDate) {
-            TODO("Not yet implemented")
-        }
+        override fun updateDate(newDate: LocalDate) {}
 
-        override fun cancelChanges() {
-            TODO("Not yet implemented")
-        }
+        override fun cancelChanges() {}
     }
 
     FitAppTheme {
