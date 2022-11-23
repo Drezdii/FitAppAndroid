@@ -56,7 +56,7 @@ class Program531BBB4DaysCreator {
 
                 for (i in 1..5) {
                     bbbSets.add(
-                        WorkoutSet(0, 5, bbbWeight, false)
+                        WorkoutSet(0, 10, bbbWeight, false)
                     )
                 }
 
