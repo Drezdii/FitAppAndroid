@@ -70,8 +70,9 @@ fun ExerciseItem(exercise: Exercise, actions: IWorkoutActions) {
                         }
                     }
                 }
-
-                OneRepMaxRow(exercise = exercise)
+                if(isExpanded) {
+                    OneRepMaxRow(exercise = exercise)
+                }
             }
             Column {
                 if (isExpanded) {
@@ -130,6 +131,7 @@ fun ExerciseItem(exercise: Exercise, actions: IWorkoutActions) {
 @Composable
 fun OneRepMaxRow(exercise: Exercise) {
     // Test with 1RM = 100kg
+    // TODO: Use actual 1RM to calculate this
     val oneRepMax = 100.0
     val biggestSet = exercise.sets.maxByOrNull { it.weight } ?: return
 
@@ -143,16 +145,6 @@ fun OneRepMaxRow(exercise: Exercise) {
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // TODO: Use actual 1RM to calculate this
-//        if (repsNeeded in 1..15) {
-//            Icon(Icons.Outlined.EmojiEvents, contentDescription = null)
-//
-//            Text(
-//                text = "Reps to beat 1RM: $repsNeeded",
-//                style = MaterialTheme.typography.labelMedium
-//            )
-//        }
-
         Spacer(modifier = Modifier.weight(1f))
 
         if (biggestSet.reps in 1..15) {

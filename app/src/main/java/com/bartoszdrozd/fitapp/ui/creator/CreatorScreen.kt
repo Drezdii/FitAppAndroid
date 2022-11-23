@@ -194,7 +194,6 @@ fun CreatorView(program: @Composable () -> Unit, workouts: Map<Int, List<Workout
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProgramsList(programs: List<Program>, selectedProgramId: Int, onClick: (Program) -> Unit) {
     val scrollState = rememberScrollState()

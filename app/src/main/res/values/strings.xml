@@ -19,6 +19,7 @@
     <string name="passwords_must_match">Passwords must match.</string>
     <string name="password_confirm">Confirm password</string>
     <string name="timeline">Timeline</string>
+    <string name="history">History</string>
     <string name="workout_type">Workout type</string>
     <string name="weight_hint">Weight</string>
     <string name="reps_divider">x</string>
@@ -34,6 +35,7 @@
     <string name="squat">Squat</string>
     <string name="ohp">OHP</string>
     <string name="no_exercise_name">Exercise</string>
+    <string name="no_program_name">No name found</string>
     <string name="add_workout">Add workout</string>
     <string name="saved">Saved!</string>
     <string name="start">Start</string>
@@ -53,6 +55,7 @@
     <string name="hours_abbr">h</string>
     <string name="minutes_abbr">m</string>
     <string name="seconds_abbr">s</string>
+    <string name="planned">Planned</string>
 
     <string-array name="exercise_names">
         <item>@string/deadlift</item>

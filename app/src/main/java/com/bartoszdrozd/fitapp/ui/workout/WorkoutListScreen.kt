@@ -22,9 +22,7 @@ import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType.*
 import com.bartoszdrozd.fitapp.model.workout.ProgramDetails
 import com.bartoszdrozd.fitapp.model.workout.Workout
-import com.bartoszdrozd.fitapp.utils.modifyIf
-import com.bartoszdrozd.fitapp.utils.toWorkoutDate
-import com.bartoszdrozd.fitapp.utils.toWorkoutDurationFormatted
+import com.bartoszdrozd.fitapp.utils.*
 
 @Composable
 fun WorkoutListScreen(viewModel: WorkoutListViewModel, onWorkoutClick: (Long) -> Unit) {
@@ -81,20 +79,14 @@ fun WorkoutItem(
                 .padding(24.dp)
                 .height(IntrinsicSize.Min)
         ) {
-            val workoutTypeId = when (workout.type) {
-                None -> R.drawable.ic_deadlift
-                Deadlift -> R.drawable.ic_deadlift
-                Bench -> R.drawable.ic_bench_press
-                Squat -> R.drawable.ic_squat
-                Ohp -> R.drawable.ic_ohp
-            }
+            val workoutIconId = exerciseTypeToIconId(workout.type)
 
             Icon(
-                painter = painterResource(id = workoutTypeId),
+                painter = painterResource(workoutIconId),
                 contentDescription = null,
                 Modifier
-                    .padding(end = 24.dp)
-                    .fillMaxHeight(0.75f)
+                    .padding(end = 20.dp)
+                    .fillMaxHeight(0.65f)
                     .aspectRatio(1f)
                     .align(Alignment.CenterVertically)
             )
@@ -102,7 +94,10 @@ fun WorkoutItem(
             val durationText = when {
                 workout.startDate != null && workout.endDate != null -> {
                     workout.endDate.minus(workout.startDate).toWorkoutDurationFormatted(
-                        stringResource(R.string.hours_abbr), stringResource(R.string.minutes_abbr), stringResource(R.string.seconds_abbr))
+                        stringResource(R.string.hours_abbr),
+                        stringResource(R.string.minutes_abbr),
+                        stringResource(R.string.seconds_abbr)
+                    )
                 }
                 workout.startDate != null && workout.endDate == null -> {
                     stringResource(id = R.string.active)
@@ -117,7 +112,7 @@ fun WorkoutItem(
                     onDateClick = {},
                 )
                 val programLabel = workout.workoutProgramDetails?.let {
-                    "5/3/1 BBB Week ${it.week}"
+                    "${stringResource(programDetailsToNameId(it))} Week ${it.week}"
                 }
                 if (programLabel != null) {
                     InputChip(
@@ -149,7 +144,7 @@ fun WorkoutDateRow(
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
-            date ?: "Planned",
+            date ?: stringResource(R.string.planned),
             Modifier
                 .modifyIf(isEditing) {
                     clickable(onClick = onDateClick)
@@ -164,7 +159,7 @@ fun WorkoutDateRow(
 @Composable
 fun WorkoutListPreview() {
     val workouts = listOf(
-        Workout(1, type = Bench, workoutProgramDetails = ProgramDetails(1, "", 2)),
+        Workout(1, type = Bench, workoutProgramDetails = ProgramDetails(1,2)),
         Workout(2, type = Deadlift),
         Workout(3, type = Squat),
         Workout(4, type = Deadlift),

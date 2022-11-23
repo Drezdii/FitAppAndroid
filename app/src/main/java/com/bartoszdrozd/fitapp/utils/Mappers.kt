@@ -1,5 +1,6 @@
 package com.bartoszdrozd.fitapp.utils
 
+import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.data.dtos.*
 import com.bartoszdrozd.fitapp.data.entities.ExerciseEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutEntity
@@ -56,9 +57,26 @@ fun WorkoutEntity.toModel(): Workout =
 
 private fun programDetailsToModel(programId: Int?, programWeek: Int?): ProgramDetails? {
     return if (programId != null && programWeek != null) {
-        ProgramDetails(programId, null, programWeek)
+        ProgramDetails(programId, programWeek)
     } else {
         null
+    }
+}
+
+fun exerciseTypeToIconId(type: ExerciseType): Int {
+    return when (type) {
+        ExerciseType.None -> R.drawable.ic_deadlift
+        ExerciseType.Deadlift -> R.drawable.ic_deadlift
+        ExerciseType.Bench -> R.drawable.ic_bench_press
+        ExerciseType.Squat -> R.drawable.ic_squat
+        ExerciseType.Ohp -> R.drawable.ic_ohp
+    }
+}
+
+fun programDetailsToNameId(program: ProgramDetails): Int {
+    return when (program.id) {
+        1 -> R.string.bbb5314BBB4Days
+        else -> R.string.no_exercise_name
     }
 }
 
@@ -126,4 +144,4 @@ fun ProgramCycle.toDTO(): ProgramCycleDTO = ProgramCycleDTO(
 
 fun Program.toDTO(): ProgramDTO = ProgramDTO(id, name)
 
-fun ProgramDetailsDTO.toModel(): ProgramDetails = ProgramDetails(id, name, week)
+fun ProgramDetailsDTO.toModel(): ProgramDetails = ProgramDetails(id, week)
