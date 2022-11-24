@@ -4,8 +4,7 @@ import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.ResourceNotFoundException
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
@@ -14,12 +13,15 @@ class WorkoutRepository @Inject constructor(
     @Named("workoutRemoteDataSource") private val remoteDataSource: IWorkoutDataSource,
     @Named("workoutLocalDataSource") private val localDataSource: IWorkoutDataSource,
 ) : IWorkoutRepository {
-    override suspend fun getUserWorkouts(): Flow<List<Workout>> = channelFlow {
+    override fun getCompletedAndActiveWorkouts(): Flow<List<Workout>> = channelFlow {
         coroutineScope {
             launch {
-                localDataSource.getWorkouts().collect {
-                    send(it)
-                }
+                localDataSource.getWorkouts()
+                    // Filter to get completed workouts OR active workouts
+                    .map { it.filter { workout -> (workout.startDate != null && workout.endDate != null) || (workout.endDate == null) } }
+                    .collect {
+                        send(it)
+                    }
             }
 
             launch {
@@ -30,7 +32,12 @@ class WorkoutRepository @Inject constructor(
         }
     }
 
-    override suspend fun getWorkout(id: Long): Flow<Workout> = channelFlow {
+    // TODO: Create a separate endpoint in backend that will only return planned workouts
+    override fun getPlannedWorkouts(): Flow<List<Workout>> =
+        getCompletedAndActiveWorkouts().map { it.filter { workout -> workout.startDate == null } }
+
+
+    override fun getWorkout(id: Long): Flow<Workout> = channelFlow {
         coroutineScope {
             launch {
                 localDataSource.getWorkout(id).collect {

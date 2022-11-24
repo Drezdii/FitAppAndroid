@@ -32,17 +32,31 @@ fun WorkoutListScreen(viewModel: WorkoutListViewModel, onWorkoutClick: (Long) ->
         viewModel.getWorkouts()
     }
 
-    WorkoutList(workoutList = workouts, onWorkoutClick)
+    val activeWorkouts = workouts.filter { it.startDate != null && it.endDate == null }
+    val finishedWorkouts = workouts.filter { it.startDate != null && it.endDate != null }
+
+    WorkoutList(finishedWorkouts, activeWorkouts, onWorkoutClick)
 }
 
 @Composable
 fun WorkoutList(
     workoutList: List<Workout>,
+    activeWorkoutsList: List<Workout>,
     onWorkoutClick: (Long) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
 
     LazyColumn(state = scrollState) {
+        if (activeWorkoutsList.isNotEmpty()) {
+            items(activeWorkoutsList) { workout ->
+                WorkoutItem(workout, onWorkoutClick)
+            }
+
+            item {
+                Divider(Modifier.padding(vertical = 6.dp), thickness = 1.dp)
+            }
+        }
+
         if (workoutList.isEmpty()) {
             item {
                 Column(
@@ -69,7 +83,7 @@ fun WorkoutItem(
     OutlinedCard(
         Modifier
             .fillMaxWidth()
-            .padding(bottom = dimensionResource(R.dimen.workout_item_gap))
+            .padding(vertical = dimensionResource(R.dimen.workout_item_vertical_padding))
             .clickable {
                 onWorkoutClick(workout.id)
             }
@@ -159,7 +173,7 @@ fun WorkoutDateRow(
 @Composable
 fun WorkoutListPreview() {
     val workouts = listOf(
-        Workout(1, type = Bench, workoutProgramDetails = ProgramDetails(1,2)),
+        Workout(1, type = Bench, workoutProgramDetails = ProgramDetails(1, 2)),
         Workout(2, type = Deadlift),
         Workout(3, type = Squat),
         Workout(4, type = Deadlift),
@@ -167,5 +181,5 @@ fun WorkoutListPreview() {
         Workout(6, type = Bench),
         Workout(7, type = Squat),
     )
-    WorkoutList(workoutList = workouts, onWorkoutClick = {})
+    WorkoutList(workoutList = workouts, activeWorkoutsList = emptyList(), onWorkoutClick = {})
 }
