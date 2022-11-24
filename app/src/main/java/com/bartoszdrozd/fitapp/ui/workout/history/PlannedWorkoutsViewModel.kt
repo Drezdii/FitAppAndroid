@@ -1,9 +1,9 @@
-package com.bartoszdrozd.fitapp.ui.workout
+package com.bartoszdrozd.fitapp.ui.workout.history
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bartoszdrozd.fitapp.domain.workout.GetCompletedAndActiveWorkouts
+import com.bartoszdrozd.fitapp.domain.workout.GetPlannedWorkoutsUseCase
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,19 +13,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WorkoutListViewModel @Inject constructor(
-    private val getUserWorkoutsUseCase: GetCompletedAndActiveWorkouts,
+class PlannedWorkoutsViewModel @Inject constructor(
+    private val getPlannedWorkoutsUseCase: GetPlannedWorkoutsUseCase
 ) : ViewModel() {
     private val _workouts: MutableStateFlow<List<Workout>> =
         MutableStateFlow(emptyList())
     private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     val workouts: StateFlow<List<Workout>> = _workouts
-    val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun getWorkouts() {
+    fun getPlannedWorkouts() {
         viewModelScope.launch {
-            getUserWorkoutsUseCase(Unit).collect {
+            getPlannedWorkoutsUseCase(Unit).collect {
                 if (it !is Result.Loading) {
                     _isLoading.value = false
                 }
@@ -38,7 +37,7 @@ class WorkoutListViewModel @Inject constructor(
                     }
                     is Result.Error -> {
                         // Handle error here
-                        Log.e("WorkoutListViewModel", "Error while getting workouts.")
+                        Log.e("HistoryViewModel", "Error while getting completed workouts.")
                     }
                     is Result.Loading -> _isLoading.value = true
                 }

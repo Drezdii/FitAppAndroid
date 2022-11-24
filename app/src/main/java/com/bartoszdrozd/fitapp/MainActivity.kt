@@ -35,6 +35,7 @@ import com.bartoszdrozd.fitapp.ui.creator.CreatorScreen
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutListScreen
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutScreen
+import com.bartoszdrozd.fitapp.ui.workout.history.PlannedWorkoutsScreen
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val screens = listOf(Screen.Timeline, Screen.History, Screen.Creator)
+        val screens = listOf(Screen.Timeline, Screen.Planned, Screen.Creator)
 
         FirebaseAuth.getInstance().addAuthStateListener {
             if (it.currentUser == null) {
@@ -193,6 +194,12 @@ class MainActivity : ComponentActivity() {
                                         snackbarHostState.showSnackbar(message.message)
                                     }
                                 }
+                            )
+                        }
+                        composable("planned") {
+                            PlannedWorkoutsScreen(
+                                viewModel = hiltViewModel(),
+                                onWorkoutClick = { workoutId -> navController.navigate("workout/$workoutId") }
                             )
                         }
                     }

@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class GetUserWorkoutsUseCase @Inject constructor(
+class GetPlannedWorkoutsUseCase @Inject constructor(
     private val workoutRepo: IWorkoutRepository,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : FlowUseCase<Unit, List<Workout>>(dispatcher) {
     override suspend fun execute(params: Unit): Flow<Result<List<Workout>>> {
-        return workoutRepo.getUserWorkouts().map { Result.Success(it) }
+        return workoutRepo.getPlannedWorkouts().map { Result.Success(it) }
     }
 }

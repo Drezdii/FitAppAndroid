@@ -88,13 +88,13 @@ fun WorkoutScreen(
         .setOnlyAlertOnce(true)
         .setOngoing(true)
 
-    // Create the NotificationChannel, but only on API 26+ because
-    // the NotificationChannel class is new and not in the support library
+    // Create the NotificationChannel
     val name = "Active workout channel"
     val descriptionText = "Workout active channel"
     val importance = NotificationManager.IMPORTANCE_DEFAULT
     val channel = NotificationChannel("WORKOUT_ACTIVE", name, importance).apply {
         description = descriptionText
+        setSound(null, null)
     }
 
     // Register the channel with the system
