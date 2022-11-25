@@ -9,8 +9,8 @@ import kotlin.math.ceil
 
 class Program531BBB4DaysCreator {
     private val percentagesPerWeek = mapOf(
-        1 to listOf(0.40, 0.50, 0.60, 0.75, 0.80, 0.85),
-        2 to listOf(0.40, 0.50, 0.60, 0.80, 0.85, 0.90),
+        1 to listOf(0.40, 0.50, 0.60, 0.65, 0.75, 0.85),
+        2 to listOf(0.40, 0.50, 0.60, 0.70, 0.80, 0.90),
         3 to listOf(0.40, 0.50, 0.60, 0.75, 0.85, 0.95)
     )
 
