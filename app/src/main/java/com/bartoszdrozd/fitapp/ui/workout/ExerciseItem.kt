@@ -6,9 +6,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddCircleOutline
+import androidx.compose.material.icons.outlined.AddCircle
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.workout.Exercise
 import com.bartoszdrozd.fitapp.utils.toNameResId
-import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 @Composable
@@ -53,7 +52,7 @@ fun ExerciseItem(exercise: Exercise, actions: IWorkoutActions) {
                             .weight(1f)
                             .clickable {
                                 // Don't allow closing empty exercises
-                                if(exercise.sets.isNotEmpty()) {
+                                if (exercise.sets.isNotEmpty()) {
                                     isExpanded = !isExpanded
                                 }
                             }
@@ -70,7 +69,7 @@ fun ExerciseItem(exercise: Exercise, actions: IWorkoutActions) {
                         }
                     }
                 }
-                if(isExpanded) {
+                if (isExpanded) {
                     OneRepMaxRow(exercise = exercise)
                 }
             }
@@ -107,7 +106,7 @@ fun ExerciseItem(exercise: Exercise, actions: IWorkoutActions) {
                                 onClick = { actions.addSet(exercise) }
                             ) {
                                 Icon(
-                                    Icons.Outlined.AddCircleOutline,
+                                    Icons.Outlined.AddCircle,
                                     contentDescription = stringResource(R.string.add_set)
                                 )
                             }
@@ -116,7 +115,7 @@ fun ExerciseItem(exercise: Exercise, actions: IWorkoutActions) {
                                 onClick = { actions.deleteExercise(exercise) }
                             ) {
                                 Icon(
-                                    Icons.Outlined.DeleteOutline,
+                                    Icons.Outlined.Delete,
                                     contentDescription = stringResource(R.string.delete_exercise)
                                 )
                             }
@@ -133,11 +132,13 @@ fun OneRepMaxRow(exercise: Exercise) {
     // Test with 1RM = 100kg
     // TODO: Use actual 1RM to calculate this
     val oneRepMax = 100.0
-    val biggestSet = exercise.sets.maxByOrNull { it.weight } ?: return
+    val biggestSet =
+        exercise.sets.maxByOrNull { (it.weight / (1.0278 - (0.0278 * it.reps))).roundToInt() }
+            ?: return
 
-    val repsNeeded = ceil(
-        (-(biggestSet.weight - (1.0278 * oneRepMax)) / (0.0278 * oneRepMax))
-    ).toInt()
+//    val repsNeeded = ceil(
+//        (-(biggestSet.weight - (1.0278 * oneRepMax)) / (0.0278 * oneRepMax))
+//    ).toInt()
 
     Row(
         Modifier
@@ -151,7 +152,7 @@ fun OneRepMaxRow(exercise: Exercise) {
             val estimatedMax =
                 (biggestSet.weight / (1.0278 - (0.0278 * biggestSet.reps))).roundToInt()
 
-            Text(text = "Est. Max: ${estimatedMax}kg", style = MaterialTheme.typography.labelMedium)
+            Text(text = stringResource(R.string.estimated_max, "${estimatedMax}kg"), style = MaterialTheme.typography.labelMedium)
         }
     }
 }
