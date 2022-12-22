@@ -56,6 +56,7 @@
     <string name="minutes_abbr">m</string>
     <string name="seconds_abbr">s</string>
     <string name="planned">Planned</string>
+    <string name="estimated_max">Est. Max %s</string>
 
     <string-array name="exercise_names">
         <item>@string/deadlift</item>
