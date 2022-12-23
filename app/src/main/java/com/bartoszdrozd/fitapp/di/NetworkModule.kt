@@ -3,6 +3,7 @@ package com.bartoszdrozd.fitapp.di
 import com.bartoszdrozd.fitapp.BuildConfig
 import com.bartoszdrozd.fitapp.data.auth.IAuthService
 import com.bartoszdrozd.fitapp.data.auth.RegisterUserResponseErrorCode
+import com.bartoszdrozd.fitapp.data.challenges.IChallengesService
 import com.bartoszdrozd.fitapp.data.workout.IWorkoutService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.*
@@ -101,6 +102,17 @@ object NetworkModule {
             .client(httpClient)
             .build()
             .create(IWorkoutService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesChallengesService(): IChallengesService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(providesGson()))
+            .client(httpClient)
+            .build()
+            .create(IChallengesService::class.java)
     }
 }
 

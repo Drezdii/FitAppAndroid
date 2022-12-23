@@ -47,7 +47,6 @@ class WorkoutRemoteDataSource @Inject constructor(
             return res.body()!!.toModel()
         } else {
             throw Exception(res.errorBody()?.string())
-            // Throw an error
         }
     }
 

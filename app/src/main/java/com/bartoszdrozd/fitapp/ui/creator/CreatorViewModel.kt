@@ -9,7 +9,7 @@ import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.program.ProgramValues
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.EventType
-import com.bartoszdrozd.fitapp.utils.Result
+import com.bartoszdrozd.fitapp.utils.ResultValue
 import com.bartoszdrozd.fitapp.utils.data
 import com.bartoszdrozd.fitapp.utils.succeeded
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -72,10 +72,10 @@ class CreatorViewModel @Inject constructor(
         val cycle = ProgramCycle(selectedProgram.value!!, workouts.value)
         viewModelScope.launch {
             val res = saveProgramCycleUseCase(cycle)
-            if (res is Result.Success) {
+            if (res is ResultValue.Success) {
                 _eventsChannel.send(EventType.Saved)
             } else {
-                _eventsChannel.send(EventType.Error((res as Result.Error).exception))
+                _eventsChannel.send(EventType.Error((res as ResultValue.Error).exception))
             }
         }
     }

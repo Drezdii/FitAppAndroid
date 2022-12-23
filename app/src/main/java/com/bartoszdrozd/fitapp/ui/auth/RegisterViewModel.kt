@@ -6,9 +6,9 @@ import com.bartoszdrozd.fitapp.data.auth.RegisterUserResponseErrorCode.*
 import com.bartoszdrozd.fitapp.domain.auth.RegisterUserParameters
 import com.bartoszdrozd.fitapp.domain.auth.RegisterUserUseCase
 import com.bartoszdrozd.fitapp.domain.auth.SignInWithCustomTokenUseCase
-import com.bartoszdrozd.fitapp.utils.Result
-import com.bartoszdrozd.fitapp.utils.Result.Error
-import com.bartoszdrozd.fitapp.utils.Result.Success
+import com.bartoszdrozd.fitapp.utils.ResultValue
+import com.bartoszdrozd.fitapp.utils.ResultValue.Error
+import com.bartoszdrozd.fitapp.utils.ResultValue.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -93,7 +93,7 @@ class RegisterViewModel @Inject constructor(
                         _uiState.value = currentState
                     }
                 }
-                is Result.Loading -> TODO()
+                is ResultValue.Loading -> TODO()
             }
         }
     }

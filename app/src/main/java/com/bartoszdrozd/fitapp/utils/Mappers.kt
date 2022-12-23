@@ -6,6 +6,8 @@ import com.bartoszdrozd.fitapp.data.entities.ExerciseEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutSetEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutWithExercises
+import com.bartoszdrozd.fitapp.model.challenges.Challenge
+import com.bartoszdrozd.fitapp.model.challenges.ChallengeEntry
 import com.bartoszdrozd.fitapp.model.creator.Program
 import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.workout.*
@@ -145,3 +147,9 @@ fun ProgramCycle.toDTO(): ProgramCycleDTO = ProgramCycleDTO(
 fun Program.toDTO(): ProgramDTO = ProgramDTO(id, name)
 
 fun ProgramDetailsDTO.toModel(): ProgramDetails = ProgramDetails(id, week)
+
+fun ChallengeEntryDTO.toModel(): ChallengeEntry =
+    ChallengeEntry(value, challengeId, completedAt, challenge.toModel())
+
+fun ChallengeDTO.toModel(): Challenge =
+    Challenge(nameTranslationKey, descriptionTranslationKey, startDate, endDate, goal, unit)

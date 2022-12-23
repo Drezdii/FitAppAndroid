@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bartoszdrozd.fitapp.domain.workout.GetCompletedAndActiveWorkouts
 import com.bartoszdrozd.fitapp.model.workout.Workout
-import com.bartoszdrozd.fitapp.utils.Result
+import com.bartoszdrozd.fitapp.utils.ResultValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,21 +26,21 @@ class WorkoutListViewModel @Inject constructor(
     fun getWorkouts() {
         viewModelScope.launch {
             getUserWorkoutsUseCase(Unit).collect {
-                if (it !is Result.Loading) {
+                if (it !is ResultValue.Loading) {
                     _isLoading.value = false
                 }
 
                 when (it) {
-                    is Result.Success -> {
+                    is ResultValue.Success -> {
                         _workouts.value = it.data.sortedByDescending { wrk ->
                             wrk.date
                         }
                     }
-                    is Result.Error -> {
+                    is ResultValue.Error -> {
                         // Handle error here
                         Log.e("WorkoutListViewModel", "Error while getting workouts.")
                     }
-                    is Result.Loading -> _isLoading.value = true
+                    is ResultValue.Loading -> _isLoading.value = true
                 }
             }
         }

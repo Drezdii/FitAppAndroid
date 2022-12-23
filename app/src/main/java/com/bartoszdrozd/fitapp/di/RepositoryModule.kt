@@ -6,6 +6,7 @@ import com.bartoszdrozd.fitapp.AppDatabase
 import com.bartoszdrozd.fitapp.data.auth.IAuthService
 import com.bartoszdrozd.fitapp.data.auth.IUserRepository
 import com.bartoszdrozd.fitapp.data.auth.UserRepository
+import com.bartoszdrozd.fitapp.data.challenges.*
 import com.bartoszdrozd.fitapp.data.workout.*
 import com.google.gson.Gson
 import dagger.Module
@@ -47,6 +48,20 @@ object RepositoryModule {
     @Named("workoutLocalDataSource")
     fun providesWorkoutLocalDataSource(workoutDao: WorkoutDao): IWorkoutDataSource =
         WorkoutLocalDataSource(workoutDao)
+
+    @Provides
+    @Singleton
+    fun providesChallengesRemoteDataSource(
+        challengesService: IChallengesService,
+        userRepository: IUserRepository
+    ): IChallengesDataSource =
+        ChallengesRemoteDataSource(challengesService, userRepository)
+
+    @Provides
+    @Singleton
+    fun providesChallengesRepository(
+        remoteDataSource: IChallengesDataSource
+    ): IChallengesRepository = ChallengesRepository(remoteDataSource)
 
     @Provides
     @Singleton

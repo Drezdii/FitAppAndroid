@@ -1,11 +1,11 @@
-package com.bartoszdrozd.fitapp.ui.workout.history
+package com.bartoszdrozd.fitapp.ui.workout.planned
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bartoszdrozd.fitapp.domain.workout.GetPlannedWorkoutsUseCase
 import com.bartoszdrozd.fitapp.model.workout.Workout
-import com.bartoszdrozd.fitapp.utils.Result
+import com.bartoszdrozd.fitapp.utils.ResultValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,21 +25,21 @@ class PlannedWorkoutsViewModel @Inject constructor(
     fun getPlannedWorkouts() {
         viewModelScope.launch {
             getPlannedWorkoutsUseCase(Unit).collect {
-                if (it !is Result.Loading) {
+                if (it !is ResultValue.Loading) {
                     _isLoading.value = false
                 }
 
                 when (it) {
-                    is Result.Success -> {
+                    is ResultValue.Success -> {
                         _workouts.value = it.data.sortedByDescending { wrk ->
                             wrk.date
                         }
                     }
-                    is Result.Error -> {
+                    is ResultValue.Error -> {
                         // Handle error here
                         Log.e("HistoryViewModel", "Error while getting completed workouts.")
                     }
-                    is Result.Loading -> _isLoading.value = true
+                    is ResultValue.Loading -> _isLoading.value = true
                 }
             }
         }

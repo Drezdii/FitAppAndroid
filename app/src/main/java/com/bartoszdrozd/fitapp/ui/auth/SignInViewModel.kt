@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.bartoszdrozd.fitapp.data.auth.InvalidCredentialsException
 import com.bartoszdrozd.fitapp.domain.auth.SignInParameters
 import com.bartoszdrozd.fitapp.domain.auth.SignInUseCase
-import com.bartoszdrozd.fitapp.utils.Result
+import com.bartoszdrozd.fitapp.utils.ResultValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -45,7 +45,7 @@ class SignInViewModel @Inject constructor(
                 )
             )
 
-            if (res is Result.Error) {
+            if (res is ResultValue.Error) {
                 _signInError.value = if (res.exception is InvalidCredentialsException) {
                     SignInErrorCode.INVALID_CREDENTIALS
                 } else {
