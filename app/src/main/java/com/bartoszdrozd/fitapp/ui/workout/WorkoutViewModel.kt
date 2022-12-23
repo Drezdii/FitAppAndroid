@@ -10,7 +10,7 @@ import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 import com.bartoszdrozd.fitapp.utils.EventType
-import com.bartoszdrozd.fitapp.utils.Result
+import com.bartoszdrozd.fitapp.utils.ResultValue
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -50,14 +50,14 @@ class WorkoutViewModel @Inject constructor(
         viewModelScope.launch {
             getWorkoutUseCase(id).collect {
                 when (it) {
-                    is Result.Success -> {
+                    is ResultValue.Success -> {
                         // Instantly mark new workout as dirty to display 'Save' button
                         _workoutUiState.value =
                             WorkoutUiState(it.data, false, isDirty = it.data.id == 0L)
                         _lastCleanWorkoutState = it.data
                     }
-                    is Result.Error -> _eventsChannel.send(EventType.Error(it.exception))
-                    is Result.Loading -> _workoutUiState.value =
+                    is ResultValue.Error -> _eventsChannel.send(EventType.Error(it.exception))
+                    is ResultValue.Loading -> _workoutUiState.value =
                         _workoutUiState.value.copy(isLoading = true)
                 }
             }
@@ -68,14 +68,14 @@ class WorkoutViewModel @Inject constructor(
         viewModelScope.launch {
             val res = saveWorkoutUseCase(_workoutUiState.value.workout)
 
-            if (res is Result.Success) {
+            if (res is ResultValue.Success) {
                 _eventsChannel.send(EventType.Saved)
             } else {
-                _eventsChannel.send(EventType.Error((res as Result.Error).exception))
+                _eventsChannel.send(EventType.Error((res as ResultValue.Error).exception))
             }
 
             // Reload workout only if a new one was being added
-            if (res is Result.Success && workoutUiState.value.workout.id == 0L) {
+            if (res is ResultValue.Success && workoutUiState.value.workout.id == 0L) {
                 loadWorkout(res.data)
             }
         }
@@ -84,7 +84,7 @@ class WorkoutViewModel @Inject constructor(
     fun deleteWorkout() {
         viewModelScope.launch {
             val res = deleteWorkoutUseCase(_workoutUiState.value.workout)
-            if (res is Result.Success) {
+            if (res is ResultValue.Success) {
                 _eventsChannel.send(EventType.Deleted)
             }
         }

@@ -1,21 +1,21 @@
 package com.bartoszdrozd.fitapp.domain
 
 import android.util.Log
-import com.bartoszdrozd.fitapp.utils.Result
+import com.bartoszdrozd.fitapp.utils.ResultValue
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
 abstract class UseCase<in P, R>(private val coroutineDispatcher: CoroutineDispatcher) {
-    suspend operator fun invoke(params: P): Result<R> {
+    suspend operator fun invoke(params: P): ResultValue<R> {
         return try {
             withContext(coroutineDispatcher) {
                 execute(params).let {
-                    Result.Success(it)
+                    ResultValue.Success(it)
                 }
             }
         } catch (e: Exception) {
             Log.e("EXCEPTION", e.stackTraceToString())
-            Result.Error(e)
+            ResultValue.Error(e)
         }
     }
 

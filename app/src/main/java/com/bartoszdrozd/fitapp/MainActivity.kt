@@ -31,11 +31,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.bartoszdrozd.fitapp.ui.Screen
 import com.bartoszdrozd.fitapp.ui.auth.LoginActivity
+import com.bartoszdrozd.fitapp.ui.challenges.ChallengesScreen
 import com.bartoszdrozd.fitapp.ui.creator.CreatorScreen
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutListScreen
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutScreen
-import com.bartoszdrozd.fitapp.ui.workout.history.PlannedWorkoutsScreen
+import com.bartoszdrozd.fitapp.ui.workout.planned.PlannedWorkoutsScreen
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -45,7 +46,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val screens = listOf(Screen.Timeline, Screen.Planned, Screen.Creator)
+        val screens = listOf(Screen.Timeline, Screen.Planned, Screen.Challenges, Screen.Creator)
 
         FirebaseAuth.getInstance().addAuthStateListener {
             if (it.currentUser == null) {
@@ -200,6 +201,11 @@ class MainActivity : ComponentActivity() {
                             PlannedWorkoutsScreen(
                                 viewModel = hiltViewModel(),
                                 onWorkoutClick = { workoutId -> navController.navigate("workout/$workoutId") }
+                            )
+                        }
+                        composable("challenges") {
+                            ChallengesScreen(
+                                viewModel = hiltViewModel(),
                             )
                         }
                     }

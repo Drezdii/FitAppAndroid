@@ -1,4 +1,4 @@
-package com.bartoszdrozd.fitapp.ui.workout.history
+package com.bartoszdrozd.fitapp.ui.workout.planned
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

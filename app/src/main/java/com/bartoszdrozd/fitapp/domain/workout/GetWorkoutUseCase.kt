@@ -4,7 +4,7 @@ import com.bartoszdrozd.fitapp.data.workout.IWorkoutRepository
 import com.bartoszdrozd.fitapp.di.IoDispatcher
 import com.bartoszdrozd.fitapp.domain.FlowUseCase
 import com.bartoszdrozd.fitapp.model.workout.Workout
-import com.bartoszdrozd.fitapp.utils.Result
+import com.bartoszdrozd.fitapp.utils.ResultValue
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -16,12 +16,12 @@ class GetWorkoutUseCase @Inject constructor(
     private val workoutRepo: IWorkoutRepository,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : FlowUseCase<Long, Workout>(dispatcher) {
-    override suspend fun execute(id: Long): Flow<Result<Workout>> {
+    override suspend fun execute(id: Long): Flow<ResultValue<Workout>> {
         if (id == 0L) {
             return flow {
-                emit(Result.Success(Workout()))
+                emit(ResultValue.Success(Workout()))
             }
         }
-        return workoutRepo.getWorkout(id).map { Result.Success(it) }
+        return workoutRepo.getWorkout(id).map { ResultValue.Success(it) }
     }
 }
