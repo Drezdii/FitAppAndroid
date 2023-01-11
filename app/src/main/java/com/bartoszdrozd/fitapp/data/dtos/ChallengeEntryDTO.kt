@@ -1,11 +1,11 @@
 package com.bartoszdrozd.fitapp.data.dtos
 
-import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 
 data class ChallengeEntryDTO(
     val value: Float,
     val challengeId: String,
-    val completedAt: Instant?,
+    val completedAt: LocalDate?,
     val challenge: ChallengeDTO
 )
 
