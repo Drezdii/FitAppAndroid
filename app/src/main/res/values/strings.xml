@@ -58,6 +58,10 @@
     <string name="planned">Planned</string>
     <string name="challenges">Challenges</string>
     <string name="estimated_max">Est. Max %s</string>
+    <string name="challenge_days_left">%dd</string>
+
+    <string name="benchTwoPlatesChallenge">Become a Gym Bro</string>
+    <string name="benchTwoPlatesChallengeDescription">Bench press two plates on each side.</string>
 
     <string-array name="exercise_names">
         <item>@string/deadlift</item>

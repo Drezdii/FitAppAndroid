@@ -24,13 +24,14 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    // Auth server address
     private const val BASE_URL = "https://10.0.2.2:5001"
-//    private const val BASE_URL = "https://fit-app.me"
+    private const val AUTH_URL = "https://fit-app.me"
+//    private const val BASE_URL = "https://fit-app.azurewebsites.net"
 
     @Provides
     @Singleton
     fun providesGson(): Gson {
+
         return GsonBuilder()
             // Kotlin Date types
             .registerTypeAdapter(
@@ -86,7 +87,7 @@ object NetworkModule {
     @Singleton
     fun providesUsersService(): IAuthService {
         return Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(AUTH_URL)
             .addConverterFactory(GsonConverterFactory.create(providesGson()))
             .client(httpClient)
             .build()
