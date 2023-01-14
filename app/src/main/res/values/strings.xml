@@ -9,6 +9,7 @@
     <string name="username">Username</string>
     <string name="signin_invalid_creds">Wrong e-mail or password.</string>
     <string name="general_error">Something went wrong.</string>
+    <string name="error_loading_workouts">Error updating workouts.</string>
     <string name="username_hint">Username</string>
     <string name="required_field">This field is required.</string>
     <string name="invalid_email">Invalid e-mail address.</string>
@@ -61,7 +62,20 @@
     <string name="challenge_days_left">%dd</string>
 
     <string name="benchTwoPlatesChallenge">Become a Gym Bro</string>
-    <string name="benchTwoPlatesChallengeDescription">Bench press two plates on each side.</string>
+    <string name="deadliftTotalWeight2023">Certified forklift</string>
+    <string name="benchTotalWeight2023">Bench: 2023</string>
+    <string name="squatTotalWeight2023">Squat: 2023</string>
+    <string name="numberOfPullups2023">Pullups: 2023</string>
+    <string name="ohpTotalWeight2023">OHP: 2023</string>
+    <string name="deadliftThreePlatesChallenge">Big boy deadlift</string>
+    <string name="deadliftTwoPlatesChallenge">Getting there</string>
+    <string name="deadliftTwoPlatesChallengeDescription">Deadlift two plates on each side</string>
+    <string name="ohpOnePlateChallenge">On top of the world</string>
+    <string name="numOfCreatedWorkoutsChallenge2023">Workouts: 2023</string>
+    <string name="ohpOnePlateChallengeDescription">OHP one plate on each side</string>
+    <string name="deadliftTotalWeight2023Description">In 2023, deadlift a total weight of 300k kg</string>
+    <string name="benchTwoPlatesChallengeDescription">Bench press two plates on each side</string>
+    <string name="deadliftThreePlatesChallengeDescription">Deadlift three plates on each side</string>
 
     <string-array name="exercise_names">
         <item>@string/deadlift</item>

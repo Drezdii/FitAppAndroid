@@ -1,5 +1,6 @@
 package com.bartoszdrozd.fitapp.data.workout
 
+import android.util.Log
 import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.ResourceNotFoundException
@@ -17,7 +18,7 @@ class WorkoutRepository @Inject constructor(
         coroutineScope {
             launch {
                 localDataSource.getWorkouts()
-                    // Filter to get completed workouts OR active workouts
+                    // Filter to get completed and active workouts
                     .map { it.filter { workout -> (workout.startDate != null && workout.endDate != null) || (workout.endDate == null) } }
                     .collect {
                         send(it)

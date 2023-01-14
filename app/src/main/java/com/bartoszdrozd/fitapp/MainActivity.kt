@@ -29,6 +29,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.bartoszdrozd.fitapp.model.SnackbarMessage
 import com.bartoszdrozd.fitapp.ui.Screen
 import com.bartoszdrozd.fitapp.ui.auth.LoginActivity
 import com.bartoszdrozd.fitapp.ui.challenges.ChallengesScreen
@@ -164,7 +165,12 @@ class MainActivity : ComponentActivity() {
                         composable("timeline") {
                             WorkoutListScreen(
                                 onWorkoutClick = { workoutId -> navController.navigate("workout/$workoutId") },
-                                viewModel = hiltViewModel()
+                                viewModel = hiltViewModel(),
+                                showSnackbar = { message ->
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(message.message)
+                                    }
+                                }
                             )
                         }
                         composable(
@@ -219,6 +225,5 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     FitAppTheme {
-        WorkoutListScreen(onWorkoutClick = {}, viewModel = viewModel())
     }
 }

@@ -1,13 +1,13 @@
 package com.bartoszdrozd.fitapp.domain.workout
 
+import android.util.Log
 import com.bartoszdrozd.fitapp.data.workout.IWorkoutRepository
 import com.bartoszdrozd.fitapp.di.IoDispatcher
 import com.bartoszdrozd.fitapp.domain.FlowUseCase
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.ResultValue
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 class GetCompletedAndActiveWorkouts @Inject constructor(
@@ -15,6 +15,7 @@ class GetCompletedAndActiveWorkouts @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : FlowUseCase<Unit, List<Workout>>(dispatcher) {
     override suspend fun execute(params: Unit): Flow<ResultValue<List<Workout>>> {
-        return workoutRepo.getCompletedAndActiveWorkouts().map { ResultValue.Success(it) }
+        return workoutRepo.getCompletedAndActiveWorkouts()
+            .map { ResultValue.Success(it) }
     }
 }
