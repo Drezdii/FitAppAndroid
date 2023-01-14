@@ -37,7 +37,7 @@ class PlannedWorkoutsViewModel @Inject constructor(
                     }
                     is ResultValue.Error -> {
                         // Handle error here
-                        Log.e("HistoryViewModel", "Error while getting completed workouts.")
+                        Log.e("PlannedWorkoutsViewModel", "Error while getting completed workouts.")
                     }
                     is ResultValue.Loading -> _isLoading.value = true
                 }

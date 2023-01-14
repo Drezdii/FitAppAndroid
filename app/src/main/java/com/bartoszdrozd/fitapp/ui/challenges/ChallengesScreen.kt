@@ -15,6 +15,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -32,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.challenges.ChallengeEntry
+import com.bartoszdrozd.fitapp.utils.AbbreviationFormatter
+import com.bartoszdrozd.fitapp.utils.modifyIf
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
@@ -68,10 +71,9 @@ fun ChallengeEntryView(entry: ChallengeEntry) {
     val progress = (entry.value / entry.challenge.goal).coerceAtMost(1f)
 
     val df = remember {
-        DecimalFormat("0.##")
+        AbbreviationFormatter()
     }
 
-    df.roundingMode = RoundingMode.UNNECESSARY
 
     val progressAnimation = remember {
         Animatable(0f)
@@ -85,6 +87,9 @@ fun ChallengeEntryView(entry: ChallengeEntry) {
         Modifier
             .fillMaxWidth()
             .padding(bottom = smallPadding)
+            .modifyIf(entry.completedAt != null) {
+                alpha(0.4f)
+            }
     ) {
         Column(Modifier.padding(smallPadding)) {
             val context = LocalContext.current
@@ -111,9 +116,9 @@ fun ChallengeEntryView(entry: ChallengeEntry) {
 
             val description = if (descriptionId != 0) stringResource(descriptionId) else null
 
-            Row(Modifier.padding(bottom = verySmallPadding)) {
+            Row(Modifier.padding(bottom = smallPadding)) {
                 Text(name, Modifier.weight(1f))
-                
+
                 if (entry.challenge.endDate != null) {
                     Row {
                         Icon(
@@ -130,7 +135,11 @@ fun ChallengeEntryView(entry: ChallengeEntry) {
             }
 
             if (description != null) {
-                Text(description, fontSize = 14.sp)
+                Text(
+                    description,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = smallPadding)
+                )
             }
 
             if (entry.challenge.startDate > Clock.System.now()) {
@@ -140,13 +149,21 @@ fun ChallengeEntryView(entry: ChallengeEntry) {
                         .daysUntil(entry.challenge.startDate, TimeZone.UTC).toString() + " days"
                 )
             } else {
-                ChallengeProgressBar(progressAnimation.value)
-            }
+                Row {
+                    Column(
+                        Modifier
+                            .weight(3.5f)
+                            .padding(end = smallPadding)
+                    ) {
+                        ChallengeProgressBar(progressAnimation.value)
+                    }
 
-            Row {
-                Text(df.format(entry.value))
-                Text("/")
-                Text(df.format(entry.challenge.goal))
+                    Text(
+                        "${df.format(entry.value)}/${df.format(entry.challenge.goal)}",
+                        Modifier.weight(1f),
+                        fontSize = 15.sp
+                    )
+                }
             }
         }
     }

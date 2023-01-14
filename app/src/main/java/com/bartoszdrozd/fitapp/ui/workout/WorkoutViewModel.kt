@@ -1,5 +1,6 @@
 package com.bartoszdrozd.fitapp.ui.workout
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bartoszdrozd.fitapp.domain.workout.DeleteWorkoutUseCase
@@ -14,10 +15,7 @@ import com.bartoszdrozd.fitapp.utils.ResultValue
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
@@ -57,8 +55,7 @@ class WorkoutViewModel @Inject constructor(
                         _lastCleanWorkoutState = it.data
                     }
                     is ResultValue.Error -> _eventsChannel.send(EventType.Error(it.exception))
-                    is ResultValue.Loading -> _workoutUiState.value =
-                        _workoutUiState.value.copy(isLoading = true)
+                    else -> {}
                 }
             }
         }
@@ -163,17 +160,17 @@ class WorkoutViewModel @Inject constructor(
     fun changeWorkoutState() {
         if (_workoutUiState.value.workout.startDate == null) {
             val workout = getWorkoutCopy().copy(startDate = Clock.System.now())
-            _workoutUiState.value = _workoutUiState.value.copy(workout = workout)
+            updateWorkoutState(workout, false)
         } else {
             val workout = getWorkoutCopy().copy(endDate = Clock.System.now())
-            _workoutUiState.value = _workoutUiState.value.copy(workout = workout)
+            updateWorkoutState(workout, false)
         }
 
         saveWorkout()
     }
 
-    private fun updateWorkoutState(workout: Workout) {
-        _workoutUiState.value = _workoutUiState.value.copy(workout = workout, isDirty = true)
+    private fun updateWorkoutState(workout: Workout, isDirty: Boolean = true) {
+        _workoutUiState.value = _workoutUiState.value.copy(workout = workout, isDirty = isDirty)
     }
 
     fun cancelChanges() {
