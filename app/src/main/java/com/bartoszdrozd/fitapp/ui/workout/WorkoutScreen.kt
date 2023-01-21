@@ -1,10 +1,13 @@
 package com.bartoszdrozd.fitapp.ui.workout
 
-import android.app.DatePickerDialog
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.Manifest
+import android.app.*
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.widget.DatePicker
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -18,7 +21,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.getSystemService
+import androidx.core.app.TaskStackBuilder
+import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.SnackbarMessage
 import com.bartoszdrozd.fitapp.model.workout.Exercise
@@ -59,6 +64,13 @@ fun WorkoutScreen(
     val state by workoutViewModel.workoutUiState.collectAsState()
     val isActive = state.workout.startDate != null && state.workout.endDate == null
 
+    val permissionLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                // Show notification
+            }
+        }
+
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -82,39 +94,52 @@ fun WorkoutScreen(
     val programName =
         state.workout.workoutProgramDetails?.let { stringResource(programDetailsToNameId(it)) }
 
-    val builder = Notification.Builder(context, "WORKOUT_ACTIVE")
-        .setSmallIcon(R.drawable.ic_deadlift)
-        .setContentTitle("Workout ${programName ?: ""}")
-        .setOnlyAlertOnce(true)
-        .setOngoing(true)
-
-    // Create the NotificationChannel
-    val name = "Active workout channel"
-    val descriptionText = "Workout active channel"
-    val importance = NotificationManager.IMPORTANCE_DEFAULT
-    val channel = NotificationChannel("WORKOUT_ACTIVE", name, importance).apply {
-        description = descriptionText
-        setSound(null, null)
+    val intent = TaskStackBuilder.create(context).run {
+        addNextIntentWithParentStack(
+            Intent(
+                Intent.ACTION_VIEW,
+                "fitapp://workout/${state.workout.id}".toUri()
+            )
+        )
+        getPendingIntent(workoutId.toInt(), PendingIntent.FLAG_IMMUTABLE)
     }
 
-    // Register the channel with the system
-    val notificationManager: NotificationManager = context.getSystemService()!!
-    notificationManager.createNotificationChannel(channel)
+    val builder = Notification.Builder(context, "WORKOUT_ACTIVE")
+        .setSmallIcon(R.drawable.ic_deadlift)
+        .setContentTitle("Active workout ${programName ?: ""}")
+        .setOnlyAlertOnce(true)
+        .setOngoing(true)
+        .setContentIntent(intent)
 
     // Workout can be both active and have ID equal to 0 or less if it's being added
     // We want to prevent displaying notification for that kind of workout
     if (isActive && state.workout.id > 0) {
-        with(NotificationManagerCompat.from(context)) {
-            LaunchedEffect(Unit) {
-                while (true) {
-                    val durationText =
-                        Clock.System.now().minus(state.workout.startDate!!)
-                            .toWorkoutDuration()
-                    builder.setContentText("Workout is currently active, Duration: $durationText")
-                    notify(state.workout.id.toInt(), builder.build())
-                    delay(1000)
-                }
+        // TODO: Fix notification not displaying the first time permission is allowed
+        // Request notifications permissions for API 33
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_DENIED
+            ) {
+                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
+        }
+
+        with(NotificationManagerCompat.from(context)) {
+            if (areNotificationsEnabled()) {
+//                LaunchedEffect(Unit) {
+//                    while (true) {
+//                        val durationText =
+//                            Clock.System.now().minus(state.workout.startDate!!)
+//                                .toWorkoutDuration()
+//                        builder.setContentText("Workout is currently active\nDuration: $durationText")
+//                        notify(state.workout.id.toInt(), builder.build())
+//                        delay(1000)
+//                    }
+//                }
+            }
+
         }
     } else {
         with(NotificationManagerCompat.from(context)) {
@@ -152,7 +177,7 @@ fun WorkoutScreen(
         }
 
         override fun onChangeWorkoutState() {
-            workoutViewModel.changeWorkoutState()
+            workoutViewModel.changeCompletionState()
         }
 
         override fun updateDate(newDate: LocalDate) {

@@ -1,11 +1,13 @@
 package com.bartoszdrozd.fitapp.ui.workout
 
-import android.util.Log
+import android.app.Application
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bartoszdrozd.fitapp.domain.workout.DeleteWorkoutUseCase
 import com.bartoszdrozd.fitapp.domain.workout.GetWorkoutUseCase
 import com.bartoszdrozd.fitapp.domain.workout.SaveWorkoutUseCase
+import com.bartoszdrozd.fitapp.domain.workout.WorkoutForegroundService
 import com.bartoszdrozd.fitapp.model.workout.Exercise
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
@@ -26,7 +28,8 @@ class WorkoutViewModel @Inject constructor(
     private val getWorkoutUseCase: GetWorkoutUseCase,
     private val saveWorkoutUseCase: SaveWorkoutUseCase,
     private val deleteWorkoutUseCase: DeleteWorkoutUseCase,
-    private val gson: Gson
+    private val gson: Gson,
+    private val application: Application
 ) : ViewModel() {
     private val _workoutUiState = MutableStateFlow(WorkoutUiState())
     private val _openExercises: MutableStateFlow<List<Long>> = MutableStateFlow(emptyList())
@@ -49,16 +52,44 @@ class WorkoutViewModel @Inject constructor(
             getWorkoutUseCase(id).collect {
                 when (it) {
                     is ResultValue.Success -> {
+                        val workout = it.data
                         // Instantly mark new workout as dirty to display 'Save' button
                         _workoutUiState.value =
-                            WorkoutUiState(it.data, false, isDirty = it.data.id == 0L)
-                        _lastCleanWorkoutState = it.data
+                            WorkoutUiState(workout, false, isDirty = workout.id == 0L)
+                        _lastCleanWorkoutState = workout
+
+                        if (workout.isActive) {
+                            startTrackingService(workout)
+                        }
+                        if (!workout.isActive) {
+                            stopTrackingService(workout.id)
+                        }
                     }
                     is ResultValue.Error -> _eventsChannel.send(EventType.Error(it.exception))
                     else -> {}
                 }
             }
         }
+    }
+
+    private fun startTrackingService(workout: Workout) {
+        if (workout.id == 0L) {
+            return
+        }
+
+        val workoutService =
+            Intent(application.applicationContext, WorkoutForegroundService::class.java)
+        workoutService.putExtra("workoutId", workout.id)
+        workoutService.action = WorkoutForegroundService.START_WORKOUT
+        application.applicationContext.startService(workoutService)
+    }
+
+    private fun stopTrackingService(workoutId: Long) {
+        val workoutService =
+            Intent(application.applicationContext, WorkoutForegroundService::class.java)
+        workoutService.putExtra("workoutId", workoutId)
+        workoutService.action = WorkoutForegroundService.STOP_WORKOUT
+        application.applicationContext.startService(workoutService)
     }
 
     fun saveWorkout() {
@@ -157,7 +188,7 @@ class WorkoutViewModel @Inject constructor(
         updateWorkoutState(_workoutUiState.value.workout.copy(date = newDate))
     }
 
-    fun changeWorkoutState() {
+    fun changeCompletionState() {
         if (_workoutUiState.value.workout.startDate == null) {
             val workout = getWorkoutCopy().copy(startDate = Clock.System.now())
             updateWorkoutState(workout, false)
