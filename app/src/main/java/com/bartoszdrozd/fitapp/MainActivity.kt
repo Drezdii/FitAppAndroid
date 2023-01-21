@@ -1,7 +1,10 @@
 package com.bartoszdrozd.fitapp
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -18,8 +21,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.core.content.getSystemService
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -29,6 +34,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import com.bartoszdrozd.fitapp.data.workout.IWorkoutRepository
 import com.bartoszdrozd.fitapp.model.SnackbarMessage
 import com.bartoszdrozd.fitapp.ui.Screen
 import com.bartoszdrozd.fitapp.ui.auth.LoginActivity
@@ -41,6 +48,7 @@ import com.bartoszdrozd.fitapp.ui.workout.planned.PlannedWorkoutsScreen
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -59,6 +67,18 @@ class MainActivity : ComponentActivity() {
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
+        // Create the NotificationChannel used for active workouts
+        val name = "Active workout channel"
+        val descriptionText = "Workout active channel"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val channel = NotificationChannel("WORKOUT_ACTIVE", name, importance).apply {
+            description = descriptionText
+            setSound(null, null)
+        }
+
+        // Register the channel with the system
+        val notificationManager: NotificationManager = getSystemService()!!
+        notificationManager.createNotificationChannel(channel)
 
         setContent {
             FitAppTheme {
@@ -144,7 +164,6 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
-//                        }
                     }
                 ) { innerPadding ->
                     val navHostPadding = PaddingValues(
@@ -175,7 +194,12 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(
                             "workout/{workoutId}",
-                            arguments = listOf(navArgument("workoutId") { type = NavType.LongType })
+                            arguments = listOf(navArgument("workoutId") {
+                                type = NavType.LongType
+                            }),
+                            deepLinks = listOf(navDeepLink {
+                                uriPattern = "fitapp://workout/{workoutId}"
+                            })
                         ) { backStackEntry ->
                             WorkoutScreen(
                                 workoutViewModel = hiltViewModel(),
