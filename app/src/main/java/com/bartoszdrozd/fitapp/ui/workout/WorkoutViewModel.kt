@@ -80,6 +80,7 @@ class WorkoutViewModel @Inject constructor(
         val workoutService =
             Intent(application.applicationContext, WorkoutForegroundService::class.java)
         workoutService.putExtra("workoutId", workout.id)
+        workoutService.putExtra("startDate", workout.startDate!!.epochSeconds)
         workoutService.action = WorkoutForegroundService.START_WORKOUT
         application.applicationContext.startService(workoutService)
     }
