@@ -15,6 +15,7 @@ import androidx.core.net.toUri
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import java.util.Timer
 import java.util.TimerTask
 
@@ -22,7 +23,7 @@ class WorkoutForegroundService : Service() {
     private val activeWorkouts = mutableMapOf<Long, Timer>()
 
     // Which workout is currently using service's notification
-    private var mainWorkoutId: Long = -1
+    private var mainWorkoutId: Long? = null
     private val notificationId = 1234
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -42,6 +43,7 @@ class WorkoutForegroundService : Service() {
         }
 
         val workoutId = intent?.getLongExtra("workoutId", -1) ?: -1
+        val startDate = intent?.getLongExtra("startDate", 0) ?: 0
 
 //        while (true) {
 ////            val durationText =
@@ -55,21 +57,17 @@ class WorkoutForegroundService : Service() {
         if (intent?.action == STOP_WORKOUT && workoutId in activeWorkouts) {
             activeWorkouts[workoutId]?.cancel()
             activeWorkouts.remove(workoutId)
+
             if (workoutId != mainWorkoutId) {
                 NotificationManagerCompat.from(this).cancel(workoutId.toInt())
             } else {
-                mainWorkoutId = activeWorkouts.keys.first()
-                NotificationManagerCompat.from(this).cancel(mainWorkoutId.toInt())
+                mainWorkoutId = activeWorkouts.keys.firstOrNull()
+                mainWorkoutId?.toInt()?.let { NotificationManagerCompat.from(this).cancel(it) }
             }
 
             if (activeWorkouts.isEmpty()) {
                 stopSelf()
             }
-//            if (activeWorkouts.isEmpty()) {
-//                stopSelf()
-//            } else {
-//                NotificationManagerCompat.from(this).cancel(workoutId.toInt())
-//            }
         }
 
         if (intent?.action == START_WORKOUT) {
@@ -99,7 +97,6 @@ class WorkoutForegroundService : Service() {
                 if (activeWorkouts.isEmpty()) {
                     mainWorkoutId = workoutId
                     startForeground(notificationId, builder.build())
-                    Log.d("TEST", "Service started")
                 }
 
                 val timer = Timer()
@@ -107,15 +104,16 @@ class WorkoutForegroundService : Service() {
                 activeWorkouts[workoutId] = timer
 
                 timer.scheduleAtFixedRate(object : TimerTask() {
-                    val now = Clock.System.now()
+                    val startDateInstant = Instant.fromEpochSeconds(startDate)
 
                     @SuppressLint("MissingPermission")
                     override fun run() {
-                        Log.d("TEST", "Timer run for: $workoutId")
-                        val durationText = Clock.System.now().minus(now).toWorkoutDuration()
+                        val durationText =
+                            Clock.System.now().minus(startDateInstant).toWorkoutDuration()
+
                         builder.setContentText("${workoutId}: Workout is currently active\nDuration: $durationText")
                         with(NotificationManagerCompat.from(this@WorkoutForegroundService)) {
-                            // Use service's notification if only one workout is in progress
+                            // Use the service's notification if only one workout is in progress
                             if (activeWorkouts.size == 1 || mainWorkoutId == workoutId) {
                                 notify(notificationId, builder.build())
                             } else {
@@ -124,7 +122,7 @@ class WorkoutForegroundService : Service() {
                         }
                     }
 
-                }, 0, 1000)
+                }, 0, 500)
             }
         }
 
