@@ -77,6 +77,8 @@
     <string name="benchTwoPlatesChallengeDescription">Bench press two plates on each side</string>
     <string name="deadliftThreePlatesChallengeDescription">Deadlift three plates on each side</string>
 
+    <string name="unlocks_in">Unlocks in %d days</string>
+
     <string-array name="exercise_names">
         <item>@string/deadlift</item>
         <item>@string/bench</item>
