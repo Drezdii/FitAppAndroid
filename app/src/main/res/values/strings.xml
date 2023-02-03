@@ -60,23 +60,6 @@
     <string name="challenges">Challenges</string>
     <string name="estimated_max">Est. Max %s</string>
     <string name="challenge_days_left">%dd</string>
-
-    <string name="benchTwoPlatesChallenge">Become a Gym Bro</string>
-    <string name="deadliftTotalWeight2023">Certified forklift</string>
-    <string name="benchTotalWeight2023">Bench: 2023</string>
-    <string name="squatTotalWeight2023">Squat: 2023</string>
-    <string name="numberOfPullups2023">Pullups: 2023</string>
-    <string name="ohpTotalWeight2023">OHP: 2023</string>
-    <string name="deadliftThreePlatesChallenge">Big boy deadlift</string>
-    <string name="deadliftTwoPlatesChallenge">Getting there</string>
-    <string name="deadliftTwoPlatesChallengeDescription">Deadlift two plates on each side</string>
-    <string name="ohpOnePlateChallenge">On top of the world</string>
-    <string name="numOfCreatedWorkoutsChallenge2023">Workouts: 2023</string>
-    <string name="ohpOnePlateChallengeDescription">OHP one plate on each side</string>
-    <string name="deadliftTotalWeight2023Description">In 2023, deadlift a total weight of 300k kg</string>
-    <string name="benchTwoPlatesChallengeDescription">Bench press two plates on each side</string>
-    <string name="deadliftThreePlatesChallengeDescription">Deadlift three plates on each side</string>
-
     <string name="unlocks_in">Unlocks in %d days</string>
 
     <string-array name="exercise_names">

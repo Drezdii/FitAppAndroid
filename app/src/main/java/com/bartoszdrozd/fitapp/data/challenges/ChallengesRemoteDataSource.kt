@@ -19,7 +19,7 @@ class ChallengesRemoteDataSource @Inject constructor(
         if (res.isSuccessful) {
             emit(res.body()!!.map(ChallengeEntryDTO::toModel))
         } else {
-            // Emit error loading workouts from the server
+            // Emit error loading challenges from the server
         }
     }
 }
