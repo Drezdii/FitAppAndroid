@@ -1,6 +1,5 @@
 package com.bartoszdrozd.fitapp.domain.workout
 
-import android.util.Log
 import com.bartoszdrozd.fitapp.data.workout.IWorkoutRepository
 import com.bartoszdrozd.fitapp.di.IoDispatcher
 import com.bartoszdrozd.fitapp.domain.FlowUseCase

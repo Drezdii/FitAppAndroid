@@ -19,16 +19,11 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.drawText
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bartoszdrozd.fitapp.R
@@ -38,8 +33,6 @@ import com.bartoszdrozd.fitapp.utils.modifyIf
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
-import java.math.RoundingMode
-import java.text.DecimalFormat
 
 @Composable
 fun ChallengesScreen(viewModel: ChallengesViewModel) {
@@ -65,7 +58,6 @@ fun ChallengesView(challenges: List<ChallengeEntry>) {
 @Composable
 fun ChallengeEntryView(entry: ChallengeEntry) {
     val smallPadding = dimensionResource(R.dimen.small_padding)
-    val verySmallPadding = dimensionResource(R.dimen.very_small_padding)
 
     // Limit max progress to 100%
     val progress = (entry.value / entry.challenge.goal).coerceAtMost(1f)

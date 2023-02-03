@@ -78,8 +78,8 @@ object NetworkModule {
         OkHttpClient()
             .newBuilder()
             .addInterceptor(AuthTokenInterceptor())
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .callTimeout(10, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .callTimeout(30, TimeUnit.SECONDS)
             .build()
     }
 

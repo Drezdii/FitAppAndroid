@@ -1,6 +1,5 @@
 package com.bartoszdrozd.fitapp.ui.workout
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bartoszdrozd.fitapp.domain.workout.GetCompletedAndActiveWorkouts

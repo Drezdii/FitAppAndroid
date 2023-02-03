@@ -1,6 +1,5 @@
 package com.bartoszdrozd.fitapp.data.workout
 
-import android.util.Log
 import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.ResourceNotFoundException
