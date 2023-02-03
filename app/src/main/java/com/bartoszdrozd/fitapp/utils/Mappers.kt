@@ -152,4 +152,4 @@ fun ChallengeEntryDTO.toModel(): ChallengeEntry =
     ChallengeEntry(value, challengeId, completedAt, challenge.toModel())
 
 fun ChallengeDTO.toModel(): Challenge =
-    Challenge(nameTranslationKey, descriptionTranslationKey, startDate, endDate, goal, unit)
+    Challenge(name, description, startDate, endDate, goal, unit)

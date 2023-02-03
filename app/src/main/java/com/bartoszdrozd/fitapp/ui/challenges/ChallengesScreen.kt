@@ -21,7 +21,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -84,32 +83,8 @@ fun ChallengeEntryView(entry: ChallengeEntry) {
             }
     ) {
         Column(Modifier.padding(smallPadding)) {
-            val context = LocalContext.current
-
-            // Get string resource id of the name of the challenge
-            val nameId = remember(entry.challenge.nameTranslationKey) {
-                context.resources.getIdentifier(
-                    entry.challenge.nameTranslationKey,
-                    "string",
-                    context.packageName
-                )
-            }
-
-            val name =
-                if (nameId != 0) stringResource(nameId) else entry.challenge.nameTranslationKey
-
-            val descriptionId = remember(entry.challenge.descriptionTranslationKey) {
-                context.resources.getIdentifier(
-                    entry.challenge.descriptionTranslationKey ?: "",
-                    "string",
-                    context.packageName
-                )
-            }
-
-            val description = if (descriptionId != 0) stringResource(descriptionId) else null
-
             Row(Modifier.padding(bottom = smallPadding)) {
-                Text(name, Modifier.weight(1f))
+                Text(entry.challenge.name, Modifier.weight(1f))
 
                 if (entry.challenge.endDate != null) {
                     Row {
@@ -126,9 +101,9 @@ fun ChallengeEntryView(entry: ChallengeEntry) {
                 }
             }
 
-            if (description != null) {
+            if (!entry.challenge.description.isNullOrBlank()) {
                 Text(
-                    description,
+                    entry.challenge.description,
                     fontSize = 14.sp,
                     modifier = Modifier.padding(bottom = smallPadding)
                 )

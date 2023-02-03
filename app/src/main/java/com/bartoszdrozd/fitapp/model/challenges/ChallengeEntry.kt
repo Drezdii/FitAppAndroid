@@ -1,6 +1,5 @@
 package com.bartoszdrozd.fitapp.model.challenges
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 
 data class ChallengeEntry(
