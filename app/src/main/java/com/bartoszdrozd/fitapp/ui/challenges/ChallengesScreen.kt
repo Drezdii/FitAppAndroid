@@ -135,10 +135,11 @@ fun ChallengeEntryView(entry: ChallengeEntry) {
             }
 
             if (entry.challenge.startDate > Clock.System.now()) {
-                // TODO: Add string resource
                 Text(
-                    "Unlocks in " + Clock.System.now()
-                        .daysUntil(entry.challenge.startDate, TimeZone.UTC).toString() + " days"
+                    stringResource(
+                        R.string.challenge_days_left, Clock.System.now()
+                            .daysUntil(entry.challenge.startDate, TimeZone.UTC).toString()
+                    )
                 )
             } else {
                 Row {
@@ -163,7 +164,6 @@ fun ChallengeEntryView(entry: ChallengeEntry) {
 
 @Composable
 fun ChallengeProgressBar(progress: Float) {
-    // TODO: Change hardcoded height
     Canvas(
         Modifier
             .progressSemantics(progress)

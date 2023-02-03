@@ -1,10 +1,7 @@
 package com.bartoszdrozd.fitapp.ui.workout
 
-import android.Manifest
 import android.app.*
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.widget.DatePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -22,7 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.SnackbarMessage
@@ -110,42 +106,6 @@ fun WorkoutScreen(
         .setOnlyAlertOnce(true)
         .setOngoing(true)
         .setContentIntent(intent)
-
-    // Workout can be both active and have ID equal to 0 or less if it's being added
-    // We want to prevent displaying notification for that kind of workout
-    if (isActive && state.workout.id > 0) {
-        // TODO: Fix notification not displaying the first time permission is allowed
-        // Request notifications permissions for API 33
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_DENIED
-            ) {
-                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
-
-        with(NotificationManagerCompat.from(context)) {
-            if (areNotificationsEnabled()) {
-//                LaunchedEffect(Unit) {
-//                    while (true) {
-//                        val durationText =
-//                            Clock.System.now().minus(state.workout.startDate!!)
-//                                .toWorkoutDuration()
-//                        builder.setContentText("Workout is currently active\nDuration: $durationText")
-//                        notify(state.workout.id.toInt(), builder.build())
-//                        delay(1000)
-//                    }
-//                }
-            }
-
-        }
-    } else {
-        with(NotificationManagerCompat.from(context)) {
-            cancel(state.workout.id.toInt())
-        }
-    }
 
     val actions = object : IWorkoutActions {
         override fun updateSet(set: WorkoutSet, exerciseId: Long) {

@@ -64,7 +64,7 @@ fun CreatorScreen(
                 }
                 // Add more error messages
                 is EventType.Error -> showSnackbar(SnackbarMessage(context.getString(R.string.general_error)))
-                else -> TODO()
+                else -> {}
             }
         }
     }
