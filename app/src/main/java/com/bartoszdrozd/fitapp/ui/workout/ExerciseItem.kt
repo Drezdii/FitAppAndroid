@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.workout.Exercise
 import com.bartoszdrozd.fitapp.utils.toNameResId
+import kotlin.math.pow
 import kotlin.math.roundToInt
 
 @Composable
@@ -136,10 +137,6 @@ fun OneRepMaxRow(exercise: Exercise) {
         exercise.sets.maxByOrNull { (it.weight / (1.0278 - (0.0278 * it.reps))).roundToInt() }
             ?: return
 
-//    val repsNeeded = ceil(
-//        (-(biggestSet.weight - (1.0278 * oneRepMax)) / (0.0278 * oneRepMax))
-//    ).toInt()
-
     Row(
         Modifier
             .padding(dimensionResource(id = R.dimen.small_padding))
@@ -150,9 +147,12 @@ fun OneRepMaxRow(exercise: Exercise) {
 
         if (biggestSet.reps in 1..15) {
             val estimatedMax =
-                (biggestSet.weight / (1.0278 - (0.0278 * biggestSet.reps))).roundToInt()
+                100 * biggestSet.weight / (48.8 + 53.8 * Math.E.pow(-0.075 * biggestSet.reps))
 
-            Text(text = stringResource(R.string.estimated_max, "${estimatedMax}kg"), style = MaterialTheme.typography.labelMedium)
+            Text(
+                text = stringResource(R.string.estimated_max, "${estimatedMax.roundToInt()}kg"),
+                style = MaterialTheme.typography.labelMedium
+            )
         }
     }
 }
