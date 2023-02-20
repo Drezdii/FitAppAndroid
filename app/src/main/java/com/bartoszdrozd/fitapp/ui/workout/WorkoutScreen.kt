@@ -2,7 +2,6 @@ package com.bartoszdrozd.fitapp.ui.workout
 
 import android.app.*
 import android.content.Intent
-import android.widget.DatePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.horizontalScroll
@@ -32,10 +31,7 @@ import com.bartoszdrozd.fitapp.utils.programDetailsToNameId
 import com.bartoszdrozd.fitapp.utils.toWorkoutDate
 import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.*
 
 interface IWorkoutActions {
     fun updateSet(set: WorkoutSet, exerciseId: Long)
@@ -234,6 +230,7 @@ fun NewExerciseBar(addExercise: (ExerciseType) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun WorkoutHeader(
     workout: Workout,
@@ -241,6 +238,8 @@ private fun WorkoutHeader(
     isDirty: Boolean
 ) {
     var durationText by remember { mutableStateOf("") }
+    var openDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState(Clock.System.now().toEpochMilliseconds())
 
     ElevatedCard(
         modifier = Modifier
@@ -274,26 +273,35 @@ private fun WorkoutHeader(
                     }
                 }
 
-                val date =
-                    workout.date ?: Clock.System.now()
-                        .toLocalDateTime(TimeZone.currentSystemDefault()).date
-
-                val datePickerDialog = DatePickerDialog(
-                    LocalContext.current,
-                    { _: DatePicker, year: Int, month: Int, day: Int ->
-                        // DatePicker uses 0-11 for months
-                        val newDate = LocalDate(year, month + 1, day)
-                        actions.updateDate(newDate)
-                    },
-                    date.year,
-                    date.monthNumber - 1,
-                    date.dayOfMonth
-                )
+                if (openDatePicker) {
+                    DatePickerDialog(
+                        onDismissRequest = { openDatePicker = false },
+                        confirmButton = {
+                            TextButton(onClick = { openDatePicker = false }) {
+                                Text(stringResource(R.string.save))
+                            }
+                            if (datePickerState.selectedDateMillis != null) {
+                                actions.updateDate(
+                                    Instant.fromEpochMilliseconds(datePickerState.selectedDateMillis!!)
+                                        .toLocalDateTime(
+                                            TimeZone.UTC
+                                        ).date
+                                )
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { openDatePicker = false }) {
+                                Text(stringResource(R.string.cancel))
+                            }
+                        }) {
+                        DatePicker(state = datePickerState)
+                    }
+                }
 
                 WorkoutDateRow(
                     date = workout.date?.toWorkoutDate(),
                     duration = durationText,
-                    onDateClick = { datePickerDialog.show() },
+                    onDateClick = { openDatePicker = true },
                     isEditing = true
                 )
             }
