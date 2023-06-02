@@ -24,6 +24,7 @@ class WorkoutRemoteDataSource @Inject constructor(
         if (res.isSuccessful) {
             emit(res.body()!!.map(WorkoutDTO::toModel))
         } else {
+            Log.e("TEST", res.errorBody()?.string().toString())
             // Emit error loading workouts from the server
         }
     }

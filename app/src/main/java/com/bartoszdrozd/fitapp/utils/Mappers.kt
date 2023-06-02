@@ -1,7 +1,14 @@
 package com.bartoszdrozd.fitapp.utils
 
 import com.bartoszdrozd.fitapp.R
-import com.bartoszdrozd.fitapp.data.dtos.*
+import com.bartoszdrozd.fitapp.data.dtos.ChallengeDTO
+import com.bartoszdrozd.fitapp.data.dtos.ChallengeEntryDTO
+import com.bartoszdrozd.fitapp.data.dtos.ExerciseDTO
+import com.bartoszdrozd.fitapp.data.dtos.ProgramCycleDTO
+import com.bartoszdrozd.fitapp.data.dtos.ProgramDTO
+import com.bartoszdrozd.fitapp.data.dtos.ProgramDetailsDTO
+import com.bartoszdrozd.fitapp.data.dtos.WorkoutDTO
+import com.bartoszdrozd.fitapp.data.dtos.WorkoutSetDTO
 import com.bartoszdrozd.fitapp.data.entities.ExerciseEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutEntity
 import com.bartoszdrozd.fitapp.data.entities.WorkoutSetEntity
@@ -10,7 +17,11 @@ import com.bartoszdrozd.fitapp.model.challenges.Challenge
 import com.bartoszdrozd.fitapp.model.challenges.ChallengeEntry
 import com.bartoszdrozd.fitapp.model.creator.Program
 import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
-import com.bartoszdrozd.fitapp.model.workout.*
+import com.bartoszdrozd.fitapp.model.workout.Exercise
+import com.bartoszdrozd.fitapp.model.workout.ExerciseType
+import com.bartoszdrozd.fitapp.model.workout.ProgramDetails
+import com.bartoszdrozd.fitapp.model.workout.Workout
+import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaLocalDate
 import java.time.format.DateTimeFormatter
