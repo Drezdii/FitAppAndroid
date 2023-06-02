@@ -1,11 +1,25 @@
 package com.bartoszdrozd.fitapp.ui.workout
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DeleteOutline
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -13,7 +27,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WorkoutSetItem(
     set: WorkoutSet,
@@ -46,10 +59,6 @@ fun WorkoutSetItem(
             },
             Modifier.weight(1f),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                textColor = LocalContentColor.current,
-                unfocusedBorderColor = LocalContentColor.current
-            )
         )
 
         Column(
@@ -72,10 +81,6 @@ fun WorkoutSetItem(
             },
             Modifier.weight(1f),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                textColor = LocalContentColor.current,
-                unfocusedBorderColor = LocalContentColor.current
-            )
         )
 
         IconButton(onClick = { deleteSet(set) }, Modifier.align(Alignment.CenterVertically)) {

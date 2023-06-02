@@ -1,14 +1,15 @@
 package com.bartoszdrozd.fitapp.domain.workout
 
-import android.annotation.SuppressLint
+import android.Manifest
 import android.app.Notification
 import android.app.Notification.FOREGROUND_SERVICE_IMMEDIATE
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
@@ -22,7 +23,7 @@ import java.util.TimerTask
 class WorkoutForegroundService : Service() {
     private val activeWorkouts = mutableMapOf<Long, Timer>()
 
-    // Which workout is currently using service's notification
+    // Which workout is currently using the service's notification
     private var mainWorkoutId: Long? = null
     private val notificationId = 1234
 
@@ -36,7 +37,6 @@ class WorkoutForegroundService : Service() {
         const val STOP_SERVICE = "com.bartoszdrozd.fitapp.STOP_SERVICE"
     }
 
-    @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == STOP_SERVICE) {
             stopSelf()
@@ -44,15 +44,6 @@ class WorkoutForegroundService : Service() {
 
         val workoutId = intent?.getLongExtra("workoutId", -1) ?: -1
         val startDate = intent?.getLongExtra("startDate", 0) ?: 0
-
-//        while (true) {
-////            val durationText =
-////                Clock.System.now().minus(state.workout.startDate!!)
-////                    .toWorkoutDuration()
-//            val durationText = Clock.System.now().minus(now).toWorkoutDuration()
-//            builder.setContentText("Workout is currently active\nDuration: $durationText")
-//            delay(1000)
-//        }
 
         if (intent?.action == STOP_WORKOUT && workoutId in activeWorkouts) {
             activeWorkouts[workoutId]?.cancel()
@@ -84,7 +75,7 @@ class WorkoutForegroundService : Service() {
 
                 val builder = Notification.Builder(this, "WORKOUT_ACTIVE")
                     .setSmallIcon(R.drawable.ic_deadlift)
-                    .setContentTitle("Active workout $workoutId")
+                    .setContentTitle("Active workout")
                     .setOnlyAlertOnce(true)
                     .setOngoing(true)
                     .setAutoCancel(false)
@@ -106,18 +97,23 @@ class WorkoutForegroundService : Service() {
                 timer.scheduleAtFixedRate(object : TimerTask() {
                     val startDateInstant = Instant.fromEpochSeconds(startDate)
 
-                    @SuppressLint("MissingPermission")
                     override fun run() {
                         val durationText =
                             Clock.System.now().minus(startDateInstant).toWorkoutDuration()
 
-                        builder.setContentText("${workoutId}: Workout is currently active\nDuration: $durationText")
+                        builder.setContentText("Workout is currently active\nDuration: $durationText")
                         with(NotificationManagerCompat.from(this@WorkoutForegroundService)) {
                             // Use the service's notification if only one workout is in progress
-                            if (activeWorkouts.size == 1 || mainWorkoutId == workoutId) {
-                                notify(notificationId, builder.build())
-                            } else {
-                                notify(workoutId.toInt(), builder.build())
+                            if (ActivityCompat.checkSelfPermission(
+                                    this@WorkoutForegroundService,
+                                    Manifest.permission.POST_NOTIFICATIONS
+                                ) == PackageManager.PERMISSION_GRANTED
+                            ) {
+                                if (activeWorkouts.size == 1 || mainWorkoutId == workoutId) {
+                                    notify(notificationId, builder.build())
+                                } else {
+                                    notify(workoutId.toInt(), builder.build())
+                                }
                             }
                         }
                     }

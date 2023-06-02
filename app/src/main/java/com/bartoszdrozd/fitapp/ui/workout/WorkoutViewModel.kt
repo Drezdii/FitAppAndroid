@@ -37,7 +37,7 @@ class WorkoutViewModel @Inject constructor(
     private val _workoutUiState = MutableStateFlow(WorkoutUiState())
     private val _openExercises: MutableStateFlow<List<Long>> = MutableStateFlow(emptyList())
 
-    private val _eventsChannel = Channel<EventType<*>>();
+    private val _eventsChannel = Channel<EventType<*>>()
 
     private lateinit var _lastCleanWorkoutState: Workout
 
@@ -68,6 +68,7 @@ class WorkoutViewModel @Inject constructor(
                             stopTrackingService(workout.id)
                         }
                     }
+
                     is ResultValue.Error -> _eventsChannel.send(EventType.Error(it.exception))
                     else -> {}
                 }

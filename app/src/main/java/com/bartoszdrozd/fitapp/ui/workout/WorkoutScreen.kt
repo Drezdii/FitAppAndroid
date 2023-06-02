@@ -1,7 +1,9 @@
 package com.bartoszdrozd.fitapp.ui.workout
 
+import android.Manifest
 import android.app.*
-import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.horizontalScroll
@@ -17,8 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.TaskStackBuilder
-import androidx.core.net.toUri
+import androidx.core.content.ContextCompat
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.SnackbarMessage
 import com.bartoszdrozd.fitapp.model.workout.Exercise
@@ -27,7 +28,6 @@ import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.utils.EventType
-import com.bartoszdrozd.fitapp.utils.programDetailsToNameId
 import com.bartoszdrozd.fitapp.utils.toWorkoutDate
 import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
 import kotlinx.coroutines.delay
@@ -54,16 +54,30 @@ fun WorkoutScreen(
     onWorkoutDeleted: () -> Unit
 ) {
     val state by workoutViewModel.workoutUiState.collectAsState()
-    val isActive = state.workout.startDate != null && state.workout.endDate == null
+//    val isActive = state.workout.startDate != null && state.workout.endDate == null
 
     val permissionLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                // Show notification
-            }
-        }
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        when (PackageManager.PERMISSION_GRANTED) {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) -> {
+
+            }
+
+            else -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        }
+    }
+
 
     LaunchedEffect(Unit) {
         workoutViewModel.loadWorkout(workoutId)
@@ -75,6 +89,7 @@ fun WorkoutScreen(
                     NotificationManagerCompat.from(context).cancel(state.workout.id.toInt())
                     onWorkoutDeleted()
                 }
+
                 is EventType.Error -> showSnackbar(SnackbarMessage(context.getString(R.string.general_error)))
                 EventType.Loading -> TODO()
                 EventType.Saved -> showSnackbar(SnackbarMessage(context.getString(R.string.saved)))
@@ -82,26 +97,28 @@ fun WorkoutScreen(
             }
         }
     }
+//
+//    val programName =
+//        state.workout.workoutProgramDetails?.let { stringResource(programDetailsToNameId(it)) }
 
-    val programName =
-        state.workout.workoutProgramDetails?.let { stringResource(programDetailsToNameId(it)) }
-
-    val intent = TaskStackBuilder.create(context).run {
-        addNextIntentWithParentStack(
-            Intent(
-                Intent.ACTION_VIEW,
-                "fitapp://workout/${state.workout.id}".toUri()
-            )
-        )
-        getPendingIntent(workoutId.toInt(), PendingIntent.FLAG_IMMUTABLE)
-    }
-
-    val builder = Notification.Builder(context, "WORKOUT_ACTIVE")
-        .setSmallIcon(R.drawable.ic_deadlift)
-        .setContentTitle("Active workout ${programName ?: ""}")
-        .setOnlyAlertOnce(true)
-        .setOngoing(true)
-        .setContentIntent(intent)
+//    val intent = remember {
+//        TaskStackBuilder.create(context).run {
+//            addNextIntentWithParentStack(
+//                Intent(
+//                    Intent.ACTION_VIEW,
+//                    "fitapp://workout/${state.workout.id}".toUri()
+//                )
+//            )
+//            getPendingIntent(workoutId.toInt(), PendingIntent.FLAG_IMMUTABLE)
+//        }
+//    }
+//
+//    val builder = Notification.Builder(context, "WORKOUT_ACTIVE")
+//        .setSmallIcon(R.drawable.ic_deadlift)
+//        .setContentTitle("Active workout ${programName ?: ""}")
+//        .setOnlyAlertOnce(true)
+//        .setOngoing(true)
+//        .setContentIntent(intent)
 
     val actions = object : IWorkoutActions {
         override fun updateSet(set: WorkoutSet, exerciseId: Long) {
