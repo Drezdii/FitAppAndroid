@@ -25,7 +25,6 @@ import com.bartoszdrozd.fitapp.model.workout.ExerciseType.*
 import com.bartoszdrozd.fitapp.model.workout.ProgramDetails
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.utils.*
-import kotlinx.coroutines.flow.collect
 
 @Composable
 fun WorkoutListScreen(
@@ -131,9 +130,11 @@ fun WorkoutItem(
                         stringResource(R.string.seconds_abbr)
                     )
                 }
+
                 workout.startDate != null && workout.endDate == null -> {
                     stringResource(id = R.string.active)
                 }
+
                 else -> stringResource(id = R.string.duration_placeholder)
             }
 
@@ -144,7 +145,7 @@ fun WorkoutItem(
                     onDateClick = {},
                 )
                 val programLabel = workout.workoutProgramDetails?.let {
-                    "${stringResource(programDetailsToNameId(it))} Week ${it.week}"
+                    "${stringResource(programIdToNameId(it.id))} Week ${it.week}"
                 }
                 if (programLabel != null) {
                     InputChip(

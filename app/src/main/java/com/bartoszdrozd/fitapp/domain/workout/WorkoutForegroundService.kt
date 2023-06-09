@@ -14,6 +14,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import com.bartoszdrozd.fitapp.R
+import com.bartoszdrozd.fitapp.utils.programIdToNameId
 import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -44,6 +45,8 @@ class WorkoutForegroundService : Service() {
 
         val workoutId = intent?.getLongExtra("workoutId", -1) ?: -1
         val startDate = intent?.getLongExtra("startDate", 0) ?: 0
+        val programId = intent?.getIntExtra("programId", 0) ?: 0
+        val programWeek = intent?.getIntExtra("programWeek", 0) ?: 0
 
         if (intent?.action == STOP_WORKOUT && workoutId in activeWorkouts) {
             activeWorkouts[workoutId]?.cancel()
@@ -73,9 +76,12 @@ class WorkoutForegroundService : Service() {
                     getPendingIntent(workoutId.toInt(), PendingIntent.FLAG_IMMUTABLE)
                 }
 
+                val programLabel =
+                    if (programId != 0) "${this.getString(programIdToNameId(programId))} Week $programWeek" else null
+                
                 val builder = Notification.Builder(this, "WORKOUT_ACTIVE")
                     .setSmallIcon(R.drawable.ic_deadlift)
-                    .setContentTitle("Active workout")
+                    .setContentTitle(programLabel ?: "Active workout")
                     .setOnlyAlertOnce(true)
                     .setOngoing(true)
                     .setAutoCancel(false)
@@ -102,13 +108,14 @@ class WorkoutForegroundService : Service() {
                             Clock.System.now().minus(startDateInstant).toWorkoutDuration()
 
                         builder.setContentText("Workout is currently active\nDuration: $durationText")
+
                         with(NotificationManagerCompat.from(this@WorkoutForegroundService)) {
-                            // Use the service's notification if only one workout is in progress
                             if (ActivityCompat.checkSelfPermission(
                                     this@WorkoutForegroundService,
                                     Manifest.permission.POST_NOTIFICATIONS
                                 ) == PackageManager.PERMISSION_GRANTED
                             ) {
+                                // Use the service's notification if only one workout is in progress
                                 if (activeWorkouts.size == 1 || mainWorkoutId == workoutId) {
                                     notify(notificationId, builder.build())
                                 } else {
@@ -118,10 +125,21 @@ class WorkoutForegroundService : Service() {
                         }
                     }
 
-                }, 0, 500)
+                }, 0, 1000)
             }
         }
 
         return START_STICKY
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+
+        // Clean up any leftover timers when user closes the application
+        for (timer in activeWorkouts.values) {
+            timer.cancel()
+        }
+
+        stopSelf()
     }
 }
