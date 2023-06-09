@@ -54,7 +54,6 @@ fun WorkoutScreen(
     onWorkoutDeleted: () -> Unit
 ) {
     val state by workoutViewModel.workoutUiState.collectAsState()
-//    val isActive = state.workout.startDate != null && state.workout.endDate == null
 
     val permissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
@@ -62,18 +61,13 @@ fun WorkoutScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        when (PackageManager.PERMISSION_GRANTED) {
-            ContextCompat.checkSelfPermission(
+        if (ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.POST_NOTIFICATIONS
-            ) -> {
-
-            }
-
-            else -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                }
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
     }
@@ -97,28 +91,6 @@ fun WorkoutScreen(
             }
         }
     }
-//
-//    val programName =
-//        state.workout.workoutProgramDetails?.let { stringResource(programDetailsToNameId(it)) }
-
-//    val intent = remember {
-//        TaskStackBuilder.create(context).run {
-//            addNextIntentWithParentStack(
-//                Intent(
-//                    Intent.ACTION_VIEW,
-//                    "fitapp://workout/${state.workout.id}".toUri()
-//                )
-//            )
-//            getPendingIntent(workoutId.toInt(), PendingIntent.FLAG_IMMUTABLE)
-//        }
-//    }
-//
-//    val builder = Notification.Builder(context, "WORKOUT_ACTIVE")
-//        .setSmallIcon(R.drawable.ic_deadlift)
-//        .setContentTitle("Active workout ${programName ?: ""}")
-//        .setOnlyAlertOnce(true)
-//        .setOngoing(true)
-//        .setContentIntent(intent)
 
     val actions = object : IWorkoutActions {
         override fun updateSet(set: WorkoutSet, exerciseId: Long) {

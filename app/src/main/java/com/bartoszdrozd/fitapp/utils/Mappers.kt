@@ -68,7 +68,10 @@ fun WorkoutEntity.toModel(): Workout =
         workoutProgramDetails = programDetailsToModel(programId, programWeek)
     )
 
-private fun programDetailsToModel(programId: Int?, programWeek: Int?): ProgramDetails? {
+private fun programDetailsToModel(
+    programId: Int?,
+    programWeek: Int?
+): ProgramDetails? {
     return if (programId != null && programWeek != null) {
         ProgramDetails(programId, programWeek)
     } else {
@@ -86,8 +89,8 @@ fun exerciseTypeToIconId(type: ExerciseType): Int {
     }
 }
 
-fun programDetailsToNameId(program: ProgramDetails): Int {
-    return when (program.id) {
+fun programIdToNameId(programId: Int): Int {
+    return when (programId) {
         1 -> R.string.bbb5314BBB4Days
         else -> R.string.no_exercise_name
     }
@@ -122,7 +125,11 @@ fun WorkoutSetEntity.toModel(): WorkoutSet = WorkoutSet(id, reps, weight, comple
 fun WorkoutWithExercises.toModel(): Workout =
     Workout(
         workout.id, workout.date, workout.startDate, workout.endDate, workout.type,
-        exercises.map { it.exercise.toModel() }
+        exercises.map { it.exercise.toModel() },
+        if (workout.programId != null && workout.programWeek != null) ProgramDetails(
+            workout.programId,
+            workout.programWeek
+        ) else null
     )
 
 fun WorkoutDTO.toModel(): Workout = Workout(
@@ -157,7 +164,8 @@ fun ProgramCycle.toDTO(): ProgramCycleDTO = ProgramCycleDTO(
 
 fun Program.toDTO(): ProgramDTO = ProgramDTO(id, name)
 
-fun ProgramDetailsDTO.toModel(): ProgramDetails = ProgramDetails(id, week)
+fun ProgramDetailsDTO.toModel(): ProgramDetails =
+    ProgramDetails(id, week)
 
 fun ChallengeEntryDTO.toModel(): ChallengeEntry =
     ChallengeEntry(value, challengeId, completedAt, challenge.toModel())

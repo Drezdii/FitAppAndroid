@@ -83,17 +83,24 @@ class WorkoutViewModel @Inject constructor(
 
         val workoutService =
             Intent(application.applicationContext, WorkoutForegroundService::class.java)
+
         workoutService.putExtra("workoutId", workout.id)
         workoutService.putExtra("startDate", workout.startDate!!.epochSeconds)
+        workoutService.putExtra("programId", workout.workoutProgramDetails?.id)
+        workoutService.putExtra("programWeek", workout.workoutProgramDetails?.week)
+
         workoutService.action = WorkoutForegroundService.START_WORKOUT
+
         application.applicationContext.startService(workoutService)
     }
 
     private fun stopTrackingService(workoutId: Long) {
         val workoutService =
             Intent(application.applicationContext, WorkoutForegroundService::class.java)
+
         workoutService.putExtra("workoutId", workoutId)
         workoutService.action = WorkoutForegroundService.STOP_WORKOUT
+
         application.applicationContext.startService(workoutService)
     }
 
