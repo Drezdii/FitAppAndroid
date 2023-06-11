@@ -14,7 +14,7 @@ import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.program.ProgramType
 import com.bartoszdrozd.fitapp.model.program.ProgramValues
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
-import com.bartoszdrozd.fitapp.model.workout.OneRepMax
+import com.bartoszdrozd.fitapp.model.stats.OneRepMax
 import com.bartoszdrozd.fitapp.ui.creator.CreatorViewModel
 import kotlin.math.roundToInt
 

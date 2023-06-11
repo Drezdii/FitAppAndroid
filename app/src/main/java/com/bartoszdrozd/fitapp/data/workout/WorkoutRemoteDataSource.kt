@@ -66,8 +66,8 @@ class WorkoutRemoteDataSource @Inject constructor(
     }
 
     override suspend fun saveProgramCycle(programCycle: ProgramCycle): ProgramCycle {
-        // Cast to DTO
         val res = workoutService.saveProgramCycle(programCycle.toDTO())
+        
         if (res.isSuccessful) {
             return ProgramCycle(Program(1, "Test"), mapOf())
 //            return res.body()!!.toModel()

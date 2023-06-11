@@ -4,6 +4,7 @@ import com.bartoszdrozd.fitapp.BuildConfig
 import com.bartoszdrozd.fitapp.data.auth.IAuthService
 import com.bartoszdrozd.fitapp.data.auth.RegisterUserResponseErrorCode
 import com.bartoszdrozd.fitapp.data.challenges.IChallengesService
+import com.bartoszdrozd.fitapp.data.stats.IStatsService
 import com.bartoszdrozd.fitapp.data.workout.IWorkoutService
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.*
@@ -31,7 +32,6 @@ object NetworkModule {
     @Provides
     @Singleton
     fun providesGson(): Gson {
-
         return GsonBuilder()
             // Kotlin Date types
             .registerTypeAdapter(
@@ -114,6 +114,17 @@ object NetworkModule {
             .client(httpClient)
             .build()
             .create(IChallengesService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providesStatsService(): IStatsService {
+        return Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(providesGson()))
+            .client(httpClient)
+            .build()
+            .create(IStatsService::class.java)
     }
 }
 

@@ -14,7 +14,7 @@ abstract class UseCase<in P, R>(private val coroutineDispatcher: CoroutineDispat
                 }
             }
         } catch (e: Exception) {
-            Log.e("EXCEPTION", e.stackTraceToString())
+            Log.e("USE_CASE_EXCEPTION", e.stackTraceToString())
             ResultValue.Error(e)
         }
     }
