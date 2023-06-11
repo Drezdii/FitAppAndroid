@@ -7,6 +7,11 @@ import com.bartoszdrozd.fitapp.data.auth.IAuthService
 import com.bartoszdrozd.fitapp.data.auth.IUserRepository
 import com.bartoszdrozd.fitapp.data.auth.UserRepository
 import com.bartoszdrozd.fitapp.data.challenges.*
+import com.bartoszdrozd.fitapp.data.stats.IStatsDataSource
+import com.bartoszdrozd.fitapp.data.stats.IStatsRepository
+import com.bartoszdrozd.fitapp.data.stats.IStatsService
+import com.bartoszdrozd.fitapp.data.stats.StatsRemoteDataSource
+import com.bartoszdrozd.fitapp.data.stats.StatsRepository
 import com.bartoszdrozd.fitapp.data.workout.*
 import com.google.gson.Gson
 import dagger.Module
@@ -21,6 +26,19 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
+    @Provides
+    @Singleton
+    fun providesStatsRepository(@Named("statsRemoteDataSource") remoteDataSource: IStatsDataSource): IStatsRepository =
+        StatsRepository(remoteDataSource)
+
+    @Provides
+    @Singleton
+    @Named("statsRemoteDataSource")
+    fun providesStatsLocalDataSource(
+        statsService: IStatsService,
+        userRepository: IUserRepository
+    ): IStatsDataSource = StatsRemoteDataSource(statsService, userRepository)
+
     @Provides
     @Singleton
     fun providesUserRepository(service: IAuthService, gson: Gson): IUserRepository =

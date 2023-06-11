@@ -4,12 +4,12 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -24,8 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -35,11 +33,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.bartoszdrozd.fitapp.data.workout.IWorkoutRepository
-import com.bartoszdrozd.fitapp.model.SnackbarMessage
+import com.bartoszdrozd.fitapp.domain.stats.SaveBodyWeightEntryUseCase
 import com.bartoszdrozd.fitapp.ui.Screen
 import com.bartoszdrozd.fitapp.ui.auth.LoginActivity
 import com.bartoszdrozd.fitapp.ui.challenges.ChallengesScreen
+import com.bartoszdrozd.fitapp.ui.components.BodyWeightDialog
 import com.bartoszdrozd.fitapp.ui.creator.CreatorScreen
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutListScreen
@@ -52,9 +50,13 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var saveBwEntryUseCase: SaveBodyWeightEntryUseCase
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val screens = listOf(Screen.Timeline, Screen.Planned, Screen.Challenges, Screen.Creator)
 
         FirebaseAuth.getInstance().addAuthStateListener {
@@ -81,6 +83,7 @@ class MainActivity : ComponentActivity() {
         notificationManager.createNotificationChannel(channel)
 
         setContent {
+            var openBwDialog by remember { mutableStateOf(false) }
             FitAppTheme {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -108,11 +111,24 @@ class MainActivity : ComponentActivity() {
                 val navBarTopPadding = (WindowInsets.ime.asPaddingValues()
                     .calculateBottomPadding().value.minus(130)).coerceAtLeast(0f)
 
+                if (openBwDialog) {
+                    BodyWeightDialog(
+                        onDismiss = { openBwDialog = false },
+                        onConfirm = { entry -> scope.launch { saveBwEntryUseCase(entry) } })
+                }
+
                 Scaffold(
                     Modifier
                         .nestedScroll(nestedScrollConnection),
                     topBar = {
-                        TopAppBar(title = { Text(text = "Top App Bar") })
+                        TopAppBar(title = { Text(text = "Top App Bar") }, actions = {
+                            Button(onClick = { openBwDialog = true }) {
+                                Icon(
+                                    Icons.Filled.MonitorWeight,
+                                    contentDescription = "Add body weight"
+                                )
+                            }
+                        })
                     },
                     snackbarHost = { SnackbarHost(snackbarHostState) },
                     floatingActionButton = {

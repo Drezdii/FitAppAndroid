@@ -1,6 +1,6 @@
 package com.bartoszdrozd.fitapp.model.program
 
-import com.bartoszdrozd.fitapp.model.workout.OneRepMax
+import com.bartoszdrozd.fitapp.model.stats.OneRepMax
 
 data class ProgramValues(
     val programType: ProgramType,

@@ -1,6 +1,7 @@
 package com.bartoszdrozd.fitapp.utils
 
 import com.bartoszdrozd.fitapp.R
+import com.bartoszdrozd.fitapp.data.dtos.BodyWeightEntryDTO
 import com.bartoszdrozd.fitapp.data.dtos.ChallengeDTO
 import com.bartoszdrozd.fitapp.data.dtos.ChallengeEntryDTO
 import com.bartoszdrozd.fitapp.data.dtos.ExerciseDTO
@@ -17,6 +18,7 @@ import com.bartoszdrozd.fitapp.model.challenges.Challenge
 import com.bartoszdrozd.fitapp.model.challenges.ChallengeEntry
 import com.bartoszdrozd.fitapp.model.creator.Program
 import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
+import com.bartoszdrozd.fitapp.model.stats.BodyWeightEntry
 import com.bartoszdrozd.fitapp.model.workout.Exercise
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.ProgramDetails
@@ -172,3 +174,7 @@ fun ChallengeEntryDTO.toModel(): ChallengeEntry =
 
 fun ChallengeDTO.toModel(): Challenge =
     Challenge(name, description, startDate, endDate, goal, unit)
+
+fun BodyWeightEntry.toDTO(): BodyWeightEntryDTO = BodyWeightEntryDTO(id, date, weight)
+
+fun BodyWeightEntryDTO.toModel(): BodyWeightEntry = BodyWeightEntry(id, date, weight)
