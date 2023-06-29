@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -38,6 +39,8 @@ import com.bartoszdrozd.fitapp.data.auth.IUserRepository
 import com.bartoszdrozd.fitapp.domain.stats.GetLatestBodyWeightEntryUseCase
 import com.bartoszdrozd.fitapp.domain.stats.SaveBodyWeightEntryUseCase
 import com.bartoszdrozd.fitapp.ui.Screen
+import com.bartoszdrozd.fitapp.ui.TopAppBarConnector
+import com.bartoszdrozd.fitapp.ui.TopAppBarState
 import com.bartoszdrozd.fitapp.ui.auth.LoginActivity
 import com.bartoszdrozd.fitapp.ui.challenges.ChallengesScreen
 import com.bartoszdrozd.fitapp.ui.components.AvatarWithUsername
@@ -63,6 +66,9 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var userRepository: IUserRepository
+
+    @Inject
+    lateinit var topAppBarConnector: TopAppBarConnector
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -152,24 +158,55 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                LaunchedEffect(Unit) {
+                    scope.launch {
+                        val state = TopAppBarState(
+                            { AvatarWithUsername(userName) },
+                            {
+                                Row(
+                                    Modifier
+                                        .clickable { openBwDialog = true }
+                                        .padding(8.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Filled.MonitorWeight,
+                                        contentDescription = "Current body weight",
+                                        Modifier.padding(end = 8.dp)
+                                    )
+                                    Text(text = currentBodyWeight.toString() + "kg")
+                                }
+                            }
+                        )
+
+                        topAppBarConnector.setDefaultState(state)
+                    }
+                }
+
+                LaunchedEffect(currentDestination?.route) {
+                    if (currentDestination?.route != "workout/{workoutId}") {
+                        topAppBarConnector.resetToDefault()
+                    }
+                }
+
+                val appBarState by topAppBarConnector.appBarState.collectAsState()
+
                 Scaffold(
                     Modifier
                         .nestedScroll(nestedScrollConnection),
                     topBar = {
-                        TopAppBar(title = { AvatarWithUsername(userName) }, actions = {
-                            Row(
-                                Modifier
-                                    .clickable { openBwDialog = true }
-                                    .padding(8.dp)
-                            ) {
-                                Icon(
-                                    Icons.Filled.MonitorWeight,
-                                    contentDescription = "Current body weight",
-                                    Modifier.padding(end = 8.dp)
-                                )
-                                Text(text = currentBodyWeight.toString() + "kg")
-                            }
-                        })
+                        TopAppBar(
+                            title = appBarState.title,
+                            actions = appBarState.actions,
+                            navigationIcon = {
+                                if (appBarState.showBackButton) {
+                                    IconButton(onClick = { navController.popBackStack() }) {
+                                        Icon(
+                                            Icons.Filled.ArrowBack,
+                                            contentDescription = stringResource(R.string.navigate_back)
+                                        )
+                                    }
+                                }
+                            })
                     },
                     snackbarHost = { SnackbarHost(snackbarHostState) },
                     floatingActionButton = {

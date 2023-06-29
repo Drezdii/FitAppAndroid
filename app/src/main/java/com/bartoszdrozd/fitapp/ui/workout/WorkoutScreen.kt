@@ -28,6 +28,7 @@ import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.utils.EventType
+import com.bartoszdrozd.fitapp.utils.programIdToNameId
 import com.bartoszdrozd.fitapp.utils.toWorkoutDate
 import com.bartoszdrozd.fitapp.utils.toWorkoutDuration
 import kotlinx.coroutines.delay
@@ -71,7 +72,6 @@ fun WorkoutScreen(
             }
         }
     }
-
 
     LaunchedEffect(Unit) {
         workoutViewModel.loadWorkout(workoutId)
@@ -132,6 +132,20 @@ fun WorkoutScreen(
         override fun cancelChanges() {
             workoutViewModel.cancelChanges()
         }
+    }
+
+    // TODO: Add proper string resource
+    val programLabel = state.workout.workoutProgramDetails?.let {
+        "${stringResource(programIdToNameId(it.id))} Week ${it.week}"
+    }
+
+    val genericLabel = stringResource(R.string.generic_workout)
+
+    LaunchedEffect(state.workout.id) {
+        if (state.workout.id == -1L) {
+            return@LaunchedEffect
+        }
+        workoutViewModel.updateTopAppBar(programLabel ?: genericLabel)
     }
 
     WorkoutView(state.workout, actions, state.isDirty)
@@ -236,9 +250,6 @@ private fun WorkoutHeader(
             .padding(vertical = dimensionResource(R.dimen.small_padding))
     ) {
         Column(modifier = Modifier.padding(dimensionResource(R.dimen.small_padding))) {
-            Button(onClick = actions::deleteWorkout) {
-                Text(text = "Delete workout")
-            }
             Row(
                 modifier = Modifier
                     .padding(24.dp)
