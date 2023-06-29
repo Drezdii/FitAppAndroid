@@ -22,11 +22,11 @@ class StatsRemoteDataSource @Inject constructor(
         }
     }
 
-    override suspend fun getLatestBodyWeightEntry(): BodyWeightEntry {
+    override suspend fun getLatestBodyWeightEntry(): BodyWeightEntry? {
         val res = service.getLatestBodyWeightEntry(userRepository.getUserId() ?: "")
 
         if (res.isSuccessful) {
-            return res.body()!!.toModel()
+            return res.body()?.toModel()
         } else {
             Log.e("TEST", res.errorBody()?.string().toString())
             throw Exception(res.errorBody()?.string())

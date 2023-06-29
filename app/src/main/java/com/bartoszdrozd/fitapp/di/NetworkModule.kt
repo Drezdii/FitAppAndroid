@@ -12,6 +12,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -25,9 +26,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    private const val BASE_URL = "https://10.0.2.2:5001"
+//    private const val BASE_URL = "https://10.0.2.2:5001"
     private const val AUTH_URL = "https://fit-app.me"
-//    private const val BASE_URL = "https://fit-app.azurewebsites.net"
+    private const val BASE_URL = "https://fit-app.azurewebsites.net"
 
     @Provides
     @Singleton
@@ -45,13 +46,13 @@ object NetworkModule {
                     JsonPrimitive(src.toString())
                 })
             .registerTypeAdapter(
-                kotlinx.datetime.Instant::class.java,
+                Instant::class.java,
                 JsonDeserializer { json, _, _ ->
-                    kotlinx.datetime.Instant.parse(json.asString)
+                    Instant.parse(json.asString)
                 })
             .registerTypeAdapter(
-                kotlinx.datetime.Instant::class.java,
-                JsonSerializer { src: kotlinx.datetime.Instant, _, _ ->
+                Instant::class.java,
+                JsonSerializer { src: Instant, _, _ ->
                     JsonPrimitive(src.toString())
                 })
 

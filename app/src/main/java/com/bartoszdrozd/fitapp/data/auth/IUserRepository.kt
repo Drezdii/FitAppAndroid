@@ -8,5 +8,5 @@ interface IUserRepository {
     suspend fun signIn(customToken: String)
     suspend fun register(userData: RegisterUserParameters): ResultValue<RegisterUserResult>
     suspend fun getUserId(): String?
-    suspend fun getUserToken(): String
+    suspend fun getUsername(): String
 }

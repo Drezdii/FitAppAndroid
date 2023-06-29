@@ -117,7 +117,7 @@ fun WorkoutItem(
                 contentDescription = null,
                 Modifier
                     .padding(end = 20.dp)
-                    .fillMaxHeight(0.65f)
+                    .fillMaxHeight(0.5f)
                     .aspectRatio(1f)
                     .align(Alignment.CenterVertically)
             )
@@ -156,7 +156,7 @@ fun WorkoutItem(
                             )
                         },
                         selected = false,
-                        modifier = Modifier.padding(0.dp)
+                        modifier = Modifier.padding(top = 8.dp)
                     )
                 }
             }
@@ -182,9 +182,9 @@ fun WorkoutDateRow(
                 .modifyIf(isEditing) {
                     clickable(onClick = onDateClick)
                 },
-            fontSize = 24.sp
+            fontSize = 20.sp
         )
-        Text(duration, fontSize = 24.sp)
+        Text(duration, fontSize = 20.sp)
     }
 }
 
