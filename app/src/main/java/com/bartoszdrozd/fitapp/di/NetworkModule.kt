@@ -26,7 +26,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-//    private const val BASE_URL = "https://10.0.2.2:5001"
+    //    private const val BASE_URL = "https://10.0.2.2:5001"
     private const val AUTH_URL = "https://fit-app.me"
     private const val BASE_URL = "https://fit-app.azurewebsites.net"
 

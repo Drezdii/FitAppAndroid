@@ -13,6 +13,7 @@ import com.bartoszdrozd.fitapp.data.stats.IStatsService
 import com.bartoszdrozd.fitapp.data.stats.StatsRemoteDataSource
 import com.bartoszdrozd.fitapp.data.stats.StatsRepository
 import com.bartoszdrozd.fitapp.data.workout.*
+import com.bartoszdrozd.fitapp.ui.TopAppBarConnector
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -90,4 +91,8 @@ object RepositoryModule {
     fun providesAppDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, "FitAppDb")
             .fallbackToDestructiveMigration().build()
+
+    @Provides
+    @Singleton
+    fun providesTopAppBarConnector(): TopAppBarConnector = TopAppBarConnector()
 }

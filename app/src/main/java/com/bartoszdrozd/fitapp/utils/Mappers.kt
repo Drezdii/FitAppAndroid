@@ -94,7 +94,7 @@ fun exerciseTypeToIconId(type: ExerciseType): Int {
 fun programIdToNameId(programId: Int): Int {
     return when (programId) {
         1 -> R.string.bbb5314BBB4Days
-        else -> R.string.no_exercise_name
+        else -> R.string.generic_workout
     }
 }
 

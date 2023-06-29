@@ -64,6 +64,9 @@
     <string name="today">Today</string>
     <string name="select_date">Select date</string>
     <string name="kg_unit">kg</string>
+    <string name="delete_workout">Delete workout</string>
+    <string name="navigate_back">Go back</string>
+    <string name="generic_workout">Generic workout</string>
 
     <string-array name="exercise_names">
         <item>@string/deadlift</item>
