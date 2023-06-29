@@ -7,10 +7,10 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.progressSemantics
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -67,11 +67,12 @@ fun ChallengeEntryView(entry: ChallengeEntry) {
 
 
     val progressAnimation = remember {
-        Animatable(0f)
+        // Don't animate completed challenges
+        Animatable(if (entry.completedAt != null) progress else 0f)
     }
 
     LaunchedEffect(Unit) {
-        progressAnimation.animateTo(progress, tween(1000))
+        progressAnimation.animateTo(progress, tween(800))
     }
 
     OutlinedCard(
@@ -139,14 +140,14 @@ fun ChallengeEntryView(entry: ChallengeEntry) {
 
 @Composable
 fun ChallengeProgressBar(progress: Float) {
+    val progressColor = MaterialTheme.colorScheme.primary
     Canvas(
         Modifier
-            .progressSemantics(progress)
             .height(16.dp)
             .fillMaxWidth()
     ) {
         drawProgressBar(Color.Gray, 16.dp.toPx(), 1f)
-        drawProgressBar(Color.Green, 16.dp.toPx(), progress)
+        drawProgressBar(progressColor, 16.dp.toPx(), progress)
     }
 }
 

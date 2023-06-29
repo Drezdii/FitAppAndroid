@@ -24,9 +24,10 @@ class ChallengesViewModel @Inject constructor(
 
     fun loadChallenges() {
         viewModelScope.launch {
-            getChallengesUseCase(Unit).collect {
-                if (it is ResultValue.Success) {
-                    _challenges.value = it.data
+            getChallengesUseCase(Unit).collect { res ->
+                if (res is ResultValue.Success) {
+                    _challenges.value =
+                        res.data.sortedBy { it.challengeId }.sortedBy { it.completedAt }
                 }
             }
         }

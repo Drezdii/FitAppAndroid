@@ -7,12 +7,12 @@ import com.bartoszdrozd.fitapp.model.stats.BodyWeightEntry
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-class SaveBodyWeightEntryUseCase @Inject constructor(
+class GetLatestBodyWeightEntryUseCase @Inject constructor(
     private val statsRepository: IStatsRepository,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) :
-    UseCase<BodyWeightEntry, BodyWeightEntry>(dispatcher) {
-    override suspend fun execute(params: BodyWeightEntry) : BodyWeightEntry {
-        return statsRepository.saveBodyWeightEntry(params)
+    UseCase<Unit, BodyWeightEntry?>(dispatcher) {
+    override suspend fun execute(params: Unit): BodyWeightEntry? {
+        return statsRepository.getLatestBodyWeightEntry()
     }
 }

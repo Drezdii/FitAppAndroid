@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -33,16 +34,20 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.bartoszdrozd.fitapp.data.auth.IUserRepository
+import com.bartoszdrozd.fitapp.domain.stats.GetLatestBodyWeightEntryUseCase
 import com.bartoszdrozd.fitapp.domain.stats.SaveBodyWeightEntryUseCase
 import com.bartoszdrozd.fitapp.ui.Screen
 import com.bartoszdrozd.fitapp.ui.auth.LoginActivity
 import com.bartoszdrozd.fitapp.ui.challenges.ChallengesScreen
+import com.bartoszdrozd.fitapp.ui.components.AvatarWithUsername
 import com.bartoszdrozd.fitapp.ui.components.BodyWeightDialog
 import com.bartoszdrozd.fitapp.ui.creator.CreatorScreen
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutListScreen
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutScreen
 import com.bartoszdrozd.fitapp.ui.workout.planned.PlannedWorkoutsScreen
+import com.bartoszdrozd.fitapp.utils.data
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -52,6 +57,12 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var saveBwEntryUseCase: SaveBodyWeightEntryUseCase
+
+    @Inject
+    lateinit var getLatestBwEntryUseCase: GetLatestBodyWeightEntryUseCase
+
+    @Inject
+    lateinit var userRepository: IUserRepository
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,7 +94,6 @@ class MainActivity : ComponentActivity() {
         notificationManager.createNotificationChannel(channel)
 
         setContent {
-            var openBwDialog by remember { mutableStateOf(false) }
             FitAppTheme {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -111,29 +121,60 @@ class MainActivity : ComponentActivity() {
                 val navBarTopPadding = (WindowInsets.ime.asPaddingValues()
                     .calculateBottomPadding().value.minus(130)).coerceAtLeast(0f)
 
+                var openBwDialog by remember { mutableStateOf(false) }
+
+                var currentBodyWeight by remember { mutableFloatStateOf(0F) }
+
+                var userName by remember { mutableStateOf("") }
+
                 if (openBwDialog) {
                     BodyWeightDialog(
                         onDismiss = { openBwDialog = false },
-                        onConfirm = { entry -> scope.launch { saveBwEntryUseCase(entry) } })
+                        onConfirm = { entry ->
+                            scope.launch {
+                                saveBwEntryUseCase(entry)
+                                openBwDialog = false
+                            }
+                        },
+                        startValue = currentBodyWeight
+                    )
+                }
+
+                LaunchedEffect(Unit) {
+                    scope.launch {
+                        currentBodyWeight = getLatestBwEntryUseCase(Unit).data?.weight ?: 0f
+                    }
+                }
+
+                LaunchedEffect(Unit) {
+                    scope.launch {
+                        userName = userRepository.getUsername()
+                    }
                 }
 
                 Scaffold(
                     Modifier
                         .nestedScroll(nestedScrollConnection),
                     topBar = {
-                        TopAppBar(title = { Text(text = "Top App Bar") }, actions = {
-                            Button(onClick = { openBwDialog = true }) {
+                        TopAppBar(title = { AvatarWithUsername(userName) }, actions = {
+                            Row(
+                                Modifier
+                                    .clickable { openBwDialog = true }
+                                    .padding(8.dp)
+                            ) {
                                 Icon(
                                     Icons.Filled.MonitorWeight,
-                                    contentDescription = "Add body weight"
+                                    contentDescription = "Current body weight",
+                                    Modifier.padding(end = 8.dp)
                                 )
+                                Text(text = currentBodyWeight.toString() + "kg")
                             }
                         })
                     },
                     snackbarHost = { SnackbarHost(snackbarHostState) },
                     floatingActionButton = {
                         when (currentDestination?.route) {
-                            "timeline" -> {
+                            "timeline_HIDDEN_FOR_NOW" -> {
                                 ExtendedFloatingActionButton(
                                     text = { Text(text = stringResource(id = R.string.add_workout)) },
                                     icon = {

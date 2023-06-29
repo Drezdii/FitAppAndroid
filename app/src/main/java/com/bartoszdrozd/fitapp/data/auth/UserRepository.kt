@@ -45,9 +45,9 @@ class UserRepository @Inject constructor(
     override suspend fun getUserId(): String? {
         return FirebaseAuth.getInstance().currentUser?.uid
     }
-
-    override suspend fun getUserToken(): String {
+    
+    override suspend fun getUsername(): String {
         val user = FirebaseAuth.getInstance().currentUser ?: return ""
-        return user.getIdToken(false).await().token ?: ""
+        return user.displayName ?: ""
     }
 }

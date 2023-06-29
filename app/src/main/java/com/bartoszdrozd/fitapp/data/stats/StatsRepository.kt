@@ -9,7 +9,7 @@ class StatsRepository @Inject constructor(private val remoteDataSource: IStatsDa
         return remoteDataSource.saveBodyWeightEntry(entry)
     }
 
-    override suspend fun getLatestBodyWeightEntry(): BodyWeightEntry {
+    override suspend fun getLatestBodyWeightEntry(): BodyWeightEntry? {
         return remoteDataSource.getLatestBodyWeightEntry()
     }
 }

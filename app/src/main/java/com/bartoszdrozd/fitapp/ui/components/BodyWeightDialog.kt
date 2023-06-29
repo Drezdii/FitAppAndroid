@@ -15,6 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -41,6 +42,14 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayAt
 
 @OptIn(ExperimentalMaterial3Api::class)
+class NoFutureDatesSelectable : SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+        return Clock.System.todayAt(TimeZone.currentSystemDefault()).atStartOfDayIn(TimeZone.UTC)
+            .toEpochMilliseconds() >= utcTimeMillis
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BodyWeightDialog(
     onDismiss: () -> Unit,
@@ -53,7 +62,8 @@ fun BodyWeightDialog(
 
     val datePickerState = rememberDatePickerState(
         today.atStartOfDayIn(TimeZone.UTC)
-            .toEpochMilliseconds()
+            .toEpochMilliseconds(),
+        selectableDates = NoFutureDatesSelectable()
     )
 
     val selectedDate = datePickerState.selectedDateMillis?.let {
@@ -62,8 +72,6 @@ fun BodyWeightDialog(
                 TimeZone.UTC
             ).date
     }
-
-    val isToday = today == selectedDate
 
     var bodyWeight by remember { mutableFloatStateOf(startValue) }
 
@@ -76,7 +84,7 @@ fun BodyWeightDialog(
                 Row {
                     Text(
                         text = "${
-                            if (isToday) "Today" else selectedDate ?: "Select date"
+                            if (today == selectedDate) stringResource(R.string.today) else selectedDate ?: R.string.select_date
                         }",
                         fontSize = dimensionResource(R.dimen.title_size).value.sp,
                         modifier = Modifier.clickable { openDatePicker = true }
@@ -103,14 +111,17 @@ fun BodyWeightDialog(
                     }
                 }
 
-                OutlinedTextField(
-                    value = bodyWeight.toString(),
-                    onValueChange = { bw ->
-                        bodyWeight = bw.toFloat()
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
+                Row {
+                    OutlinedTextField(
+                        value = bodyWeight.toString(),
+                        onValueChange = { bw ->
+                            bodyWeight = bw.toFloat()
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        suffix = { Text(stringResource(R.string.kg_unit)) }
+                    )
+                }
 
                 Row {
                     TextButton(onClick = { onDismiss() }) {
@@ -119,13 +130,7 @@ fun BodyWeightDialog(
 
                     TextButton(onClick = {
                         selectedDate?.let {
-                            onConfirm(
-                                BodyWeightEntry(
-                                    0,
-                                    it,
-                                    bodyWeight
-                                )
-                            )
+                            onConfirm(BodyWeightEntry(0, it, bodyWeight))
                         }
                     }) {
                         Text(stringResource(R.string.save))
