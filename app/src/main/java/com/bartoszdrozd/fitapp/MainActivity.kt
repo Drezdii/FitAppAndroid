@@ -45,6 +45,7 @@ import com.bartoszdrozd.fitapp.ui.challenges.ChallengesScreen
 import com.bartoszdrozd.fitapp.ui.components.AvatarWithUsername
 import com.bartoszdrozd.fitapp.ui.components.BodyWeightDialog
 import com.bartoszdrozd.fitapp.ui.creator.ProgramsScreen
+import com.bartoszdrozd.fitapp.ui.progress.ProgressScreen
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutListScreen
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutScreen
@@ -70,7 +71,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val screens = listOf(Screen.Timeline, Screen.Planned, Screen.Challenges, Screen.Programs)
+        val screens = listOf(Screen.Timeline, Screen.Planned, Screen.Progress, Screen.Programs)
 
         FirebaseAuth.getInstance().addAuthStateListener {
             if (it.currentUser == null) {
@@ -322,6 +323,11 @@ class MainActivity : ComponentActivity() {
                                 onWorkoutClick = { workoutId -> navController.navigate("workout/$workoutId") },
                                 setAppBarState = setAppBarState
                             )
+                        }
+                        composable("progress") {
+                            ProgressScreen(
+                                viewModel = hiltViewModel(),
+                                onViewChallenges = { navController.navigate("challenges") })
                         }
                         composable("challenges") {
                             ChallengesScreen(

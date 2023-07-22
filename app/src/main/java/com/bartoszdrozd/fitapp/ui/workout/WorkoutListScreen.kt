@@ -63,7 +63,7 @@ fun WorkoutList(
 ) {
     val scrollState = rememberLazyListState()
 
-    LazyColumn(state = scrollState) {
+    LazyColumn(state = scrollState, verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.workout_item_vertical_padding))) {
         if (activeWorkoutsList.isNotEmpty()) {
             items(activeWorkoutsList) { workout ->
                 WorkoutItem(workout, onWorkoutClick)
@@ -100,7 +100,6 @@ fun WorkoutItem(
     OutlinedCard(
         Modifier
             .fillMaxWidth()
-            .padding(vertical = dimensionResource(R.dimen.workout_item_vertical_padding))
             .clickable {
                 onWorkoutClick(workout.id)
             }
