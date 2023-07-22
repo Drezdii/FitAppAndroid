@@ -30,12 +30,14 @@ class CreatorViewModel @Inject constructor(
     private val _selectedProgram: MutableStateFlow<Program?> = MutableStateFlow(null)
     private val _workouts: MutableStateFlow<Map<Int, List<Workout>>> = MutableStateFlow(mapOf())
     private val _eventsChannel = Channel<EventType<*>>()
+    private val _isSaving = MutableStateFlow(false)
 //    private val _canProceed = MutableStateFlow(false)
 
     val currentPage: StateFlow<Int> = _currentPage
     val selectedProgram: StateFlow<Program?> = _selectedProgram
     val workouts: StateFlow<Map<Int, List<Workout>>> = _workouts
     val events: Flow<EventType<*>> = _eventsChannel.receiveAsFlow()
+    val isSaving: StateFlow<Boolean> = _isSaving
 //    val canProceed: StateFlow<Boolean> = _canProceed
 
     fun nextPage() {
@@ -71,12 +73,14 @@ class CreatorViewModel @Inject constructor(
     fun saveWorkouts() {
         val cycle = ProgramCycle(selectedProgram.value!!, workouts.value)
         viewModelScope.launch {
+            _isSaving.value = true
             val res = saveProgramCycleUseCase(cycle)
             if (res is ResultValue.Success) {
                 _eventsChannel.send(EventType.Saved)
             } else {
                 _eventsChannel.send(EventType.Error((res as ResultValue.Error).exception))
             }
+            _isSaving.value = false
         }
     }
 //

@@ -39,13 +39,12 @@ import com.bartoszdrozd.fitapp.data.auth.IUserRepository
 import com.bartoszdrozd.fitapp.domain.stats.GetLatestBodyWeightEntryUseCase
 import com.bartoszdrozd.fitapp.domain.stats.SaveBodyWeightEntryUseCase
 import com.bartoszdrozd.fitapp.ui.Screen
-import com.bartoszdrozd.fitapp.ui.TopAppBarConnector
 import com.bartoszdrozd.fitapp.ui.TopAppBarState
 import com.bartoszdrozd.fitapp.ui.auth.LoginActivity
 import com.bartoszdrozd.fitapp.ui.challenges.ChallengesScreen
 import com.bartoszdrozd.fitapp.ui.components.AvatarWithUsername
 import com.bartoszdrozd.fitapp.ui.components.BodyWeightDialog
-import com.bartoszdrozd.fitapp.ui.creator.CreatorScreen
+import com.bartoszdrozd.fitapp.ui.creator.ProgramsScreen
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutListScreen
 import com.bartoszdrozd.fitapp.ui.workout.WorkoutScreen
@@ -67,14 +66,11 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var userRepository: IUserRepository
 
-    @Inject
-    lateinit var topAppBarConnector: TopAppBarConnector
-
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val screens = listOf(Screen.Timeline, Screen.Planned, Screen.Challenges, Screen.Creator)
+        val screens = listOf(Screen.Timeline, Screen.Planned, Screen.Challenges, Screen.Programs)
 
         FirebaseAuth.getInstance().addAuthStateListener {
             if (it.currentUser == null) {
@@ -158,37 +154,35 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                LaunchedEffect(Unit) {
-                    scope.launch {
-                        val state = TopAppBarState(
-                            { AvatarWithUsername(userName) },
-                            {
-                                Row(
-                                    Modifier
-                                        .clickable { openBwDialog = true }
-                                        .padding(8.dp)
-                                ) {
-                                    Icon(
-                                        Icons.Filled.MonitorWeight,
-                                        contentDescription = "Current body weight",
-                                        Modifier.padding(end = 8.dp)
-                                    )
-                                    Text(text = currentBodyWeight.toString() + "kg")
-                                }
-                            }
-                        )
-
-                        topAppBarConnector.setDefaultState(state)
+                val defaultTopAppBarState = TopAppBarState(
+                    { AvatarWithUsername(userName) },
+                    {
+                        Row(
+                            Modifier
+                                .clickable { openBwDialog = true }
+                                .padding(8.dp)
+                        ) {
+                            Icon(
+                                Icons.Filled.MonitorWeight,
+                                contentDescription = "Current body weight",
+                                Modifier.padding(end = 8.dp)
+                            )
+                            Text(text = currentBodyWeight.toString() + "kg")
+                        }
                     }
+                )
+
+                var appBarState by remember { mutableStateOf(TopAppBarState({}, {})) }
+
+                val setAppBarState: (TopAppBarState) -> Unit = { newState ->
+                    appBarState = newState
                 }
 
                 LaunchedEffect(currentDestination?.route) {
                     if (currentDestination?.route != "workout/{workoutId}") {
-                        topAppBarConnector.resetToDefault()
+                        setAppBarState(defaultTopAppBarState)
                     }
                 }
-
-                val appBarState by topAppBarConnector.appBarState.collectAsState()
 
                 Scaffold(
                     Modifier
@@ -305,11 +299,12 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onWorkoutDeleted = {
                                     navController.navigate("timeline")
-                                }
+                                },
+                                setTopAppBarState = setAppBarState
                             )
                         }
-                        composable("creator") {
-                            CreatorScreen(
+                        composable("programs") {
+                            ProgramsScreen(
                                 creatorViewModel = hiltViewModel(),
                                 onProgramSaved = {
                                     navController.navigate("timeline")
@@ -324,7 +319,8 @@ class MainActivity : ComponentActivity() {
                         composable("planned") {
                             PlannedWorkoutsScreen(
                                 viewModel = hiltViewModel(),
-                                onWorkoutClick = { workoutId -> navController.navigate("workout/$workoutId") }
+                                onWorkoutClick = { workoutId -> navController.navigate("workout/$workoutId") },
+                                setAppBarState = setAppBarState
                             )
                         }
                         composable("challenges") {
