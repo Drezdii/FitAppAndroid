@@ -2,15 +2,8 @@ package com.bartoszdrozd.fitapp.ui.workout
 
 import android.app.Application
 import android.content.Intent
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.DeleteForever
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.domain.workout.DeleteWorkoutUseCase
 import com.bartoszdrozd.fitapp.domain.workout.GetWorkoutUseCase
 import com.bartoszdrozd.fitapp.domain.workout.SaveWorkoutUseCase
@@ -19,8 +12,6 @@ import com.bartoszdrozd.fitapp.model.workout.Exercise
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
-import com.bartoszdrozd.fitapp.ui.TopAppBarConnector
-import com.bartoszdrozd.fitapp.ui.TopAppBarState
 import com.bartoszdrozd.fitapp.utils.EventType
 import com.bartoszdrozd.fitapp.utils.ResultValue
 import com.google.gson.Gson
@@ -42,7 +33,6 @@ class WorkoutViewModel @Inject constructor(
     private val deleteWorkoutUseCase: DeleteWorkoutUseCase,
     private val gson: Gson,
     private val application: Application,
-    private val topAppBarConnector: TopAppBarConnector
 ) : ViewModel() {
     private val _workoutUiState = MutableStateFlow(WorkoutUiState())
     private val _openExercises: MutableStateFlow<List<Long>> = MutableStateFlow(emptyList())
@@ -85,23 +75,6 @@ class WorkoutViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    suspend fun updateTopAppBar(title: String) {
-        val state = TopAppBarState(
-            { Text(title) },
-            {
-                IconButton(onClick = { deleteWorkout() }) {
-                    Icon(
-                        Icons.Outlined.DeleteForever,
-                        contentDescription = stringResource(R.string.delete_workout)
-                    )
-                }
-            },
-            showBackButton = true
-        )
-
-        topAppBarConnector.setAppBarState(state)
     }
 
     private fun startTrackingService(workout: Workout) {

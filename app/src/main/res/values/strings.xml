@@ -44,7 +44,7 @@
     <string name="active">Active</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
-    <string name="creator">Creator</string>
+    <string name="programs">Programs</string>
     <string name="previous">Previous</string>
     <string name="next">Next</string>
     <string name="your_maxes">Your 1RM</string>
@@ -67,6 +67,8 @@
     <string name="delete_workout">Delete workout</string>
     <string name="navigate_back">Go back</string>
     <string name="generic_workout">Generic workout</string>
+    <string name="num_of_planned_workouts">%d planned workouts</string>
+    <string name="saving">Saving</string>
 
     <string-array name="exercise_names">
         <item>@string/deadlift</item>

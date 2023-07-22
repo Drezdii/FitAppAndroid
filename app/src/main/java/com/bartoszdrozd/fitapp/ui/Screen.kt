@@ -13,5 +13,5 @@ sealed class Screen(val route: String, @StringRes val resourceId: Int, val icon:
     object Timeline : Screen("timeline", R.string.timeline, Icons.Outlined.Dashboard)
     object Planned : Screen("planned", R.string.planned, Icons.Outlined.CalendarMonth)
     object Challenges : Screen("challenges", R.string.challenges, Icons.Outlined.ViewList)
-    object Creator : Screen("creator", R.string.creator, Icons.Outlined.Create)
+    object Programs : Screen("programs", R.string.programs, Icons.Outlined.Create)
 }

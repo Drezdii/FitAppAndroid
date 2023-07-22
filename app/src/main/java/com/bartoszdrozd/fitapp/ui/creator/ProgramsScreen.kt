@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun CreatorScreen(
+fun ProgramsScreen(
     creatorViewModel: CreatorViewModel,
     onProgramSaved: () -> Unit,
     showSnackbar: (SnackbarMessage) -> Unit
@@ -41,6 +41,7 @@ fun CreatorScreen(
     val currentPage by creatorViewModel.currentPage.collectAsState()
     val selectedProgram by creatorViewModel.selectedProgram.collectAsState()
     val workouts by creatorViewModel.workouts.collectAsState()
+    val isSaving by creatorViewModel.isSaving.collectAsState()
 
     val pagerState = rememberPagerState()
     val programs = listOf(
@@ -82,6 +83,7 @@ fun CreatorScreen(
                     programs,
                     selectedProgram?.id ?: 0
                 ) { creatorViewModel.selectProgram(it) }
+
                 1 -> {
                     when (selectedProgram?.id) {
                         1 -> CreatorView(
@@ -104,8 +106,12 @@ fun CreatorScreen(
 
             if (selectedProgram != null) {
                 if (workouts.isNotEmpty()) {
-                    Button(onClick = { creatorViewModel.saveWorkouts() }) {
-                        Text(text = stringResource(id = R.string.save))
+                    Button(onClick = { creatorViewModel.saveWorkouts() }, enabled = !isSaving) {
+                        if (isSaving) {
+                            CircularProgressIndicator(modifier = Modifier.size(ButtonDefaults.IconSize), strokeWidth = 2.dp)
+                        } else {
+                            Text(text = stringResource(id = R.string.save))
+                        }
                     }
                 } else {
                     Button(onClick = { creatorViewModel.nextPage() }) {

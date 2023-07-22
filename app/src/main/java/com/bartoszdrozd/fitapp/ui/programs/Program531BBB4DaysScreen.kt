@@ -4,8 +4,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -13,19 +21,18 @@ import androidx.compose.ui.unit.sp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.program.ProgramType
 import com.bartoszdrozd.fitapp.model.program.ProgramValues
-import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.stats.OneRepMax
+import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.ui.creator.CreatorViewModel
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Program531BBB4DaysScreen(creatorViewModel: CreatorViewModel) {
     var deadlift1RM by remember { mutableStateOf("0") }
     var bench1RM by remember { mutableStateOf("0") }
     var squat1RM by remember { mutableStateOf("0") }
     var ohp1RM by remember { mutableStateOf("0") }
-    var trainingMaxPercentage by remember { mutableStateOf(85F) }
+    var trainingMaxPercentage by remember { mutableFloatStateOf(85F) }
 
     val smallPadding = dimensionResource(R.dimen.small_padding)
 

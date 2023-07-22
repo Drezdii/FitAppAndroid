@@ -10,6 +10,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -26,6 +28,7 @@ import com.bartoszdrozd.fitapp.model.workout.Exercise
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.model.workout.WorkoutSet
+import com.bartoszdrozd.fitapp.ui.TopAppBarState
 import com.bartoszdrozd.fitapp.ui.theme.FitAppTheme
 import com.bartoszdrozd.fitapp.utils.EventType
 import com.bartoszdrozd.fitapp.utils.programIdToNameId
@@ -52,7 +55,8 @@ fun WorkoutScreen(
     workoutViewModel: WorkoutViewModel,
     workoutId: Long,
     showSnackbar: (SnackbarMessage) -> Unit,
-    onWorkoutDeleted: () -> Unit
+    onWorkoutDeleted: () -> Unit,
+    setTopAppBarState: (TopAppBarState) -> Unit
 ) {
     val state by workoutViewModel.workoutUiState.collectAsState()
 
@@ -145,7 +149,21 @@ fun WorkoutScreen(
         if (state.workout.id == -1L) {
             return@LaunchedEffect
         }
-        workoutViewModel.updateTopAppBar(programLabel ?: genericLabel)
+
+        val newAppBarState = TopAppBarState(
+            { Text(programLabel ?: genericLabel) },
+            {
+                IconButton(onClick = { actions.deleteWorkout() }) {
+                    Icon(
+                        Icons.Outlined.DeleteForever,
+                        contentDescription = stringResource(R.string.delete_workout)
+                    )
+                }
+            },
+            showBackButton = true
+        )
+
+        setTopAppBarState(newAppBarState)
     }
 
     WorkoutView(state.workout, actions, state.isDirty)
