@@ -33,7 +33,7 @@ class Program531BBB4DaysCreator {
 
                 // Calculate the main lift for this day
                 val exercise = Exercise(0, exercises[day].mainExercise)
-                val oneRepMax = config.maxes.find { it.type == exercise.exerciseType }!!.value
+                val oneRepMax = config.maxes.find { it.exerciseType == exercise.exerciseType }!!.value
                 val sets = mutableListOf<WorkoutSet>()
 
                 percentagesPerWeek[week]!!.forEachIndexed { index, percentage ->
@@ -47,7 +47,7 @@ class Program531BBB4DaysCreator {
 
                 exercise.sets = sets
                 val bbbExerciseOneRepMax =
-                    config.maxes.find { it.type == exercises[day].secondaryExercise }!!.value
+                    config.maxes.find { it.exerciseType == exercises[day].secondaryExercise }!!.value
                 val bbbExercise = Exercise(0, exercises[day].secondaryExercise)
                 val bbbSets = mutableListOf<WorkoutSet>()
                 // TODO: Add ability to change percentages for BBB exercises

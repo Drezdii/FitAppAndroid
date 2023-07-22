@@ -21,9 +21,12 @@ import androidx.compose.ui.unit.sp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.program.ProgramType
 import com.bartoszdrozd.fitapp.model.program.ProgramValues
-import com.bartoszdrozd.fitapp.model.stats.OneRepMax
+import com.bartoszdrozd.fitapp.model.stats.PersonalBest
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.ui.creator.CreatorViewModel
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayAt
 import kotlin.math.roundToInt
 
 @Composable
@@ -101,13 +104,15 @@ fun Program531BBB4DaysScreen(creatorViewModel: CreatorViewModel) {
         }
 
         Button(onClick = {
+            val today = Clock.System.todayAt(TimeZone.currentSystemDefault())
+
             val config = ProgramValues(
                 ProgramType.BBB_531_4_Days,
                 listOf(
-                    OneRepMax(ExerciseType.Deadlift, deadlift1RM.toFloat()),
-                    OneRepMax(ExerciseType.Bench, bench1RM.toFloat()),
-                    OneRepMax(ExerciseType.Squat, squat1RM.toFloat()),
-                    OneRepMax(ExerciseType.Ohp, ohp1RM.toFloat())
+                    PersonalBest(ExerciseType.Deadlift, deadlift1RM.toFloat(), today),
+                    PersonalBest(ExerciseType.Bench, bench1RM.toFloat(), today),
+                    PersonalBest(ExerciseType.Squat, squat1RM.toFloat(), today),
+                    PersonalBest(ExerciseType.Ohp, ohp1RM.toFloat(), today)
                 ),
                 trainingMax = trainingMaxPercentage.roundToInt() / 100F
             )

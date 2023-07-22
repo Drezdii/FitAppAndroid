@@ -57,7 +57,7 @@
     <string name="minutes_abbr">m</string>
     <string name="seconds_abbr">s</string>
     <string name="planned">Planned</string>
-    <string name="challenges">Challenges</string>
+    <string name="progress">Progress</string>
     <string name="estimated_max">Est. Max %s</string>
     <string name="challenge_days_left">%dd</string>
     <string name="unlocks_in">Unlocks in %d days</string>
@@ -69,6 +69,11 @@
     <string name="generic_workout">Generic workout</string>
     <string name="num_of_planned_workouts">%d planned workouts</string>
     <string name="saving">Saving</string>
+    <string name="personal_bests">Personal bests</string>
+    <string name="no_personal_bests">No personal bests set yet.</string>
+    <string name="challenges">Challenges</string>
+    <string name="view_all">View all</string>
+    <string name="no_closest_challenges">No challenges could be found.</string>
 
     <string-array name="exercise_names">
         <item>@string/deadlift</item>

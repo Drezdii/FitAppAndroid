@@ -5,6 +5,7 @@ import com.bartoszdrozd.fitapp.data.dtos.BodyWeightEntryDTO
 import com.bartoszdrozd.fitapp.data.dtos.ChallengeDTO
 import com.bartoszdrozd.fitapp.data.dtos.ChallengeEntryDTO
 import com.bartoszdrozd.fitapp.data.dtos.ExerciseDTO
+import com.bartoszdrozd.fitapp.data.dtos.PersonalBestDTO
 import com.bartoszdrozd.fitapp.data.dtos.ProgramCycleDTO
 import com.bartoszdrozd.fitapp.data.dtos.ProgramDTO
 import com.bartoszdrozd.fitapp.data.dtos.ProgramDetailsDTO
@@ -19,6 +20,7 @@ import com.bartoszdrozd.fitapp.model.challenges.ChallengeEntry
 import com.bartoszdrozd.fitapp.model.creator.Program
 import com.bartoszdrozd.fitapp.model.creator.ProgramCycle
 import com.bartoszdrozd.fitapp.model.stats.BodyWeightEntry
+import com.bartoszdrozd.fitapp.model.stats.PersonalBest
 import com.bartoszdrozd.fitapp.model.workout.Exercise
 import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.ProgramDetails
@@ -178,3 +180,5 @@ fun ChallengeDTO.toModel(): Challenge =
 fun BodyWeightEntry.toDTO(): BodyWeightEntryDTO = BodyWeightEntryDTO(id, date, weight)
 
 fun BodyWeightEntryDTO.toModel(): BodyWeightEntry = BodyWeightEntry(id, date, weight)
+
+fun PersonalBestDTO.toModel(): PersonalBest = PersonalBest(exerciseType, value, date)

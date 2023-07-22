@@ -1,10 +1,14 @@
 package com.bartoszdrozd.fitapp.ui.challenges
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -13,7 +17,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.CornerRadius
@@ -46,14 +54,13 @@ fun ChallengesScreen(viewModel: ChallengesViewModel) {
 
 @Composable
 fun ChallengesView(challenges: List<ChallengeEntry>) {
-    LazyColumn {
+    LazyColumn(verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.small_padding))) {
         items(challenges) { entry ->
             ChallengeEntryView(entry)
         }
     }
 }
 
-@SuppressLint("DiscouragedApi")
 @Composable
 fun ChallengeEntryView(entry: ChallengeEntry) {
     val smallPadding = dimensionResource(R.dimen.small_padding)
@@ -78,7 +85,6 @@ fun ChallengeEntryView(entry: ChallengeEntry) {
     OutlinedCard(
         Modifier
             .fillMaxWidth()
-            .padding(bottom = smallPadding)
             .modifyIf(entry.completedAt != null) {
                 alpha(0.4f)
             }
