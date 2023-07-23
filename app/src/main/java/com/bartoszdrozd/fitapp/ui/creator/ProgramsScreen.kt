@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import com.bartoszdrozd.fitapp.R
 import com.bartoszdrozd.fitapp.model.SnackbarMessage
 import com.bartoszdrozd.fitapp.model.creator.Program
-import com.bartoszdrozd.fitapp.model.workout.ExerciseType
 import com.bartoszdrozd.fitapp.model.workout.Workout
 import com.bartoszdrozd.fitapp.ui.programs.Program531BBB4DaysScreen
 import com.bartoszdrozd.fitapp.utils.EventType
+import com.bartoszdrozd.fitapp.utils.exerciseTypeToIconId
 import com.bartoszdrozd.fitapp.utils.toNameResId
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -108,9 +108,12 @@ fun ProgramsScreen(
                 if (workouts.isNotEmpty()) {
                     Button(onClick = { creatorViewModel.saveWorkouts() }, enabled = !isSaving) {
                         if (isSaving) {
-                            CircularProgressIndicator(modifier = Modifier.size(ButtonDefaults.IconSize), strokeWidth = 2.dp)
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(ButtonDefaults.IconSize),
+                                strokeWidth = 2.dp
+                            )
                         } else {
-                            Text(text = stringResource(id = R.string.save))
+                            Text(text = stringResource(id = R.string.finish))
                         }
                     }
                 } else {
@@ -163,6 +166,7 @@ fun CreatorView(program: @Composable () -> Unit, workouts: Map<Int, List<Workout
 //            }
 //        }
         val coroutineScope = rememberCoroutineScope()
+
         if (workouts.isNotEmpty()) {
             Column(Modifier.fillMaxWidth()) {
                 TabRow(selectedTabIndex = pagerState.currentPage) {
@@ -254,7 +258,6 @@ fun ProgramsList(programs: List<Program>, selectedProgramId: Int, onClick: (Prog
 //    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailedWorkoutItem(workout: Workout) {
     OutlinedCard(
@@ -267,13 +270,7 @@ private fun DetailedWorkoutItem(workout: Workout) {
                 .padding(24.dp)
                 .height(IntrinsicSize.Min)
         ) {
-            val workoutTypeId = when (workout.type) {
-                ExerciseType.None -> R.drawable.ic_deadlift
-                ExerciseType.Deadlift -> R.drawable.ic_deadlift
-                ExerciseType.Bench -> R.drawable.ic_bench_press
-                ExerciseType.Squat -> R.drawable.ic_squat
-                ExerciseType.Ohp -> R.drawable.ic_ohp
-            }
+            val workoutTypeId = exerciseTypeToIconId(workout.type)
 
             Icon(
                 painter = painterResource(workoutTypeId),
